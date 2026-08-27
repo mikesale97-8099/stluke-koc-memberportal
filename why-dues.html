@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Dues — St. Luke Knights of Columbus Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1E3A8A;
+    --primary-light: #2563EB;
+    --secondary: #C5A572;
+    --secondary-light: #D4B583;
+    --accent: #B91C1C;
+    --light-bg: #F9FAFB;
+    --text-dark: #1F2937;
+    --text-medium: #6B7280;
+    --shadow: rgba(30, 58, 138, 0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { max-width:100%; overflow-x:hidden; }
+body {
+    font-family:'Lora', serif;
+    color:var(--text-dark);
+    background:var(--light-bg);
+    line-height:1.65;
+    padding-bottom:4rem;
+}
+a { color:inherit; }
+:focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
+
+/* ---------- Nav (shared with Home) ---------- */
+nav { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); }
+nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:stretch; }
+.logo-section { padding:0.7rem 1.5rem; display:flex; align-items:center; }
+.logo { font-family:'Crimson Pro', serif; color:var(--primary); line-height:1.15; text-decoration:none; }
+.logo-main { display:block; font-size:1.05rem; font-weight:700; letter-spacing:0.2px; }
+.logo-sub { display:block; font-size:0.72rem; font-weight:400; color:var(--text-medium); font-family:'Lato',sans-serif; }
+nav ul { list-style:none; display:flex; margin:0; }
+nav ul li { display:flex; align-items:center; }
+nav a.navlink {
+    font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium);
+    text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; transition:all .2s;
+}
+nav a.navlink:hover { color:var(--primary); background:rgba(30,58,138,0.05); }
+nav a.navlink.active { color:var(--primary); font-weight:700; border-bottom-color:var(--secondary); }
+nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); padding:1.1rem 1.5rem; text-decoration:none; }
+nav a.signout:hover { color:var(--accent); }
+
+/* ---------- Page ---------- */
+.hero { max-width:760px; margin:0 auto; padding:3rem 2rem 0; text-align:center; }
+.hero h1 { font-family:'Crimson Pro', serif; font-size:2.3rem; color:var(--primary); font-weight:700; }
+.hero p { font-family:'Lora',serif; font-size:1.08rem; color:var(--text-medium); margin-top:1rem; }
+
+.breakdown { max-width:900px; margin:0 auto; padding:2.5rem 2rem 0; display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem; }
+.breakdown-card { background:white; border-radius:16px; padding:1.75rem; box-shadow:0 4px 15px var(--shadow); }
+.breakdown-card .icon {
+    width:44px; height:44px; border-radius:50%; background:var(--light-bg); display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; margin-bottom:1rem;
+}
+.breakdown-card h3 { font-family:'Crimson Pro', serif; font-size:1.15rem; color:var(--primary); font-weight:700; margin-bottom:0.6rem; }
+.breakdown-card p { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); }
+
+.closing { max-width:700px; margin:2.5rem auto 0; padding:2rem 2rem; background:white; border-radius:16px; box-shadow:0 4px 15px var(--shadow); text-align:center; }
+.closing p { font-family:'Lora',serif; font-size:1.02rem; color:var(--text-dark); }
+.closing p + p { margin-top:0.9rem; }
+
+.actions { max-width:700px; margin:2rem auto 0; padding:0 2rem; display:flex; gap:0.9rem; justify-content:center; flex-wrap:wrap; }
+.btn {
+    font-family:'Lato', sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer;
+    border-radius:50px; padding:0.7rem 1.5rem; border:2px solid transparent; text-decoration:none; display:inline-block;
+}
+.btn-primary { background:var(--secondary); color:white; }
+.btn-primary:hover { background:var(--secondary-light); }
+.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
+.btn-outline:hover { background:var(--primary); color:white; }
+
+.note {
+    max-width:700px; margin:2rem auto 0; padding:1rem 1.5rem; background:#FFFBEB; border-left:3px solid #B45309;
+    border-radius:8px; font-family:'Lato',sans-serif; font-size:0.85rem; color:#8A6D2F;
+}
+
+@media (max-width:720px){
+    .breakdown { grid-template-columns:1fr; }
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    nav ul { flex-wrap:wrap; width:100%; justify-content:center; order:3; border-top:1px solid #F0F1F3; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
+    .hero { padding:2rem 1.25rem 0; }
+    .hero h1 { font-size:1.7rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <div class="logo-section">
+            <a href="home.html" class="logo">
+                <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
+                <span class="logo-sub">Member Portal · Council 14895</span>
+            </a>
+        </div>
+        <ul>
+            <li><a href="home.html" class="navlink">Home</a></li>
+            <li><a href="#" class="navlink">Membership Card</a></li>
+            <li><a href="#" class="navlink active">Why Dues?</a></li>
+            <li><a href="#" class="navlink">Connections</a></li>
+        </ul>
+        <a href="#" class="signout">Sign out</a>
+    </div>
+</nav>
+
+<div class="hero">
+    <h1>Where Your Dues Go</h1>
+    <p>Annual dues cover more than membership — they fund the council's charitable work in the parish and community, keep the hall and equipment running, and cover per-capita fees owed to the State and Supreme Councils that keep us part of the larger Knights of Columbus. Every dollar circles back into either direct charity or the infrastructure that makes our charity possible.</p>
+</div>
+
+<div class="breakdown">
+    <div class="breakdown-card">
+        <div class="icon">&#10084;</div>
+        <h3>Charitable Works</h3>
+        <p>Parish support, community outreach, and the causes our council backs each year — the reason the Knights exist in the first place.</p>
+    </div>
+    <div class="breakdown-card">
+        <div class="icon">&#127963;</div>
+        <h3>Council Operations</h3>
+        <p>Hall upkeep, supplies, communications, and the everyday costs of keeping the council running for every member, every event.</p>
+    </div>
+    <div class="breakdown-card">
+        <div class="icon">&#128279;</div>
+        <h3>Per-Capita Fees</h3>
+        <p>A portion goes to the State and Supreme Councils — what keeps St. Luke Council connected to the broader Knights of Columbus and its national programs.</p>
+    </div>
+</div>
+
+<div class="closing">
+    <p>The Knights of Columbus was founded to provide for our brothers and their families, and to serve the community around us — dues are how that mission stays funded year over year.</p>
+    <p>Dues aren't a membership fee in the ordinary sense — they're the mechanism that turns individual membership into collective charity. That's true whether you're able to attend every event or just able to contribute.</p>
+</div>
+
+<div class="actions">
+    <a href="home.html" class="btn btn-outline">Back to My Profile</a>
+</div>
+
+<div class="note">
+    Placeholder note (remove once real numbers are added): this page currently describes where dues go in general terms. Adding actual figures or percentages from the council's budget — even roughly — would make this page land with more weight than qualitative language alone.
+</div>
+
+</body>
+</html>
