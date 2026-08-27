@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Portal — St. Luke Knights of Columbus</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1E3A8A;
+    --primary-light: #2563EB;
+    --secondary: #C5A572;
+    --secondary-light: #D4B583;
+    --accent: #B91C1C;
+    --light-bg: #F9FAFB;
+    --text-dark: #1F2937;
+    --text-medium: #6B7280;
+    --shadow: rgba(30, 58, 138, 0.15);
+    --green: #15803D;
+    --green-bg: #F0FDF4;
+    --amber: #B45309;
+    --amber-bg: #FFFBEB;
+    --red-bg: #FEF2F2;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family:'Lora', serif;
+    color:var(--text-dark);
+    background:var(--light-bg);
+    min-height:100vh;
+}
+a { color:inherit; }
+:focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
+
+/* mockup-only review panel */
+.review-panel { background:#fff; border-bottom:2px dashed #9CA3AF; padding:0.9rem 1.5rem; }
+.review-panel .inner { max-width:900px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.review-panel .tag {
+    font-family:'Lato', sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    background:#374151; color:#fff; padding:0.3rem 0.6rem; border-radius:4px;
+}
+.review-panel label { font-family:'Lato', sans-serif; font-size:0.85rem; color:var(--text-medium); }
+.review-panel select { font-family:'Lato', sans-serif; font-size:0.9rem; padding:0.4rem 0.6rem; border-radius:6px; border:1.5px solid #D1D5DB; background:#fff; }
+.review-panel .note { font-family:'Lato', sans-serif; font-size:0.8rem; color:var(--text-medium); margin-left:auto; }
+
+/* header strip echoing the public site */
+.brandbar { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); padding:0.9rem 0; }
+.brandbar .inner { max-width:900px; margin:0 auto; padding:0 1.5rem; }
+.brandbar .logo { font-family:'Crimson Pro', serif; color:var(--primary); line-height:1.2; }
+.brandbar .logo-main { display:block; font-size:1.05rem; font-weight:700; }
+.brandbar .logo-sub { display:block; font-size:0.72rem; font-family:'Lato',sans-serif; color:var(--text-medium); }
+
+/* page */
+.stage { max-width:520px; margin:0 auto; padding:3.5rem 1.5rem 2rem; }
+.hero-emblem {
+    width:64px; height:64px; margin:0 auto 1.25rem; border-radius:50%;
+    background:linear-gradient(135deg, var(--primary), var(--primary-light));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Crimson Pro',serif; font-weight:700; color:white; font-size:1.6rem;
+    box-shadow:0 8px 20px var(--shadow);
+}
+.stage h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); text-align:center; font-weight:700; }
+.stage .sub { font-family:'Lato',sans-serif; font-size:0.98rem; color:var(--text-medium); text-align:center; margin-top:0.6rem; max-width:420px; margin-left:auto; margin-right:auto; }
+
+.login-card {
+    background:white; border-radius:16px; padding:2rem; box-shadow:0 4px 15px var(--shadow); margin-top:2.25rem;
+}
+.field-label { font-family:'Lato',sans-serif; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-medium); display:block; margin-bottom:0.4rem; }
+.email-input {
+    width:100%; font-family:'Lora',serif; font-size:1.05rem; padding:0.85rem 1rem; border:1.5px solid #D1D5DB; border-radius:10px;
+}
+.email-input:focus { border-color:var(--primary-light); }
+.login-hint { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); margin-top:0.5rem; }
+
+.btn-submit {
+    width:100%; margin-top:1.25rem; padding:0.9rem; border-radius:50px; border:none; cursor:pointer;
+    background:var(--secondary); color:white; font-family:'Lato',sans-serif; font-weight:700; font-size:1rem; transition:all .2s;
+}
+.btn-submit:hover { background:var(--secondary-light); }
+.btn-submit:disabled { opacity:0.6; cursor:default; }
+
+/* status states */
+.status-msg {
+    display:none; margin-top:1.1rem; padding:0.9rem 1rem; border-radius:10px; font-family:'Lato',sans-serif; font-size:0.88rem;
+}
+.status-msg.show { display:block; }
+.status-checking { background:#F3F4F6; color:var(--text-medium); }
+.status-found { background:var(--green-bg); color:#166534; }
+.status-notfound { background:var(--red-bg); color:#991B1B; }
+
+.fallback {
+    margin-top:1.75rem; padding-top:1.5rem; border-top:1px dashed #E5E7EB; text-align:center;
+}
+.fallback p { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
+.fallback a { color:var(--primary); font-weight:600; text-decoration:underline; }
+
+.council-footer {
+    text-align:center; margin-top:2.5rem; font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium);
+}
+</style>
+</head>
+<body>
+
+<!-- Live status strip -->
+<div class="review-panel">
+    <div class="inner">
+        <span class="tag">Live</span>
+        <span class="note" id="wireStatus">Checking connection to the membership sheet&hellip;</span>
+    </div>
+</div>
+
+<div class="brandbar">
+    <div class="inner">
+        <div class="logo">
+            <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
+            <span class="logo-sub">Indianapolis, Indiana · Council 14895</span>
+        </div>
+    </div>
+</div>
+
+<div class="stage">
+    <div class="hero-emblem">14895</div>
+    <h1>Member Portal</h1>
+    <p class="sub">Enter the email address on file with the council to view your profile, membership card, and dues status.</p>
+
+    <div class="login-card">
+        <label class="field-label" for="emailField">Email address</label>
+        <input class="email-input" id="emailField" type="email" placeholder="you@example.com" autocomplete="email">
+        <p class="login-hint">This should match the email a steward has on file for you.</p>
+        <button class="btn-submit" id="submitBtn" onclick="handleLogin()">Continue</button>
+
+        <div class="status-msg status-checking" id="msg-checking">Checking our records&hellip;</div>
+        <div class="status-msg status-found" id="msg-found">Found you<span id="foundName"></span> — taking you to your profile.</div>
+        <div class="status-msg status-notfound" id="msg-notfound">
+            We don't have that email on file yet. Reach out to a steward and we'll get it added — or try the email your dues notices usually arrive at.
+        </div>
+        <div class="status-msg status-notfound" id="msg-error">
+            Couldn't reach the membership sheet right now. If this keeps happening, a steward may need to check the sheet's sharing settings.
+        </div>
+    </div>
+
+    <div class="fallback">
+        <p>Not sure what email the council has for you, or don't have one on file at all?<br>
+        Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a> and a steward will help you get set up.</p>
+    </div>
+</div>
+
+<p class="council-footer">St. Luke Knights of Columbus, Council 14895</p>
+
+<script>
+const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
+const SHEET_GID = '1631184765'; // St Luke KOC Membership DB tab
+const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
+
+let SHEET_ROWS = null; // cached after first successful fetch
+
+async function fetchSheet() {
+    const res = await fetch(GVIZ_URL);
+    const text = await res.text();
+    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+    if (!match) throw new Error('Unexpected response from sheet');
+    const json = JSON.parse(match[1]);
+    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const idx = (label) => cols.indexOf(label);
+    const rows = json.table.rows.map(r => {
+        const cell = (label) => {
+            const c = r.c[idx(label)];
+            if (!c) return null;
+            return (c.v !== null && c.v !== undefined) ? c.v : c.f;
+        };
+        return {
+            memberNumber: cell('Member Number'),
+            email: cell('email'),
+            firstName: cell('First Name'),
+            lastName: cell('Last Name'),
+        };
+    });
+    return rows;
+}
+
+async function initConnection() {
+    const status = document.getElementById('wireStatus');
+    try {
+        SHEET_ROWS = await fetchSheet();
+        status.textContent = `Connected — ${SHEET_ROWS.length} records loaded from the live sheet.`;
+    } catch (e) {
+        status.textContent = 'Could not connect to the membership sheet — check sharing settings (Anyone with the link — Viewer).';
+    }
+}
+
+function titleCase(s) {
+    return (s || '').toString().replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
+}
+
+async function handleLogin() {
+    const emailInput = document.getElementById('emailField').value.trim().toLowerCase();
+    const btn = document.getElementById('submitBtn');
+    ['checking','found','notfound','error'].forEach(s => document.getElementById('msg-' + s)?.classList.remove('show'));
+    if (!emailInput) return;
+
+    btn.disabled = true;
+    document.getElementById('msg-checking').classList.add('show');
+
+    try {
+        if (!SHEET_ROWS) SHEET_ROWS = await fetchSheet();
+        const match = SHEET_ROWS.find(r => (r.email || '').toString().trim().toLowerCase() === emailInput);
+
+        document.getElementById('msg-checking').classList.remove('show');
+
+        if (match) {
+            document.getElementById('foundName').textContent = ', ' + titleCase(match.firstName);
+            document.getElementById('msg-found').classList.add('show');
+            setTimeout(() => {
+                window.location.href = 'home.html?member=' + encodeURIComponent(match.memberNumber);
+            }, 900);
+        } else {
+            document.getElementById('msg-notfound').classList.add('show');
+            btn.disabled = false;
+        }
+    } catch (e) {
+        document.getElementById('msg-checking').classList.remove('show');
+        document.getElementById('msg-error').classList.add('show');
+        btn.disabled = false;
+    }
+}
+
+document.getElementById('emailField').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLogin();
+});
+
+window.addEventListener('DOMContentLoaded', initConnection);
+</script>
+
+</body>
+</html>
