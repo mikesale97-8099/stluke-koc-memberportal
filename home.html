@@ -161,6 +161,8 @@ nav a.signout:hover { color:var(--accent); }
 .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem; margin-top:1rem; }
 .info-item .field-label { display:block; margin-bottom:0.2rem; }
 .info-item .field-value { font-weight:600; }
+.info-item .field-value.dues-current { color:var(--green); }
+.info-item .field-value.dues-owed { color:var(--accent); }
 
 /* Flag issue */
 .flag-block { margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed #E5E7EB; }
@@ -224,6 +226,8 @@ nav a.signout:hover { color:var(--accent); }
 /* quick actions */
 .quick-actions { display:flex; gap:0.75rem; margin-top:1.5rem; flex-wrap:wrap; }
 .quick-actions .btn { flex:1; text-align:center; }
+.pay-prompt { margin-top:1.5rem; }
+.btn-pay { width:100%; padding:0.85rem; font-size:0.95rem; }
 
 /* footer / request removal */
 .page-footer { max-width:1200px; margin:3rem auto 0; padding:1.5rem 2rem 0; border-top:1px solid #E5E7EB; text-align:center; }
@@ -320,6 +324,8 @@ nav a.signout:hover { color:var(--accent); }
                     <div class="info-item"><span class="field-label">Degree</span><span class="field-value" id="degreeValue">Third Degree</span></div>
                     <div class="info-item"><span class="field-label">Years of Service</span><span class="field-value" id="yosValue">14 years</span></div>
                     <div class="info-item"><span class="field-label">Council Role</span><span class="field-value" id="roleValue">Member</span></div>
+                    <div class="info-item"><span class="field-label">Dues Status</span><span class="field-value" id="duesValue">Current</span></div>
+                    <div class="info-item"><span class="field-label">Paid Through</span><span class="field-value" id="paidThroughValue">2026</span></div>
                 </div>
             </div>
 
@@ -364,9 +370,12 @@ nav a.signout:hover { color:var(--accent); }
                 <p id="statusMessage">You're all set. Thank you for staying active in council life.</p>
             </div>
 
+            <div class="pay-prompt" id="payPrompt" style="display:none;">
+                <button class="btn btn-primary btn-pay" id="payDuesBtn" onclick="alert('This connects to Square once dues payment is wired up.')">Pay Dues</button>
+            </div>
+
             <div class="quick-actions">
-                <button class="btn btn-primary">Pay Dues</button>
-                <button class="btn btn-outline">View Connections</button>
+                <button class="btn btn-outline" style="flex:1;">View Connections</button>
             </div>
         </div>
     </div>
@@ -505,6 +514,42 @@ function applyMember(indexOrMember) {
     document.getElementById('yosValue').textContent = (m.yrsSvc !== null ? m.yrsSvc : '?') + ' years';
     document.getElementById('roleValue').textContent = m.clergy ? 'Clergy' : 'Member';
 
+    const duesEl = document.getElementById('duesValue');
+    const payPrompt = document.getElementById('payPrompt');
+    const payBtn = document.getElementById('payDuesBtn');
+    duesEl.classList.remove('dues-current', 'dues-owed');
+    payPrompt.style.display = 'none';
+    if (m.clergy) {
+        duesEl.textContent = 'Exempt';
+        duesEl.classList.add('dues-current');
+    } else {
+        const owedRaw = (m.outstandingDues === null || m.outstandingDues === undefined) ? '' : String(m.outstandingDues);
+        const owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
+        if (!isNaN(owed) && owed > 0) {
+            duesEl.textContent = '$' + owed.toFixed(2) + ' owed';
+            duesEl.classList.add('dues-owed');
+            payBtn.textContent = 'Pay $' + owed.toFixed(2) + ' Now';
+            payPrompt.style.display = 'block';
+        } else if (m.duesBucket === 'neverPaid' || m.duesBucket === 'noRecord') {
+            duesEl.textContent = 'No payment on record';
+            duesEl.classList.add('dues-owed');
+            payBtn.textContent = 'Pay Dues';
+            payPrompt.style.display = 'block';
+        } else {
+            duesEl.textContent = 'Current';
+            duesEl.classList.add('dues-current');
+        }
+    }
+
+    const paidThroughEl = document.getElementById('paidThroughValue');
+    if (m.clergy) {
+        paidThroughEl.textContent = '—';
+    } else if (typeof m.lastYrPaid === 'number') {
+        paidThroughEl.textContent = m.lastYrPaid;
+    } else {
+        paidThroughEl.textContent = 'None on file';
+    }
+
     // card visual
     const cardVisual = document.getElementById('cardVisual');
     const ribbon = document.getElementById('cardRibbon');
@@ -628,6 +673,7 @@ async function fetchLiveMember(memberNumber) {
     const degreeRaw = (cell(row, 'Degree Level') || '').toString().trim();
     const lastYrPaidRaw = cell(row, 'Last Yr Paid');
     const lastYrPaid = (typeof lastYrPaidRaw === 'number') ? lastYrPaidRaw : (parseInt(lastYrPaidRaw) || null);
+    const outstandingDuesRaw = cell(row, 'Outstanding Dues');
 
     return {
         memberNumber: cell(row, 'Member Number'),
@@ -646,6 +692,7 @@ async function fetchLiveMember(memberNumber) {
         phone: cell(row, 'phone'),
         lastVerified: cell(row, 'Member Last Verify Date'),
         lastYrPaid: lastYrPaid,
+        outstandingDues: outstandingDuesRaw,
     };
 }
 
