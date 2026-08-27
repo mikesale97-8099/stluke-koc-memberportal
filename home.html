@@ -23,6 +23,7 @@
     --amber-bg: #FFFBEB;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
+html, body { max-width:100%; overflow-x:hidden; }
 body {
     font-family:'Lora', serif;
     color:var(--text-dark);
@@ -32,6 +33,7 @@ body {
 }
 a { color:inherit; }
 :focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
+.field-value, .card-name, .card-meta strong { overflow-wrap:break-word; word-break:break-word; }
 
 /* ---------- Mockup-only review panel ---------- */
 .review-panel {
@@ -106,7 +108,7 @@ nav a.signout:hover { color:var(--accent); }
 
     .review-panel { padding:0.7rem 1rem; }
     .review-panel .inner { gap:0.5rem; }
-    .review-panel select { max-width:100%; flex:1; min-width:0; }
+    .review-panel select { max-width:100%; width:100%; flex:1 1 100%; min-width:0; }
     .review-panel .note { margin-left:0; width:100%; }
 
     .welcome { padding:1.25rem 1rem 0; }
