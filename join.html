@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Us - St. Luke Knights of Columbus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .hero-join {
+            background: linear-gradient(135deg, var(--primary) 0%, #1E40AF 100%);
+            color: white;
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .hero-join h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-join p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.95;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .benefit-card .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-card h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .benefit-card p {
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+
+        .requirements-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .requirements-box h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .requirements-box ul {
+            font-size: 1.15rem;
+            line-height: 2;
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .requirements-box ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .process-steps {
+            display: grid;
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .step-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow);
+            display: flex;
+            align-items: start;
+            gap: 1.5rem;
+        }
+
+        .step-number {
+            background: var(--secondary);
+            color: var(--text-dark);
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-content p {
+            color: var(--text-medium);
+            line-height: 1.7;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, var(--accent), #D85A3C);
+            color: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-box h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-box p {
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo-section">
+                <a href="index.html" class="logo">
+                    <span class="logo-main">ST. LUKE THE EVANGELIST</span>
+                    <span class="logo-main">KNIGHTS OF COLUMBUS</span>
+                    <span class="logo-sub">Indianapolis, Indiana • Council 14895</span>
+                </a>
+            </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="volunteer.html">Volunteer</a></li>
+                <li><a href="join.html" class="active">Join Us</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+                    <button class="mobile-menu-toggle" id="mobileMenuBtn">☰</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-join">
+        <div class="container">
+            <h2>Join Our Brotherhood</h2>
+            <p>Become part of a worldwide community of 1.9 million Catholic men dedicated to service, faith, and fellowship</p>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">🙏</div>
+                    <h3>Grow in Faith</h3>
+                    <p>Deepen your relationship with Christ through prayer, spiritual development, and living out your Catholic faith in action</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">❤️</div>
+                    <h3>Serve Others</h3>
+                    <p>Make a real, tangible impact in your community through charitable works and support for those in need</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">🤝</div>
+                    <h3>Build Brotherhood</h3>
+                    <p>Form lasting friendships with fellow Catholic men who share your values and commitment to service</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">👨‍👩‍👧‍👦</div>
+                    <h3>Support Your Family</h3>
+                    <p>Access comprehensive life insurance, annuity, and long-term care programs through the Knights of Columbus</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Membership Requirements -->
+    <section style="padding-top: 1.5rem;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Who Can Join?</h2>
+                <p>Basic requirements for membership</p>
+            </div>
+            <div class="requirements-box">
+                <h3>✓ Membership Requirements</h3>
+                <p style="text-align: center; font-size: 1.1rem; color: var(--text-medium); margin-bottom: 1.5rem;">
+                    The Knights of Columbus is open to men who meet the following criteria:
+                </p>
+                <ul>
+                    <li><strong>Catholic in good standing</strong> - A practicing Catholic who attends Mass regularly and receives the sacraments</li>
+                    <li><strong>At least 18 years of age</strong> - There are no upper age limits</li>
+                    <li><strong>Family-oriented</strong> - Whether married or single, committed to supporting Catholic family values</li>
+                    <li><strong>Willing to serve</strong> - Ready to contribute time and talent to charitable works in your community</li>
+                </ul>
+                <p style="text-align: center; font-size: 1.05rem; color: var(--text-medium); margin-top: 2rem; font-style: italic;">
+                    That's it! If you meet these basic requirements and want to grow in faith while serving others, we'd love to have you join our council.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Join -->
+    <section style="background: var(--cream);">
+        <div class="container">
+            <div class="section-header">
+                <h2>How to Join</h2>
+                <p>The path to becoming a Knight is simple</p>
+            </div>
+            <div class="process-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Reach Out to Us</h4>
+                        <p>Send us an email at <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1774786279747e7b26232f2e2257707a767e7b3974787a">[email&#160;protected]</a></strong> expressing your interest in joining. You can also attend one of our monthly meetings (First Thursday at 7:00 PM) or talk to any Knight after Mass.</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Meet with a Knight</h4>
+                        <p>One of our members will reach out to answer your questions, explain what membership involves, and help you complete a simple membership application. There's no pressure—just a friendly conversation about the Knights.</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Attend Your First Degree Ceremony</h4>
+                        <p>The First Degree ceremony is a meaningful ritual that formally welcomes you into the Order. It's a spiritual experience that emphasizes our commitment to charity and explains the principles we hold dear. Family members are often invited to attend part of the ceremony.</p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Get Involved</h4>
+                        <p>Start participating in council activities at your own pace. Attend meetings, volunteer at events, and get to know your brother Knights. You'll quickly discover opportunities to serve that match your interests and availability.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What to Expect -->
+    <section>
+        <div class="container">
+            <div class="section-header">
+                <h2>What to Expect as a Member</h2>
+                <p>Life as a Knight of Columbus</p>
+            </div>
+            <div style="max-width: 900px; margin: 0 auto;">
+                <div style="display: grid; gap: 2rem;">
+                    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow);">
+                        <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.5rem; color: var(--primary); margin-bottom: 1rem;">📅 Monthly Meetings</h4>
+                        <p style="color: var(--text-medium); line-height: 1.8;">We meet on the first Thursday of each month at 7:00 PM in the Blessed Fr. Michael McGivney Room. Meetings include council business, updates on charitable activities, and plenty of fellowship. Most meetings last about 90 minutes.</p>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow);">
+                        <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.5rem; color: var(--primary); margin-bottom: 1rem;">🎯 Service Opportunities</h4>
+                        <p style="color: var(--text-medium); line-height: 1.8;">From fish fries to food drives, blood donations to youth sports events, there are dozens of ways to serve throughout the year. Participate in what interests you and fits your schedule—there's no obligation to do everything.</p>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow);">
+                        <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.5rem; color: var(--primary); margin-bottom: 1rem;">🤝 Brotherhood & Fellowship</h4>
+                        <p style="color: var(--text-medium); line-height: 1.8;">Beyond formal events, you'll build genuine friendships with men who share your faith and values. Many councils organize social events, family activities, and informal gatherings. The bonds formed in the Knights often last a lifetime.</p>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow);">
+                        <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.5rem; color: var(--primary); margin-bottom: 1rem;">🏆 Opportunities to Lead</h4>
+                        <p style="color: var(--text-medium); line-height: 1.8;">As you become more involved, you may be asked to take on leadership roles—organizing events, serving as an officer, or mentoring new members. These opportunities help you grow personally while serving the council's mission.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section style="background: var(--cream);">
+        <div class="container">
+            <div class="cta-box">
+                <h3>Ready to Take the Next Step?</h3>
+                <p>Join hundreds of thousands of Catholic men who have found deeper faith, lasting friendships, and meaningful service through the Knights of Columbus. Your journey starts with a simple email or conversation.</p>
+                <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="/cdn-cgi/l/email-protection#c1a2aeb4afa2a8adf0f5f9f8f481a6aca0a8adefa2aeacfeb2b4a3aba4a2b5fc8ca4aca3a4b3b2a9a8b1e188afb0b4a8b3b8" class="btn btn-primary">Email Us About Joining</a>
+                    <a href="contact.html" class="btn btn-secondary">Learn More First</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQs -->
+    <section>
+        <div class="container">
+            <div class="section-header">
+                <h2>Common Questions</h2>
+                <p>Answers to what prospective members often ask</p>
+            </div>
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow); margin-bottom: 1.5rem;">
+                    <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.3rem; color: var(--primary); margin-bottom: 0.8rem;">How much time is required?</h4>
+                    <p style="color: var(--text-medium); line-height: 1.7;">As much or as little as you can give! Some Knights attend monthly meetings and help at a few events per year. Others are involved weekly. You choose your level of involvement based on your schedule and interests.</p>
+                </div>
+
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow); margin-bottom: 1.5rem;">
+                    <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.3rem; color: var(--primary); margin-bottom: 0.8rem;">Are there membership dues?</h4>
+                    <p style="color: var(--text-medium); line-height: 1.7;">Yes, there are modest annual dues that help cover council operating expenses. Contact us for current rates. Dues help fund our charitable work and keep the council running.</p>
+                </div>
+
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow); margin-bottom: 1.5rem;">
+                    <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.3rem; color: var(--primary); margin-bottom: 0.8rem;">Can my family be involved?</h4>
+                    <p style="color: var(--text-medium); line-height: 1.7;">Absolutely! While the Knights is a men's organization, many of our events are family-friendly and we actively encourage family participation. Wives and children are welcome at many activities throughout the year.</p>
+                </div>
+
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow);">
+                    <h4 style="font-family: 'Crimson Pro', serif; font-size: 1.3rem; color: var(--primary); margin-bottom: 0.8rem;">What if I'm new to the parish?</h4>
+                    <p style="color: var(--text-medium); line-height: 1.7;">Perfect! Joining the Knights is a wonderful way to get connected at St. Luke. You'll quickly meet other men in the parish and find your place in the community. We welcome new parishioners warmly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7b4b8a2b9b4bebbe6e3efeee297b0bab6bebbf9b4b8ba">[email&#160;protected]</a></li>
+                    <li>📍 7575 Holliday Drive East</li>
+                    <li>St. Luke Catholic Church</li>
+                    <li>Indianapolis, IN</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Knights of Columbus</h3>
+                <ul>
+                    <li><a href="http://www.kofc.org/" target="_blank">Supreme Council</a></li>
+                    <li><a href="http://www.indianakofc.org/" target="_blank">Indiana State Council</a></li>
+                    <li><a href="http://www.stluke.org/" target="_blank">St. Luke Parish</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 St. Luke Knights of Columbus Council #14895. All rights reserved. | <a href="sitemap.html" style="color: var(--secondary);">Site Map</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var btn = document.getElementById("mobileMenuBtn");
+            var menu = document.querySelector("nav ul");
+            if (btn && menu) {
+                btn.addEventListener("click", function() {
+                    menu.classList.toggle("mobile-open");
+                    btn.textContent = menu.classList.contains("mobile-open") ? "✕" : "☰";
+                });
+            }
+        });
+    </script>
+</body>
+</html>

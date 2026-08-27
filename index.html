@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>St. Luke Knights of Columbus - Council #14895</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .hero {
+            background: linear-gradient(rgba(30, 58, 138, 0.9), rgba(30, 64, 175, 0.95)),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%231E3A8A" width="1200" height="600"/></svg>');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 8rem 2rem 6rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: var(--light-bg);
+            clip-path: polygon(0 50%, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .hero h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        .hero .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s backwards;
+        }
+
+        .principles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .principle-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px var(--shadow);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .principle-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .principle-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .principle-card h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 3rem auto 0;
+        }
+
+        .highlight-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px var(--shadow);
+            border-top: 4px solid var(--accent);
+        }
+
+        .highlight-card h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .highlight-card p {
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .highlight-card a {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .highlight-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo-section">
+                <a href="index.html" class="logo">
+                    <span class="logo-main">ST. LUKE THE EVANGELIST</span>
+                    <span class="logo-main">KNIGHTS OF COLUMBUS</span>
+                    <span class="logo-sub">Indianapolis, Indiana • Council 14895</span>
+                </a>
+            </div>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="volunteer.html">Volunteer</a></li>
+                <li><a href="join.html">Join Us</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+                    <button class="mobile-menu-toggle" id="mobileMenuBtn">☰</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Council #14895 - Indianapolis</h1>
+        <p>St. Luke the Evangelist Catholic Church</p>
+        <div class="cta-buttons">
+            <a href="join.html" class="btn btn-primary">Become a Member</a>
+            <a href="events.html" class="btn btn-secondary">Upcoming Events</a>
+        </div>
+    </section>
+
+    <!-- Principles Section -->
+    <section>
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Four Principles</h2>
+                <p>The foundation of everything we do</p>
+            </div>
+            <div class="principles-grid">
+                <div class="principle-card">
+                    <div class="principle-icon">❤️</div>
+                    <h3>Charity</h3>
+                    <p>Serving those in need through our community outreach programs and charitable giving</p>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🤝</div>
+                    <h3>Unity</h3>
+                    <p>Building brotherhood and fellowship among Catholic men in our community</p>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🙏</div>
+                    <h3>Fraternity</h3>
+                    <p>Supporting each other in faith, family life, and personal growth</p>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🇺🇸</div>
+                    <h3>Patriotism</h3>
+                    <p>Honoring our country and serving our communities with pride</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Highlights Section -->
+    <section style="background: var(--cream);">
+        <div class="container">
+            <div class="section-header">
+                <h2>What We Do</h2>
+                <p>Making a difference in our community</p>
+            </div>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <h3>🍽️ Community Events</h3>
+                    <p>Our famous fish fries, pancake breakfasts, and Fall Festival food booth bring the community together while raising funds for charitable causes.</p>
+                    <a href="events.html">See Upcoming Events →</a>
+                </div>
+                <div class="highlight-card">
+                    <h3>🧥 Coats for Kids</h3>
+                    <p>Every year we provide warm winter coats to students at Holy Angels School, ensuring no child goes cold during Indiana winters.</p>
+                    <a href="volunteer.html">Get Involved →</a>
+                </div>
+                <div class="highlight-card">
+                    <h3>🏅 Special Olympics</h3>
+                    <p>We're proud supporters of Indiana Special Olympics, providing both financial support and volunteers for competitions.</p>
+                    <a href="about.html#causes">Learn More →</a>
+                </div>
+                <div class="highlight-card">
+                    <h3>🙏 Pro-Life Ministry</h3>
+                    <p>Through 40 Days for Life vigils, 40 Cans for Lent, and support for pregnancy centers, we stand for the dignity of all human life.</p>
+                    <a href="volunteer.html">Join Our Ministry →</a>
+                </div>
+                <div class="highlight-card">
+                    <h3>👨‍👩‍👧 Family Activities</h3>
+                    <p>From bike rodeos to youth sports competitions, we create opportunities for families to grow together in faith and fun.</p>
+                    <a href="events.html">View Calendar →</a>
+                </div>
+                <div class="highlight-card">
+                    <h3>🩸 Blood Drives</h3>
+                    <p>Regular blood drives with Indiana Blood Bank help save lives in our community throughout the year.</p>
+                    <a href="volunteer.html">Sign Up →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section>
+        <div class="container" style="text-align: center; max-width: 800px; margin: 0 auto;">
+            <h2 style="font-family: 'Crimson Pro', serif; font-size: 2.5rem; color: var(--primary); margin-bottom: 1.5rem;">Ready to Join Our Brotherhood?</h2>
+            <p style="font-size: 1.2rem; color: var(--text-medium); margin-bottom: 2rem; line-height: 1.8;">
+                We invite practicing Catholic men, 18 years of age and older, to join us. Together, we pray, serve, and grow in faith while making a real difference in our community.
+            </p>
+            <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                <a href="join.html" class="btn btn-primary">Learn About Membership</a>
+                <a href="contact.html" class="btn" style="background: var(--primary); color: white;">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a3c0ccd6cdc0cacf92979b9a96e3c4cec2cacf8dc0ccce">[email&#160;protected]</a></li>
+                    <li>📍 7575 Holliday Drive East</li>
+                    <li>St. Luke Catholic Church</li>
+                    <li>Indianapolis, IN</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Knights of Columbus</h3>
+                <ul>
+                    <li><a href="http://www.kofc.org/" target="_blank">Supreme Council</a></li>
+                    <li><a href="http://www.indianakofc.org/" target="_blank">Indiana State Council</a></li>
+                    <li><a href="http://www.stluke.org/" target="_blank">St. Luke Parish</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 St. Luke Knights of Columbus Council #14895. All rights reserved. | <a href="sitemap.html" style="color: var(--secondary);">Site Map</a></p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('mobileMenuBtn');
+            var menu = document.querySelector('nav ul');
+            if (btn && menu) {
+                btn.addEventListener('click', function() {
+                    menu.classList.toggle('mobile-open');
+                    btn.textContent = menu.classList.contains('mobile-open') ? '✕' : '☰';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

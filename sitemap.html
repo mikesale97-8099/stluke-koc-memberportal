@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Map - St. Luke Knights of Columbus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .sitemap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .sitemap-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .sitemap-section:hover {
+            transform: translateY(-4px);
+        }
+
+        .sitemap-section-header {
+            background: var(--primary);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .sitemap-section-header h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            color: white;
+            margin: 0;
+        }
+
+        .sitemap-section-header a {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sitemap-section-header a:hover {
+            color: var(--secondary);
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+        }
+
+        .sitemap-links {
+            padding: 1.2rem 1.5rem;
+            list-style: none;
+        }
+
+        .sitemap-links li {
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .sitemap-links li:last-child {
+            border-bottom: none;
+        }
+
+        .sitemap-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.7rem 0;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .sitemap-links a:hover {
+            color: var(--primary);
+            padding-left: 0.5rem;
+        }
+
+        .sitemap-links a::before {
+            content: '→';
+            color: var(--secondary);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .sitemap-intro {
+            text-align: center;
+            max-width: 700px;
+            margin: 3rem auto 0;
+            padding: 0 2rem;
+        }
+
+        .sitemap-intro h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .sitemap-intro p {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+        }
+
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--secondary);
+            margin: 1rem auto;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .sitemap-intro h1 {
+                font-size: 1.8rem;
+            }
+
+            .sitemap-grid {
+                grid-template-columns: 1fr;
+                padding: 1.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="logo-section">
+                <a href="index.html" class="logo">
+                    <span class="logo-main">ST. LUKE THE EVANGELIST</span>
+                    <span class="logo-main">KNIGHTS OF COLUMBUS</span>
+                    <span class="logo-sub">Indianapolis, Indiana • Council 14895</span>
+                </a>
+            </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="volunteer.html">Volunteer</a></li>
+                <li><a href="join.html">Join Us</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" id="mobileMenuBtn">☰</button>
+        </div>
+    </nav>
+
+    <!-- Intro -->
+    <div class="sitemap-intro">
+        <h1>Site Map</h1>
+        <div class="divider"></div>
+        <p>Everything on our website, at a glance. Click any link to go directly there.</p>
+    </div>
+
+    <!-- Site Map Grid -->
+    <div class="sitemap-grid">
+
+        <!-- Home -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">🏠</span>
+                <a href="index.html">Home</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="index.html#principles">Our 4 Principles</a></li>
+                <li><a href="index.html#what-we-do">What We Do</a></li>
+                <li><a href="join.html">Become a Member</a></li>
+            </ul>
+        </div>
+
+        <!-- About Us -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">✟</span>
+                <a href="about.html">About Us</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="about.html">Our History</a></li>
+                <li><a href="about.html">Our Causes</a></li>
+                <li><a href="about.html">Organizations We Support</a></li>
+            </ul>
+        </div>
+
+        <!-- Events -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">📅</span>
+                <a href="events.html">Events</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="events.html">Regular Council Meetings</a></li>
+                <li><a href="events.html">January - Basketball Free Throw</a></li>
+                <li><a href="events.html">February - Fish Fry 🔥, Baby Bottle Drive</a></li>
+                <li><a href="events.html">March - Fish Fry 🔥</a></li>
+                <li><a href="events.html">April - Pancake Breakfast</a></li>
+                <li><a href="events.html">May - Special Olympics</a></li>
+                <li><a href="events.html">June - Bocce League</a></li>
+                <li><a href="events.html">July - Hot Dog Night</a></li>
+                <li><a href="events.html">August - Bocce Championship</a></li>
+                <li><a href="events.html">September - Fall Festival, Soccer</a></li>
+                <li><a href="events.html">October - Coats for Kids</a></li>
+                <li><a href="events.html">November - Blood Drive</a></li>
+                <li><a href="events.html">December - K of C Mass</a></li>
+            </ul>
+        </div>
+
+        <!-- Volunteer -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">🤝</span>
+                <a href="volunteer.html">Volunteer</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="volunteer.html">✟ Faith - K of C Mass</a></li>
+                <li><a href="volunteer.html">✟ Faith - Special Needs Mass</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Fall Festival</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Pancake Breakfast</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Fish Fry 🔥</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - MVPS Dinner</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Mary's Way</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Soccer Challenge</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Basketball Free Throw</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Bocce Championship</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - Hot Dog Night</a></li>
+                <li><a href="volunteer.html">👨‍👩‍👧‍👦 Family - School Open House</a></li>
+                <li><a href="volunteer.html">🤝 Community - Blood Drive</a></li>
+                <li><a href="volunteer.html">🤝 Community - Coats for Kids</a></li>
+                <li><a href="volunteer.html">🤝 Community - 40 Cans for Lent</a></li>
+                <li><a href="volunteer.html">❤️ Life - 40 Days for Life</a></li>
+                <li><a href="volunteer.html">❤️ Life - Baby Bottle Drive</a></li>
+            </ul>
+        </div>
+
+        <!-- Join Us -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">⚔️</span>
+                <a href="join.html">Join Us</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="join.html">Why Join the Knights?</a></li>
+                <li><a href="join.html">Membership Requirements</a></li>
+                <li><a href="join.html">How to Join</a></li>
+                <li><a href="join.html">Contact Us to Join</a></li>
+            </ul>
+        </div>
+
+        <!-- Members -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">🛡️</span>
+                <a href="members.html">Members</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="members.html">Check Membership Status</a></li>
+                <li><a href="members.html">Pay Dues Online</a></li>
+                <li><a href="members.html">Make a Donation</a></li>
+                <li><a href="members.html">Council Officers</a></li>
+                <li><a href="members.html">Insurance & Retirement</a></li>
+                <li><a href="members.html">Charitable Support Request</a></li>
+                <li><a href="members.html">Catholic Movie Reviews</a></li>
+                <li><a href="members.html">Supreme Council</a></li>
+                <li><a href="members.html">Indiana State Council</a></li>
+            </ul>
+        </div>
+
+        <!-- Contact -->
+        <div class="sitemap-section">
+            <div class="sitemap-section-header">
+                <span class="section-icon">✉️</span>
+                <a href="contact.html">Contact</a>
+            </div>
+            <ul class="sitemap-links">
+                <li><a href="contact.html">Email the Council</a></li>
+                <li><a href="contact.html">Our Location</a></li>
+                <li><a href="contact.html">Make a Donation</a></li>
+                <li><a href="join.html">Join the Knights</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3d0dcc6ddd0dadf82878b8a86f3d4ded2dadf9dd0dcde">[email&#160;protected]</a></li>
+                    <li>📍 7575 Holliday Drive East</li>
+                    <li>St. Luke Catholic Church</li>
+                    <li>Indianapolis, IN</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Knights of Columbus</h3>
+                <ul>
+                    <li><a href="http://www.kofc.org/" target="_blank">Supreme Council</a></li>
+                    <li><a href="http://www.indianakofc.org/" target="_blank">Indiana State Council</a></li>
+                    <li><a href="http://www.stluke.org/" target="_blank">St. Luke Parish</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 St. Luke Knights of Columbus Council #14895. All rights reserved. | <a href="sitemap.html" style="color: var(--secondary);">Site Map</a></p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('mobileMenuBtn');
+            var menu = document.querySelector('nav ul');
+            if (btn && menu) {
+                btn.addEventListener('click', function
