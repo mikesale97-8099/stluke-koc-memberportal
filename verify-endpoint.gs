@@ -1,0 +1,59 @@
+/**
+ * Deploy this as a Web App (Extensions > Apps Script, from inside the
+ * St Luke KOC Membership DB spreadsheet).
+ *
+ * Deploy > New deployment > Type: Web app
+ *   Execute as: Me
+ *   Who has access: Anyone
+ * Then copy the Web App URL it gives you and paste it into
+ * VERIFY_ENDPOINT_URL near the top of home.html's <script> block.
+ */
+
+function doPost(e) {
+  const SHEET_NAME = 'St Luke KOC Membership DB';
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+
+  const memberNumberCol = headers.indexOf('Member Number');
+  const lastVerifyCol = headers.indexOf('Member Last Verify Date');
+  const lastChangeDateCol = headers.indexOf('Last Change Date');
+  const lastChangeNameCol = headers.indexOf('Last Change Name');
+
+  if ([memberNumberCol, lastVerifyCol, lastChangeDateCol, lastChangeNameCol].includes(-1)) {
+    return jsonResponse({ success: false, error: 'One or more expected columns not found' });
+  }
+
+  let params;
+  try {
+    params = JSON.parse(e.postData.contents);
+  } catch (err) {
+    return jsonResponse({ success: false, error: 'Invalid request body' });
+  }
+
+  const memberNumber = String(params.memberNumber || '').replace(/^0+/, '');
+  const confirmerName = String(params.confirmerName || '').trim();
+
+  if (!memberNumber || !confirmerName) {
+    return jsonResponse({ success: false, error: 'Missing memberNumber or confirmerName' });
+  }
+
+  for (let i = 1; i < data.length; i++) {
+    const rowMemberNumber = String(data[i][memberNumberCol]).replace(/^0+/, '');
+    if (rowMemberNumber === memberNumber) {
+      const rowNum = i + 1; // 1-indexed, +1 for header row already accounted in loop start
+      const today = new Date();
+      sheet.getRange(rowNum, lastVerifyCol + 1).setValue(today);
+      sheet.getRange(rowNum, lastChangeDateCol + 1).setValue(today);
+      sheet.getRange(rowNum, lastChangeNameCol + 1).setValue(confirmerName);
+      return jsonResponse({ success: true, verifiedDate: today.toISOString() });
+    }
+  }
+
+  return jsonResponse({ success: false, error: 'Member not found' });
+}
+
+function jsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}

@@ -85,10 +85,12 @@ nav a.signout:hover { color:var(--accent); }
 .welcome { max-width:1200px; margin:0 auto; padding:2rem 2rem 0; }
 .welcome h1 { font-family:'Crimson Pro', serif; font-size:2.1rem; color:var(--primary); font-weight:700; }
 .welcome .verified { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-top:0.4rem; }
-.welcome .verified button {
-    font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--primary); background:none; border:none;
-    text-decoration:underline; cursor:pointer; padding:0;
-}
+.confirm-row { margin-top:0.75rem; display:flex; align-items:center; gap:0.9rem; flex-wrap:wrap; }
+.btn-confirm { padding:0.5rem 1.1rem; font-size:0.82rem; }
+.btn-confirm:disabled { opacity:0.55; cursor:default; }
+.confirm-status { font-family:'Lato',sans-serif; font-size:0.82rem; color:var(--text-medium); }
+.confirm-status.ok { color:var(--green); font-weight:600; }
+.confirm-status.err { color:var(--accent); font-weight:600; }
 
 /* ---------- Layout ---------- */
 .layout {
@@ -276,8 +278,8 @@ nav a.signout:hover { color:var(--accent); }
         </div>
         <ul>
             <li><a href="#" class="navlink active">Home</a></li>
-            <li><a href="membership-card.html" class="navlink">Membership Card</a></li>
-            <li><a href="why-dues.html" class="navlink">Why Dues?</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
+            <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="#" class="navlink">Connections</a></li>
         </ul>
         <a href="#" class="signout">Sign out</a>
@@ -286,7 +288,11 @@ nav a.signout:hover { color:var(--accent); }
 
 <div class="welcome">
     <h1 id="welcomeName">Welcome back, Daniel</h1>
-    <p class="verified"><span id="verifiedText">Last verified March 3, 2026</span> &nbsp;·&nbsp; <button type="button">Looks wrong? Verify my info now</button></p>
+    <p class="verified"><span id="verifiedText">Last verified March 3, 2026</span></p>
+    <div class="confirm-row">
+        <button type="button" class="btn btn-outline btn-confirm" id="confirmBtn" onclick="confirmInfo()">&#10003; Confirm my info is correct</button>
+        <span class="confirm-status" id="confirmStatus"></span>
+    </div>
 </div>
 
 <div class="layout">
@@ -489,8 +495,11 @@ function setText(id, text, emptyClass) {
     if (emptyClass) el.classList.toggle('empty', !text || text.startsWith('Not on file'));
 }
 
+let CURRENT_MEMBER = null;
+
 function applyMember(indexOrMember) {
     const m = (indexOrMember !== null && typeof indexOrMember === 'object') ? indexOrMember : MEMBERS[indexOrMember];
+    CURRENT_MEMBER = m;
     const cfg = states[m.state];
     const name = fullName(m);
 
@@ -587,6 +596,56 @@ function applyMember(indexOrMember) {
     document.getElementById('editToggleBtn').style.display = 'inline-block';
     document.getElementById('flagForm').classList.remove('open');
     document.getElementById('flagConfirm').classList.remove('open');
+
+    const confirmBtn = document.getElementById('confirmBtn');
+    const confirmStatus = document.getElementById('confirmStatus');
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = '\u2713 Confirm my info is correct';
+    confirmStatus.textContent = '';
+    confirmStatus.className = 'confirm-status';
+}
+
+async function confirmInfo() {
+    const btn = document.getElementById('confirmBtn');
+    const status = document.getElementById('confirmStatus');
+    if (!CURRENT_MEMBER) return;
+
+    if (!VERIFY_ENDPOINT_URL || VERIFY_ENDPOINT_URL.includes('PASTE_YOUR')) {
+        status.textContent = 'Not wired yet \u2014 deploy verify-endpoint.gs and paste its URL into VERIFY_ENDPOINT_URL.';
+        status.className = 'confirm-status err';
+        return;
+    }
+
+    btn.disabled = true;
+    status.textContent = 'Saving\u2026';
+    status.className = 'confirm-status';
+
+    try {
+        const res = await fetch(VERIFY_ENDPOINT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight against Apps Script
+            body: JSON.stringify({
+                memberNumber: CURRENT_MEMBER.memberNumber,
+                confirmerName: fullName(CURRENT_MEMBER),
+            }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+            document.getElementById('verifiedText').textContent = 'Last verified ' + today;
+            status.textContent = 'Thanks \u2014 saved to your record.';
+            status.className = 'confirm-status ok';
+            btn.textContent = '\u2713 Confirmed';
+        } else {
+            status.textContent = data.error || 'Could not save \u2014 try again.';
+            status.className = 'confirm-status err';
+            btn.disabled = false;
+        }
+    } catch (e) {
+        status.textContent = 'Could not reach the verification endpoint.';
+        status.className = 'confirm-status err';
+        btn.disabled = false;
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -597,6 +656,10 @@ window.addEventListener('DOMContentLoaded', () => {
 /* ---- Live wiring: pull the actual logged-in member from the sheet ---- */
 const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
 const SHEET_GID = '1292747386'; // St Luke KOC Membership DB tab
+
+// Paste your deployed Apps Script Web App URL here (see verify-endpoint.gs) to make
+// the "Confirm my info is correct" button actually write to the sheet.
+const VERIFY_ENDPOINT_URL = 'PASTE_YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE';
 const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 
 const DEGREE_MAP = {'1st':'First Degree','2nd':'Second Degree','3rd':'Third Degree'};
@@ -735,6 +798,17 @@ function submitFlag() {
 }
 function openRemoveModal() { document.getElementById('removeModal').classList.add('open'); }
 function closeRemoveModal() { document.getElementById('removeModal').classList.remove('open'); }
+
+/* Carry the logged-in member across pages via preserve-member links */
+(function () {
+    const memberParam = new URLSearchParams(window.location.search).get("member");
+    if (!memberParam) return;
+    document.querySelectorAll("a.preserve-member").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.href);
+        url.searchParams.set("member", memberParam);
+        a.setAttribute("href", url.pathname + url.search);
+    });
+})();
 </script>
 
 </body>

@@ -96,14 +96,14 @@ nav a.signout:hover { color:var(--accent); }
 <nav>
     <div class="container">
         <div class="logo-section">
-            <a href="home.html" class="logo">
+            <a href="home.html" class="logo preserve-member">
                 <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
                 <span class="logo-sub">Member Portal · Council 14895</span>
             </a>
         </div>
         <ul>
-            <li><a href="home.html" class="navlink">Home</a></li>
-            <li><a href="membership-card.html" class="navlink">Membership Card</a></li>
+            <li><a href="home.html" class="navlink preserve-member">Home</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
             <li><a href="#" class="navlink active">Why Dues?</a></li>
             <li><a href="#" class="navlink">Connections</a></li>
         </ul>
@@ -140,12 +140,25 @@ nav a.signout:hover { color:var(--accent); }
 </div>
 
 <div class="actions">
-    <a href="home.html" class="btn btn-outline">Back to My Profile</a>
+    <a href="home.html" class="btn btn-outline preserve-member">Back to My Profile</a>
 </div>
 
 <div class="note">
     Placeholder note (remove once real numbers are added): this page currently describes where dues go in general terms. Adding actual figures or percentages from the council's budget — even roughly — would make this page land with more weight than qualitative language alone.
 </div>
+
+<script>
+/* Carry the logged-in member across pages via preserve-member links */
+(function () {
+    const memberParam = new URLSearchParams(window.location.search).get("member");
+    if (!memberParam) return;
+    document.querySelectorAll("a.preserve-member").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.href);
+        url.searchParams.set("member", memberParam);
+        a.setAttribute("href", url.pathname + url.search);
+    });
+})();
+</script>
 
 </body>
 </html>
