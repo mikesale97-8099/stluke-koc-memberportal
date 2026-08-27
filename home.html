@@ -621,14 +621,11 @@ async function confirmInfo() {
     status.className = 'confirm-status';
 
     try {
-        const res = await fetch(VERIFY_ENDPOINT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight against Apps Script
-            body: JSON.stringify({
-                memberNumber: CURRENT_MEMBER.memberNumber,
-                confirmerName: fullName(CURRENT_MEMBER),
-            }),
-        });
+        const url = new URL(VERIFY_ENDPOINT_URL);
+        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
+        url.searchParams.set('confirmerName', fullName(CURRENT_MEMBER));
+
+        const res = await fetch(url.toString(), { method: 'GET' });
         const data = await res.json();
         if (data.success) {
             const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
