@@ -10,7 +10,13 @@
  */
 
 function doGet(e) {
-  return handleVerify(e.parameter);
+  const result = handleVerify(e.parameter);
+  const callback = e.parameter && e.parameter.callback;
+  if (callback) {
+    return ContentService.createTextOutput(callback + '(' + JSON.stringify(result) + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return jsonResponse(result);
 }
 
 function doPost(e) {
@@ -20,7 +26,7 @@ function doPost(e) {
   } catch (err) {
     return jsonResponse({ success: false, error: 'Invalid request body' });
   }
-  return handleVerify(params);
+  return jsonResponse(handleVerify(params));
 }
 
 function handleVerify(params) {
@@ -35,14 +41,14 @@ function handleVerify(params) {
   const lastChangeNameCol = headers.indexOf('Last Change Name');
 
   if ([memberNumberCol, lastVerifyCol, lastChangeDateCol, lastChangeNameCol].includes(-1)) {
-    return jsonResponse({ success: false, error: 'One or more expected columns not found' });
+    return { success: false, error: 'One or more expected columns not found' };
   }
 
   const memberNumber = String((params && params.memberNumber) || '').replace(/^0+/, '');
   const confirmerName = String((params && params.confirmerName) || '').trim();
 
   if (!memberNumber || !confirmerName) {
-    return jsonResponse({ success: false, error: 'Missing memberNumber or confirmerName' });
+    return { success: false, error: 'Missing memberNumber or confirmerName' };
   }
 
   for (let i = 1; i < data.length; i++) {
@@ -53,11 +59,11 @@ function handleVerify(params) {
       sheet.getRange(rowNum, lastVerifyCol + 1).setValue(today);
       sheet.getRange(rowNum, lastChangeDateCol + 1).setValue(today);
       sheet.getRange(rowNum, lastChangeNameCol + 1).setValue(confirmerName);
-      return jsonResponse({ success: true, verifiedDate: today.toISOString() });
+      return { success: true, verifiedDate: today.toISOString() };
     }
   }
 
-  return jsonResponse({ success: false, error: 'Member not found' });
+  return { success: false, error: 'Member not found' };
 }
 
 function jsonResponse(obj) {
