@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Profile — St. Luke Knights of Columbus Member Portal</title>
+<title>Membership Card — St. Luke Knights of Columbus Member Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -13,7 +13,6 @@
     --secondary-light: #D4B583;
     --accent: #B91C1C;
     --light-bg: #F9FAFB;
-    --nav-bg: #E5E7EB;
     --text-dark: #1F2937;
     --text-medium: #6B7280;
     --shadow: rgba(30, 58, 138, 0.15);
@@ -33,37 +32,14 @@ body {
 }
 a { color:inherit; }
 :focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
-.field-value, .card-name, .card-meta strong { overflow-wrap:break-word; word-break:break-word; }
 
-/* ---------- Mockup-only review panel ---------- */
-.review-panel {
-    background:#fff;
-    border-bottom:2px dashed #9CA3AF;
-    padding:0.9rem 1.5rem;
-}
-.review-panel .inner {
-    max-width:1200px; margin:0 auto;
-    display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
-}
-.review-panel .tag {
-    font-family:'Lato', sans-serif; font-size:0.7rem; font-weight:700;
-    letter-spacing:0.08em; text-transform:uppercase;
-    background:#374151; color:#fff; padding:0.3rem 0.6rem; border-radius:4px;
-}
-.review-panel label {
-    font-family:'Lato', sans-serif; font-size:0.85rem; color:var(--text-medium);
-}
-.review-panel select {
-    font-family:'Lato', sans-serif; font-size:0.9rem;
-    padding:0.4rem 0.6rem; border-radius:6px; border:1.5px solid #D1D5DB;
-    background:#fff;
-}
-.review-panel .note {
-    font-family:'Lato', sans-serif; font-size:0.8rem; color:var(--text-medium);
-    margin-left:auto;
-}
+.review-panel { background:#fff; border-bottom:2px dashed #9CA3AF; padding:0.9rem 1.5rem; }
+.review-panel .inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.review-panel .tag { font-family:'Lato', sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; background:#374151; color:#fff; padding:0.3rem 0.6rem; border-radius:4px; }
+.review-panel label { font-family:'Lato', sans-serif; font-size:0.85rem; color:var(--text-medium); }
+.review-panel select { font-family:'Lato', sans-serif; font-size:0.9rem; padding:0.4rem 0.6rem; border-radius:6px; border:1.5px solid #D1D5DB; background:#fff; }
+.review-panel .note { font-family:'Lato', sans-serif; font-size:0.8rem; color:var(--text-medium); margin-left:auto; }
 
-/* ---------- Nav ---------- */
 nav { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); }
 nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:stretch; }
 .logo-section { padding:0.7rem 1.5rem; display:flex; align-items:center; }
@@ -72,146 +48,38 @@ nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:
 .logo-sub { display:block; font-size:0.72rem; font-weight:400; color:var(--text-medium); font-family:'Lato',sans-serif; }
 nav ul { list-style:none; display:flex; margin:0; }
 nav ul li { display:flex; align-items:center; }
-nav a.navlink {
-    font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium);
-    text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; transition:all .2s;
-}
+nav a.navlink { font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium); text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; transition:all .2s; }
 nav a.navlink:hover { color:var(--primary); background:rgba(30,58,138,0.05); }
 nav a.navlink.active { color:var(--primary); font-weight:700; border-bottom-color:var(--secondary); }
 nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); padding:1.1rem 1.5rem; text-decoration:none; }
 nav a.signout:hover { color:var(--accent); }
 
-/* ---------- Hero / welcome ---------- */
-.welcome { max-width:1200px; margin:0 auto; padding:2rem 2rem 0; }
-.welcome h1 { font-family:'Crimson Pro', serif; font-size:2.1rem; color:var(--primary); font-weight:700; }
-.welcome .verified { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-top:0.4rem; }
-.welcome .verified button {
-    font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--primary); background:none; border:none;
-    text-decoration:underline; cursor:pointer; padding:0;
-}
+.stage { max-width:460px; margin:0 auto; padding:2.5rem 1.5rem 0; text-align:center; }
+.stage h1 { font-family:'Crimson Pro', serif; font-size:1.8rem; color:var(--primary); font-weight:700; }
+.stage .sub { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); margin-top:0.5rem; }
 
-/* ---------- Layout ---------- */
-.layout {
-    max-width:1200px; margin:0 auto; padding:1.5rem 2rem 0;
-    display:grid; grid-template-columns:1.3fr 1fr; gap:1.75rem; align-items:start;
-}
-@media (max-width:900px){ .layout { grid-template-columns:1fr; } }
-
-/* ---------- Mobile ---------- */
-@media (max-width:640px){
-    nav .container { flex-wrap:wrap; }
-    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
-    .logo-main { font-size:0.95rem; }
-    nav ul { flex-wrap:wrap; width:100%; justify-content:center; order:3; border-top:1px solid #F0F1F3; }
-    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
-    nav a.signout { padding:0.6rem 1rem; font-size:0.8rem; }
-
-    .review-panel { padding:0.7rem 1rem; }
-    .review-panel .inner { gap:0.5rem; }
-    .review-panel select { max-width:100%; width:100%; flex:1 1 100%; min-width:0; }
-    .review-panel .note { margin-left:0; width:100%; }
-
-    .welcome { padding:1.25rem 1rem 0; }
-    .welcome h1 { font-size:1.5rem; }
-
-    .layout { padding:1rem 1rem 0; gap:1.25rem; }
-    .card-panel { padding:1.25rem; }
-
-    .field-row { grid-template-columns:1fr; gap:0.15rem; padding:0.6rem 0; }
-    .info-grid { grid-template-columns:1fr; gap:0.9rem; }
-
-    .quick-actions { flex-direction:column; }
-    .card-name { font-size:1.3rem; }
-    .card-meta { flex-wrap:wrap; gap:1rem 1.5rem; }
-
-    .modal { padding:1.5rem; }
-    .modal-actions { flex-direction:column-reverse; }
-    .modal-actions .btn { width:100%; }
-}
-
-.card-panel {
-    background:white; border-radius:16px; padding:1.75rem; box-shadow:0 4px 15px var(--shadow);
-}
-.panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
-.panel-head h2 { font-family:'Crimson Pro', serif; font-size:1.35rem; color:var(--primary); font-weight:700; }
-.btn {
-    font-family:'Lato', sans-serif; font-weight:600; font-size:0.85rem; cursor:pointer;
-    border-radius:50px; padding:0.55rem 1.2rem; border:2px solid transparent; transition:all .2s;
-}
-.btn-primary { background:var(--secondary); color:white; }
-.btn-primary:hover { background:var(--secondary-light); }
-.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
-.btn-outline:hover { background:var(--primary); color:white; }
-.btn-text { background:none; border:none; color:var(--primary); text-decoration:underline; font-family:'Lato',sans-serif; font-size:0.85rem; cursor:pointer; padding:0; }
-
-/* Profile rows */
-.field-row { display:grid; grid-template-columns:130px 1fr; gap:0.75rem; padding:0.7rem 0; border-bottom:1px solid #F0F1F3; align-items:center; }
-.field-row:last-child { border-bottom:none; }
-.field-label { font-family:'Lato',sans-serif; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-medium); }
-.field-value { font-size:1rem; color:var(--text-dark); }
-.field-value.empty { color:var(--text-medium); font-style:italic; }
-.field-row input {
-    font-family:'Lora',serif; font-size:0.95rem; padding:0.5rem 0.6rem; border:1.5px solid #D1D5DB; border-radius:6px; width:100%;
-}
-.edit-actions { display:flex; gap:0.75rem; margin-top:1.25rem; }
-.edit-hint { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); margin-top:0.6rem; }
-
-/* Membership info block */
-.membership-info { margin-top:1.75rem; padding-top:1.5rem; border-top:1px dashed #E5E7EB; }
-.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem; margin-top:1rem; }
-.info-item .field-label { display:block; margin-bottom:0.2rem; }
-.info-item .field-value { font-weight:600; }
-.info-item .field-value.dues-current { color:var(--green); }
-.info-item .field-value.dues-owed { color:var(--accent); }
-
-/* Flag issue */
-.flag-block { margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed #E5E7EB; }
-.flag-block p { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-bottom:0.6rem; }
-.flag-form { display:none; margin-top:0.9rem; }
-.flag-form.open { display:block; }
-.flag-form textarea {
-    width:100%; min-height:80px; font-family:'Lora',serif; font-size:0.9rem; padding:0.7rem; border:1.5px solid #D1D5DB; border-radius:8px; resize:vertical;
-}
-.flag-confirm {
-    display:none; margin-top:0.9rem; padding:0.85rem 1rem; background:var(--green-bg); border-left:3px solid var(--green);
-    border-radius:6px; font-family:'Lato',sans-serif; font-size:0.85rem; color:#166534;
-}
-.flag-confirm.open { display:block; }
-
-/* Right column: card + status */
 .card-visual {
-    position:relative; border-radius:16px; overflow:hidden;
+    position:relative; border-radius:18px; overflow:hidden; margin-top:2rem;
     background:linear-gradient(135deg, #ffffff, #F3F4F6);
-    border:1px solid #E5E7EB; box-shadow:0 8px 25px var(--shadow);
-    padding:1.5rem; min-height:210px; display:flex; flex-direction:column; justify-content:space-between;
+    border:1px solid #E5E7EB; box-shadow:0 12px 34px var(--shadow);
+    padding:2rem; min-height:250px; display:flex; flex-direction:column; justify-content:space-between; text-align:left;
 }
 .card-visual.exempt { border:2px solid var(--secondary); background:linear-gradient(135deg,#fff,#FBF6EC); }
-.card-visual .ribbon {
-    position:absolute; top:0; right:0; background:var(--primary); color:white; font-family:'Lato',sans-serif;
-    font-size:0.68rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:0.35rem 0.9rem; border-bottom-left-radius:10px;
-}
+.card-visual .ribbon { position:absolute; top:0; right:0; background:var(--primary); color:white; font-family:'Lato',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:0.4rem 1.1rem; border-bottom-left-radius:10px; }
 .card-visual.exempt .ribbon { background:var(--secondary); }
 .card-top { font-family:'Lato',sans-serif; }
-.card-org { font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-medium); }
-.card-council { font-size:0.85rem; color:var(--primary); font-weight:700; margin-top:0.1rem; }
-.card-name { font-family:'Crimson Pro', serif; font-size:1.5rem; font-weight:700; color:var(--text-dark); margin-top:1rem; }
-.card-since { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); margin-top:0.25rem; }
-.card-meta { display:flex; gap:1.5rem; margin-top:0.9rem; font-family:'Lato',sans-serif; }
-.card-meta div span { display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-medium); }
-.card-meta div strong { font-size:0.95rem; color:var(--text-dark); }
-.watermark {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    pointer-events:none;
-}
-.watermark span {
-    font-family:'Lato',sans-serif; font-weight:800; font-size:1.9rem; letter-spacing:0.1em;
-    color:rgba(185,28,28,0.28); border:4px solid rgba(185,28,28,0.28); border-radius:8px;
-    padding:0.3rem 1.2rem; transform:rotate(-14deg); text-transform:uppercase;
-}
-.watermark .exp { position:absolute; bottom:14px; left:0; right:0; text-align:center; font-size:0.72rem; font-weight:700; color:rgba(185,28,28,0.6); letter-spacing:0.03em; }
+.card-org { font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-medium); }
+.card-council { font-size:0.95rem; color:var(--primary); font-weight:700; margin-top:0.15rem; }
+.card-name { font-family:'Crimson Pro', serif; font-size:1.85rem; font-weight:700; color:var(--text-dark); margin-top:1.25rem; overflow-wrap:break-word; word-break:break-word; }
+.card-since { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-top:0.3rem; }
+.card-meta { display:flex; gap:2rem; margin-top:1.25rem; font-family:'Lato',sans-serif; flex-wrap:wrap; }
+.card-meta div span { display:block; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-medium); }
+.card-meta div strong { font-size:1.05rem; color:var(--text-dark); overflow-wrap:break-word; word-break:break-word; }
+.watermark { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.watermark span { font-family:'Lato',sans-serif; font-weight:800; font-size:2.3rem; letter-spacing:0.1em; color:rgba(185,28,28,0.28); border:4px solid rgba(185,28,28,0.28); border-radius:8px; padding:0.35rem 1.4rem; transform:rotate(-14deg); text-transform:uppercase; }
+.watermark .exp { position:absolute; bottom:18px; left:0; right:0; text-align:center; font-size:0.8rem; font-weight:700; color:rgba(185,28,28,0.6); letter-spacing:0.03em; }
 
-/* status message */
-.status-box { margin-top:1.5rem; padding:1.1rem 1.25rem; border-radius:12px; }
+.status-box { margin-top:1.5rem; padding:1.1rem 1.25rem; border-radius:12px; text-align:left; }
 .status-box .status-label { font-family:'Lato',sans-serif; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.35rem; display:block; }
 .status-box p { font-size:0.95rem; }
 .status-box.tone-good { background:var(--green-bg); }
@@ -223,40 +91,33 @@ nav a.signout:hover { color:var(--accent); }
 .status-box.tone-exempt { background:#FBF6EC; }
 .status-box.tone-exempt .status-label { color:#8A6D2F; }
 
-/* quick actions */
-.quick-actions { display:flex; gap:0.75rem; margin-top:1.5rem; flex-wrap:wrap; }
-.quick-actions .btn { flex:1; text-align:center; }
-.pay-prompt { margin-top:1.5rem; }
-.btn-pay { width:100%; padding:0.85rem; font-size:0.95rem; }
+.wallet-row { margin-top:1.5rem; }
+.btn { font-family:'Lato', sans-serif; font-weight:600; font-size:0.88rem; cursor:pointer; border-radius:50px; padding:0.75rem 1.4rem; border:2px solid transparent; transition:all .2s; text-decoration:none; display:inline-block; }
+.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
+.btn-outline:hover { background:var(--primary); color:white; }
+.btn-outline:disabled { opacity:0.5; cursor:default; }
+.btn-outline:disabled:hover { background:transparent; color:var(--primary); }
+.wallet-note { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); margin-top:0.6rem; }
 
-/* footer / request removal */
-.page-footer { max-width:1200px; margin:3rem auto 0; padding:1.5rem 2rem 0; border-top:1px solid #E5E7EB; text-align:center; }
-.page-footer .council { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); margin-bottom:0.75rem; }
-.remove-link { font-family:'Lato',sans-serif; font-size:0.8rem; color:#9CA3AF; text-decoration:underline; background:none; border:none; cursor:pointer; }
-.remove-link:hover { color:var(--accent); }
+.back-link { display:inline-block; margin-top:2rem; font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--primary); text-decoration:underline; }
 
-/* modal */
-.modal-overlay {
-    display:none; position:fixed; inset:0; background:rgba(31,41,55,0.55); z-index:2000;
-    align-items:center; justify-content:center; padding:1.5rem;
+@media (max-width:640px){
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    nav ul { flex-wrap:wrap; width:100%; justify-content:center; order:3; border-top:1px solid #F0F1F3; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
+    .review-panel { padding:0.7rem 1rem; }
+    .review-panel select { width:100%; flex:1 1 100%; min-width:0; }
+    .review-panel .note { margin-left:0; width:100%; }
+    .stage { padding:1.75rem 1rem 0; }
+    .card-visual { padding:1.5rem; }
+    .card-name { font-size:1.5rem; }
+    .card-meta { gap:1.25rem; }
 }
-.modal-overlay.open { display:flex; }
-.modal {
-    background:white; border-radius:16px; max-width:440px; width:100%; padding:2rem; box-shadow:0 20px 50px rgba(0,0,0,0.25);
-}
-.modal h3 { font-family:'Crimson Pro', serif; color:var(--accent); font-size:1.3rem; margin-bottom:0.9rem; }
-.modal p { font-family:'Lora',serif; font-size:0.95rem; color:var(--text-dark); margin-bottom:0.8rem; }
-.modal .fine { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); margin-bottom:1.25rem; }
-.modal-actions { display:flex; gap:0.75rem; justify-content:flex-end; }
-.btn-danger { background:var(--accent); color:white; }
-.btn-danger:hover { background:#991B1B; }
-.btn-ghost { background:none; border:2px solid #D1D5DB; color:var(--text-medium); }
-.btn-ghost:hover { border-color:var(--text-medium); }
 </style>
 </head>
 <body>
 
-<!-- Live status / demo browser strip -->
 <div class="review-panel">
     <div class="inner">
         <span class="tag">Live</span>
@@ -269,14 +130,14 @@ nav a.signout:hover { color:var(--accent); }
 <nav>
     <div class="container">
         <div class="logo-section">
-            <a href="#" class="logo">
+            <a href="home.html" class="logo">
                 <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
                 <span class="logo-sub">Member Portal · Council 14895</span>
             </a>
         </div>
         <ul>
-            <li><a href="#" class="navlink active">Home</a></li>
-            <li><a href="membership-card.html" class="navlink">Membership Card</a></li>
+            <li><a href="home.html" class="navlink">Home</a></li>
+            <li><a href="membership-card.html" class="navlink active">Membership Card</a></li>
             <li><a href="why-dues.html" class="navlink">Why Dues?</a></li>
             <li><a href="#" class="navlink">Connections</a></li>
         </ul>
@@ -284,170 +145,105 @@ nav a.signout:hover { color:var(--accent); }
     </div>
 </nav>
 
-<div class="welcome">
-    <h1 id="welcomeName">Welcome back, Daniel</h1>
-    <p class="verified"><span id="verifiedText">Last verified March 3, 2026</span> &nbsp;·&nbsp; <button type="button">Looks wrong? Verify my info now</button></p>
-</div>
+<div class="stage">
+    <h1>My Membership Card</h1>
+    <p class="sub">Your digital proof of membership — always current, no need to carry a physical card.</p>
 
-<div class="layout">
-    <!-- LEFT: profile -->
-    <div>
-        <div class="card-panel">
-            <div class="panel-head">
-                <h2>My Profile</h2>
-                <button class="btn btn-outline" id="editToggleBtn" onclick="toggleEdit()">Edit</button>
-            </div>
-
-            <div id="viewMode">
-                <div class="field-row"><span class="field-label">Name</span><span class="field-value" id="profileName">Daniel R. Fitzgerald</span></div>
-                <div class="field-row"><span class="field-label">Address</span><span class="field-value" id="profileAddress">4218 Birchwood Ln, Indianapolis, IN 46228</span></div>
-                <div class="field-row"><span class="field-label">Phone</span><span class="field-value" id="profilePhone">(317) 555-0148</span></div>
-                <div class="field-row"><span class="field-label">Email</span><span class="field-value" id="profileEmail">d.fitzgerald@example.com</span></div>
-            </div>
-
-            <div id="editMode" style="display:none;">
-                <div class="field-row"><span class="field-label">Name</span><input type="text" id="editName" value="Daniel R. Fitzgerald"></div>
-                <div class="field-row"><span class="field-label">Address</span><input type="text" id="editAddress" value="4218 Birchwood Ln, Indianapolis, IN 46228"></div>
-                <div class="field-row"><span class="field-label">Phone</span><input type="text" id="editPhone" value="(317) 555-0148"></div>
-                <div class="field-row"><span class="field-label">Email</span><input type="text" id="editEmail" value="d.fitzgerald@example.com"></div>
-                <div class="edit-actions">
-                    <button class="btn btn-primary" onclick="toggleEdit()">Save changes</button>
-                    <button class="btn btn-ghost" onclick="toggleEdit()">Cancel</button>
-                </div>
-                <p class="edit-hint">Saving updates your "last verified" date automatically.</p>
-            </div>
-
-            <div class="membership-info">
-                <h2 style="font-family:'Crimson Pro',serif; font-size:1.1rem; color:var(--primary);">Membership Info</h2>
-                <div class="info-grid">
-                    <div class="info-item"><span class="field-label">Member ID</span><span class="field-value" id="memberIdValue">#0142</span></div>
-                    <div class="info-item"><span class="field-label">Degree</span><span class="field-value" id="degreeValue">Third Degree</span></div>
-                    <div class="info-item"><span class="field-label">Years of Service</span><span class="field-value" id="yosValue">14 years</span></div>
-                    <div class="info-item"><span class="field-label">Council Role</span><span class="field-value" id="roleValue">Member</span></div>
-                    <div class="info-item"><span class="field-label">Dues Status</span><span class="field-value" id="duesValue">Current</span></div>
-                    <div class="info-item"><span class="field-label">Paid Through</span><span class="field-value" id="paidThroughValue">2026</span></div>
-                </div>
-            </div>
-
-            <div class="flag-block">
-                <p>Something look off with your dues status or record?</p>
-                <button class="btn-text" onclick="toggleFlag()">Flag an issue</button>
-                <div class="flag-form" id="flagForm">
-                    <textarea placeholder="Tell us what looks wrong — a steward will follow up."></textarea>
-                    <div class="edit-actions">
-                        <button class="btn btn-primary" onclick="submitFlag()">Send to stewards</button>
-                        <button class="btn btn-ghost" onclick="toggleFlag()">Cancel</button>
-                    </div>
-                </div>
-                <div class="flag-confirm" id="flagConfirm">Thanks — a steward has been notified and will follow up with you directly.</div>
-            </div>
+    <div class="card-visual" id="cardVisual">
+        <div class="ribbon" id="cardRibbon">Active</div>
+        <div class="card-top">
+            <div class="card-org">Knights of Columbus</div>
+            <div class="card-council">St. Luke Council 14895</div>
+        </div>
+        <div class="card-name" id="cardName">Daniel R. Fitzgerald</div>
+        <div class="card-since" id="cardSince">Member Since 2012</div>
+        <div class="card-meta">
+            <div><span>Member ID</span><strong id="cardMemberId">#0142</strong></div>
+            <div><span>Degree</span><strong id="cardDegree">Third Degree</strong></div>
+            <div><span>Years of Service</span><strong id="cardYos">14</strong></div>
+        </div>
+        <div class="watermark" id="cardWatermark" style="display:none;">
+            <span id="cardWatermarkLabel">Lapsed</span>
+            <div class="exp" id="cardExpText">Expired July 1, 2024</div>
         </div>
     </div>
 
-    <!-- RIGHT: card + status -->
-    <div>
-        <div class="card-panel">
-            <div class="card-visual" id="cardVisual">
-                <div class="ribbon" id="cardRibbon">Active</div>
-                <div class="card-top">
-                    <div class="card-org">Knights of Columbus</div>
-                    <div class="card-council">St. Luke Council 14895</div>
-                </div>
-                <div class="card-name" id="cardName">Daniel R. Fitzgerald</div>
-                <div class="card-since" id="cardSince">Member Since 2012</div>
-                <div class="card-meta">
-                    <div><span>Member ID</span><strong id="cardMemberId">#0142</strong></div>
-                    <div><span>Degree</span><strong id="cardDegree">Third Degree</strong></div>
-                </div>
-                <div class="watermark" id="cardWatermark" style="display:none;">
-                    <span id="cardWatermarkLabel">Lapsed</span>
-                    <div class="exp" id="cardExpText">Expired July 1, 2024</div>
-                </div>
-            </div>
-
-            <div class="status-box tone-good" id="statusBox">
-                <span class="status-label" id="statusLabel">Core Member</span>
-                <p id="statusMessage">You're all set. Thank you for staying active in council life.</p>
-            </div>
-
-            <div class="pay-prompt" id="payPrompt" style="display:none;">
-                <button class="btn btn-primary btn-pay" id="payDuesBtn" onclick="alert('This connects to Square once dues payment is wired up.')">Pay Dues</button>
-            </div>
-
-            <div class="quick-actions">
-                <button class="btn btn-outline" style="flex:1;">View Connections</button>
-            </div>
-        </div>
+    <div class="status-box tone-good" id="statusBox">
+        <span class="status-label" id="statusLabel">Core Member</span>
+        <p id="statusMessage">You're all set. Thank you for staying active in council life.</p>
     </div>
-</div>
 
-<div class="page-footer">
-    <p class="council">St. Luke Knights of Columbus, Council 14895 · Indianapolis, IN · council14895@gmail.com</p>
-    <button class="remove-link" onclick="openRemoveModal()">Request removal from the council</button>
-</div>
-
-<div class="modal-overlay" id="removeModal">
-    <div class="modal">
-        <h3>Before you go</h3>
-        <p>This will notify the stewards and mark your membership as pending removal. It can't be undone from here.</p>
-        <p class="fine">If this is about dues, participation, or something else — a quick "Flag an issue" or a note to a brother might solve it without leaving.</p>
-        <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeRemoveModal()">Never mind</button>
-            <button class="btn btn-danger" onclick="closeRemoveModal()">Yes, request removal</button>
-        </div>
+    <div class="wallet-row">
+        <button class="btn btn-outline" disabled title="Coming in a future phase">Save to Google Wallet</button>
+        <p class="wallet-note">Google Wallet pass planned for a future phase — for now, this page itself is your digital card. Bookmark it or add it to your home screen.</p>
     </div>
+
+    <a href="home.html" class="back-link">&larr; Back to My Profile</a>
 </div>
 
 <script>
 const states = {
-    core: {
-        ribbon:"Active", card:"current", statusLabel:"Core Member", tone:"tone-good",
-        msg:"You're all set. Thank you for staying active in council life."
-    },
-    payingDisengaged: {
-        ribbon:"Active", card:"current", statusLabel:"Paying, Disengaged", tone:"tone-good",
-        msg:"Your dues are current — we'd love to see you at an upcoming event."
-    },
-    contributingBehind: {
-        ribbon:"Active", card:"lapsed", statusLabel:"Contributing, Behind", tone:"tone-warm",
-        msg:"You're a couple of years behind on dues. Pay anytime below — thanks for staying involved."
-    },
-    checkInNeeded: {
-        ribbon:"Active", card:"lapsed", statusLabel:"Check-In Needed", tone:"tone-warm",
-        msg:"It's been a while since we've seen you around. We'd love to reconnect — reach out to a brother anytime."
-    },
-    valuedBehind: {
-        ribbon:"Active", card:"lapsed", statusLabel:"Valued, Financially Behind", tone:"tone-warm",
-        msg:"You've been part of this council a long time. If dues are a barrier, a quiet payment plan is available — just ask."
-    },
-    inactive: {
-        ribbon:"Active", card:"lapsed", statusLabel:"Inactive", tone:"tone-neutral",
-        msg:"We haven't seen you in a while. If you'd like to stay a member, we're here — otherwise, no action is needed."
-    },
-    neverEngaged: {
-        ribbon:"Active", card:"lapsed", statusLabel:"Never Engaged", tone:"tone-neutral",
-        msg:"We don't show any dues activity yet. If you're still interested in the council, we'd love to hear from you."
-    },
-    legacyGrace: {
-        ribbon:"Active", card:"current", statusLabel:"Legacy Grace", tone:"tone-good",
-        msg:"Thank you for over two decades of brotherhood. No action needed — reach out anytime if you'd like to update your dues."
-    },
-    onboardingGrace: {
-        ribbon:"Active", card:"current", statusLabel:"Onboarding Grace", tone:"tone-good",
-        msg:"Welcome to the council! Dues are billed each July. Pay anytime below — there's no rush."
-    },
-    clergy: {
-        ribbon:"Clergy", card:"exempt", statusLabel:"Clergy", tone:"tone-exempt",
-        msg:"As clergy, you're exempt from dues tracking entirely. Thank you for your continued guidance to our council."
-    },
-    dataIssue: {
-        ribbon:"Verify Needed", card:"unknown", statusLabel:"Records Incomplete", tone:"tone-neutral",
-        msg:"We don't have dues records on file for you yet. Flag this below so a steward can take a look — nothing is being held against you."
-    }
+    core: { ribbon:"Active", card:"current", statusLabel:"Core Member", tone:"tone-good", msg:"You're all set. Thank you for staying active in council life." },
+    payingDisengaged: { ribbon:"Active", card:"current", statusLabel:"Paying, Disengaged", tone:"tone-good", msg:"Your dues are current — we'd love to see you at an upcoming event." },
+    contributingBehind: { ribbon:"Active", card:"lapsed", statusLabel:"Contributing, Behind", tone:"tone-warm", msg:"You're a couple of years behind on dues. Pay anytime — thanks for staying involved." },
+    checkInNeeded: { ribbon:"Active", card:"lapsed", statusLabel:"Check-In Needed", tone:"tone-warm", msg:"It's been a while since we've seen you around. We'd love to reconnect." },
+    valuedBehind: { ribbon:"Active", card:"lapsed", statusLabel:"Valued, Financially Behind", tone:"tone-warm", msg:"You've been part of this council a long time. If dues are a barrier, a quiet payment plan is available — just ask." },
+    inactive: { ribbon:"Active", card:"lapsed", statusLabel:"Inactive", tone:"tone-neutral", msg:"We haven't seen you in a while. If you'd like to stay a member, we're here — otherwise, no action is needed." },
+    neverEngaged: { ribbon:"Active", card:"lapsed", statusLabel:"Never Engaged", tone:"tone-neutral", msg:"We don't show any dues activity yet. If you're still interested in the council, we'd love to hear from you." },
+    legacyGrace: { ribbon:"Active", card:"current", statusLabel:"Legacy Grace", tone:"tone-good", msg:"Thank you for over two decades of brotherhood. No action needed — reach out anytime if you'd like to update your dues." },
+    onboardingGrace: { ribbon:"Active", card:"current", statusLabel:"Onboarding Grace", tone:"tone-good", msg:"Welcome to the council! Dues are billed each July. Pay anytime — there's no rush." },
+    clergy: { ribbon:"Clergy", card:"exempt", statusLabel:"Clergy", tone:"tone-exempt", msg:"As clergy, you're exempt from dues tracking entirely. Thank you for your continued guidance to our council." },
+    dataIssue: { ribbon:"Verify Needed", card:"unknown", statusLabel:"Records Incomplete", tone:"tone-neutral", msg:"We don't have dues records on file for you yet. Flag this on your profile so a steward can take a look." }
 };
 
-/* ---- Real member data, wired from the council's export (183 records) ---- */
 const MEMBERS = [{"memberNumber": 4673612, "firstName": "Gabriel", "lastName": "Alvarez", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "3239 Lincoln Ct", "addrLine2": "Indianapolis, IN 46228-2854", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5127212, "firstName": "Alvin", "lastName": "Alviar", "suffix": null, "degree": "First Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "9044 Kirkham Ct", "addrLine2": "Indianapolis, IN 46260-1635", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 265, "lastYrPaid": 2020}, {"memberNumber": 4306728, "firstName": "James", "lastName": "Archer", "suffix": null, "degree": "First Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "7438 Frederick Dr E", "addrLine2": "Indianapolis, IN 46260-3417", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 4363255, "firstName": "Patrick", "lastName": "Atkins", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "1151 W 116Th St", "addrLine2": "Carmel, IN 46032-9512", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 280, "lastYrPaid": 2019}, {"memberNumber": 4555348, "firstName": "Andrew", "lastName": "Baase", "suffix": null, "degree": "Third Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "11018 Lincoln Trl", "addrLine2": "Indianapolis, IN 46236-2949", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5493467, "firstName": "Robert", "lastName": "Bacallao", "suffix": null, "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9064 Sweet Bay Ct", "addrLine2": "Indianapolis, IN 46260-1554", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5373769, "firstName": "Robert", "lastName": "Baehner", "suffix": null, "degree": "Third Degree", "yrsSvc": 4, "memberSince": 2023, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "8280 Spring Mill Rd", "addrLine2": "Indianapolis, IN 46260-2983", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}, {"memberNumber": 4363262, "firstName": "Lucas", "lastName": "Ballard", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "835 E 78Th St", "addrLine2": "Indianapolis, IN 46240-2602", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5295491, "firstName": "Jayaraju", "lastName": "Bandari", "suffix": null, "degree": "Third Degree", "yrsSvc": 5, "memberSince": 2022, "clergy": true, "duesBucket": "current", "state": "clergy", "addrLine1": "St. Luke Catholic Church, Holliday Dr", "addrLine2": "Indianapolis, IN 46260", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4698510, "firstName": "David", "lastName": "Barda", "suffix": null, "degree": "Third Degree", "yrsSvc": 13, "memberSince": 2014, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8136 Ecole St", "addrLine2": "Indianapolis, IN 46240-2726", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5145150, "firstName": "Marcus", "lastName": "Barlow", "suffix": null, "degree": "Third Degree", "yrsSvc": 7, "memberSince": 2020, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "3837 Penzance Pl", "addrLine2": "Carmel, IN 46032-8325", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}, {"memberNumber": 4999143, "firstName": "Ernest", "lastName": "Barnett", "suffix": null, "degree": "Third Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "1029 Oakwood Trl", "addrLine2": "Indianapolis, IN 46260-4020", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4601017, "firstName": "Richard", "lastName": "Bassi", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "11549 Montoya Dr", "addrLine2": "Zionsville, IN 46077-9823", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4749587, "firstName": "Andrew", "lastName": "Bauer", "suffix": null, "degree": "Third Degree", "yrsSvc": 13, "memberSince": 2014, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "1299 Bentley Way", "addrLine2": "Carmel, IN 46032-7109", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4168425, "firstName": "Nicholas", "lastName": "Beckmann", "suffix": null, "degree": "Third Degree", "yrsSvc": 20, "memberSince": 2007, "clergy": false, "duesBucket": "behind3plus", "state": "legacyGrace", "addrLine1": "1004 E 81St St", "addrLine2": "Indianapolis, IN 46240-2680", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4440244, "firstName": "William", "lastName": "Berg", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8040 Broadway St", "addrLine2": "Indianapolis, IN 46240-2503", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5324744, "firstName": "Tom", "lastName": "Bigelow", "suffix": null, "degree": "Third Degree", "yrsSvc": 5, "memberSince": 2022, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "10048 Cedar Point Dr", "addrLine2": "Carmel, IN 46032-9581", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 5498686, "firstName": "Kevin", "lastName": "Blankenberger", "suffix": null, "degree": "First Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "3202 Babson Ct", "addrLine2": "Indianapolis, IN 46268-1326", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4783396, "firstName": "Christopher", "lastName": "Boland", "suffix": null, "degree": "Third Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "817 W 96Th St", "addrLine2": "Indianapolis, IN 46260-1215", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 5421348, "firstName": "David", "lastName": "Boncosky", "suffix": null, "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "neverPaid", "state": "neverEngaged", "addrLine1": "7780 N Pennsylvania St", "addrLine2": "Nora, IN 46240-2806", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": "Never Paid?"}, {"memberNumber": 4445175, "firstName": "Andrew", "lastName": "Borland", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "541 Allard Pl", "addrLine2": "Indianapolis, IN 46202-3720", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4445172, "firstName": "Patrick", "lastName": "Bosler", "suffix": null, "degree": "First Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "12675 Mustard Seed Ct", "addrLine2": "Fishers, IN 46038-1012", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 160, "lastYrPaid": 2022}, {"memberNumber": 4447931, "firstName": "James", "lastName": "Bradley", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9018 Ironwood Ct", "addrLine2": "Indianapolis, IN 46260-1529", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4674164, "firstName": "Peter", "lastName": "Brady", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "1925 Nottingham Dr", "addrLine2": "Indianapolis, IN 46240-1241", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 3781223, "firstName": "Joseph", "lastName": "Breen", "suffix": null, "degree": "First Degree", "yrsSvc": 25, "memberSince": 2002, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1115 Selkirk Ln", "addrLine2": "Indianapolis, IN 46260-1225", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4527156, "firstName": "John", "lastName": "Breitsch", "suffix": null, "degree": "Third Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8468 Admirals Landing Way", "addrLine2": "Indianapolis, IN 46236-9174", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5127218, "firstName": "Roger", "lastName": "Brouillette", "suffix": null, "degree": "Third Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "5184 Sweetwater Dr", "addrLine2": "Noblesville, IN 46062-7188", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5602305, "firstName": "John", "lastName": "Bryan", "suffix": null, "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "6449 Coughlan Dr", "addrLine2": "Indianapolis, IN 46278-7805", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4563040, "firstName": "Russ", "lastName": "Bryant", "suffix": null, "degree": "Third Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "13470 Clifty Falls Dr", "addrLine2": "Carmel, IN 46032-9406", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 1824631, "firstName": "Joseph", "lastName": "Cahill", "suffix": null, "degree": "Third Degree", "yrsSvc": 51, "memberSince": 1976, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1216 Frederick Dr S", "addrLine2": "Indianapolis, IN 46260-3423", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4363270, "firstName": "Joseph", "lastName": "Caito", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "2071 Kerns Ct", "addrLine2": "Indianapolis, IN 46280-1569", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4375474, "firstName": "Alfred", "lastName": "Capuano", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9691 Prairiewood Way", "addrLine2": "Carmel, IN 46032-9230", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4648881, "firstName": "David", "lastName": "Carlyle", "suffix": "JR", "degree": "First Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "8909 Sawleaf Rd", "addrLine2": "Indianapolis, IN 46260-1536", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 3726096, "firstName": "Thomas", "lastName": "Catalano", "suffix": null, "degree": "Third Degree", "yrsSvc": 26, "memberSince": 2001, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "12495 Glendurgan Dr", "addrLine2": "Carmel, IN 46032-8314", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5404854, "firstName": "Brian", "lastName": "Chase", "suffix": null, "degree": "Third Degree", "yrsSvc": 4, "memberSince": 2023, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "9100 Spring Hollow Dr", "addrLine2": "Indianapolis, IN 46260-1472", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5444831, "firstName": "Graydon", "lastName": "Chisholm", "suffix": null, "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "6130 Carvel Ave Apt 26", "addrLine2": "Indianapolis, IN 46220-2044", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4199913, "firstName": "Christopher", "lastName": "Cimaglio", "suffix": null, "degree": "Third Degree", "yrsSvc": 20, "memberSince": 2007, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "5458 Woodbrush Way", "addrLine2": "Mccordsville, IN 46055-8033", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4777875, "firstName": "Michael", "lastName": "Clawson", "suffix": null, "degree": "Third Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "25743 State Route 1", "addrLine2": "Guilford, IN 47022-8979", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4976764, "firstName": "George", "lastName": "Clift", "suffix": null, "degree": "Third Degree", "yrsSvc": 10, "memberSince": 2017, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8081 Dartmouth Rd", "addrLine2": "Indianapolis, IN 46260-2820", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5104133, "firstName": "Larry", "lastName": "Cloud", "suffix": null, "degree": "First Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "10239 Washington Blvd", "addrLine2": "Indianapolis, IN 46280-1367", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 255, "lastYrPaid": 2020}, {"memberNumber": 5489240, "firstName": "Kenneth", "lastName": "Cook", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "2908 Ruby Blvd", "addrLine2": "Indianapolis, IN 46268-0150", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4999155, "firstName": "Jon", "lastName": "Crawford", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "20192 Fenside Xing", "addrLine2": "Westfield, IN 46074-0400", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 5591381, "firstName": "Steven", "lastName": "Crawford", "suffix": null, "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1503 Sandi Dr", "addrLine2": "Indianapolis, IN 46260-2730", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4385006, "firstName": "Matthew", "lastName": "Dagon", "suffix": null, "degree": "First Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "noRecord", "state": "dataIssue", "addrLine1": "5916 Hillside Avenue West Dr", "addrLine2": "Indianapolis, IN 46220-2418", "email": null, "phone": null, "lastVerified": null, "outstandingDues": "No Record", "lastYrPaid": "No Record"}, {"memberNumber": 4486605, "firstName": "Rickey", "lastName": "Davis", "suffix": null, "degree": "Third Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "8063 Dartmouth Rd", "addrLine2": "Indianapolis, IN 46260-2820", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 5650080, "firstName": "Alan", "lastName": "Deluce", "suffix": null, "degree": "Third Degree", "yrsSvc": 1, "memberSince": 2026, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "6471 Sunset Ln", "addrLine2": "Indianapolis, IN 46260-4634", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": "New Member"}, {"memberNumber": 4985185, "firstName": "Douglas", "lastName": "Derringer", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "11341 Abercaim Ct", "addrLine2": "Zionsville, IN 46077", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 4366622, "firstName": "Vincent", "lastName": "Dillon", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9301 Washington Blvd", "addrLine2": "Indianapolis, IN 46240-1065", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5413143, "firstName": "Lawrence", "lastName": "Dougherty", "suffix": null, "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "818 Rosebay Ct", "addrLine2": "Indianapolis, IN 46240-2300", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 3330528, "firstName": "Patrick", "lastName": "Downey", "suffix": null, "degree": "Third Degree", "yrsSvc": 31, "memberSince": 1996, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "20598 Chatham Creek Dr", "addrLine2": "Westfield, IN 46074-4343", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4455466, "firstName": "Brian", "lastName": "Duncan", "suffix": null, "degree": "First Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1050 Fleetwood Dr", "addrLine2": "Indianapolis, IN 46228-1932", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4980572, "firstName": "Vincent", "lastName": "Eagan", "suffix": null, "degree": "First Degree", "yrsSvc": 10, "memberSince": 2017, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "4016 Madeline Ln", "addrLine2": "Carmel, IN 46033-8428", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4533150, "firstName": "Thaddeus", "lastName": "Eckerle", "suffix": null, "degree": "Third Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "14080 Brookstone Dr", "addrLine2": "Carmel, IN 46032-7758", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 5512095, "firstName": "Matthew", "lastName": "Elliott", "suffix": null, "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "neverPaid", "state": "onboardingGrace", "addrLine1": "8639 Lancaster Rd", "addrLine2": "Indianapolis, IN 46260-1667", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": "Never Paid?"}, {"memberNumber": 5493193, "firstName": "Ben", "lastName": "Engels", "suffix": null, "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "neverPaid", "state": "neverEngaged", "addrLine1": "4031 Rookwood Ave", "addrLine2": "Indianapolis, IN 46208-3839", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": "Never Paid?"}, {"memberNumber": 4440249, "firstName": "John", "lastName": "Enright", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "1417 Shawnee Rd", "addrLine2": "Indianapolis, IN 46260-4078", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 5089205, "firstName": "Nicholas", "lastName": "Feick", "suffix": null, "degree": "First Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "6405 Holliday Dr W", "addrLine2": "Indianapolis, IN 46260-4256", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 4806879, "firstName": "Thomas", "lastName": "Feick", "suffix": null, "degree": "Third Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "6405 Holliday Dr W", "addrLine2": "Indianapolis, IN 46260-4256", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4499235, "firstName": "Kevin", "lastName": "Figg", "suffix": null, "degree": "Third Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "3566 Insignia Ct", "addrLine2": "Indianapolis, IN 46214-4050", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4839585, "firstName": "David", "lastName": "Fink", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7043 N Delaware St", "addrLine2": "Indianapolis, IN 46220-1033", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5031878, "firstName": "Joseph", "lastName": "Fisher", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8233 Claridge Rd", "addrLine2": "Indianapolis, IN 46260-4913", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5591285, "firstName": "Kyle", "lastName": "Fisher", "suffix": null, "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1570 W 96Th St", "addrLine2": "Indianapolis, IN 46260-4810", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4990725, "firstName": "William", "lastName": "Fox", "suffix": null, "degree": "Third Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "6315 Oxbow Way", "addrLine2": "Indianapolis, IN 46220-7109", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4608097, "firstName": "Gary", "lastName": "Gadomski", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "702 E 81St St", "addrLine2": "Indianapolis, IN 46240-2642", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4382301, "firstName": "William", "lastName": "Garten", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9700 Summerlakes Dr", "addrLine2": "Carmel, IN 46032-9395", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5166227, "firstName": "Alex", "lastName": "Garza", "suffix": null, "degree": "First Degree", "yrsSvc": 7, "memberSince": 2020, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "123 N Meridian St # 134", "addrLine2": "Pittsboro, IN 46167-9618", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}, {"memberNumber": 4925861, "firstName": "Mark", "lastName": "Garza", "suffix": null, "degree": "Third Degree", "yrsSvc": 10, "memberSince": 2017, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "5490 Forest Glen Dr", "addrLine2": "Brownsburg, IN 46112-5668", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 4861212, "firstName": "Igor", "lastName": "Gejdos", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "930 Forest Boulevard North Dr", "addrLine2": "Indianapolis, IN 46240-2617", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4363288, "firstName": "Andrew", "lastName": "Gzibovskis", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "2030 Kohut Ct", "addrLine2": "Westfield, IN 46074-6029", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 1234622, "firstName": "Niles", "lastName": "Hansen", "suffix": "III", "degree": "Third Degree", "yrsSvc": 59, "memberSince": 1968, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1281 Munsee Ct", "addrLine2": "Indianapolis, IN 46260-3578", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4608111, "firstName": "William", "lastName": "Hendrickson", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "526 W 79Th St", "addrLine2": "Indianapolis, IN 46260-3570", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4749572, "firstName": "Derek", "lastName": "Hileman", "suffix": null, "degree": "Third Degree", "yrsSvc": 13, "memberSince": 2014, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "5025 Graceland Ave", "addrLine2": "Indianapolis, IN 46208-3428", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 1319456, "firstName": "Edward", "lastName": "Holloran", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 58, "memberSince": 1969, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9295 Golden Oaks E", "addrLine2": "Indianapolis, IN 46260-5135", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 1897971, "firstName": "Greg", "lastName": "Jacoby", "suffix": null, "degree": "First Degree", "yrsSvc": 50, "memberSince": 1977, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7457 N Park Ave", "addrLine2": "Indianapolis, IN 46240-3028", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4960213, "firstName": "John", "lastName": "Jacox", "suffix": null, "degree": "Third Degree", "yrsSvc": 10, "memberSince": 2017, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "5434 N Pennsylvania St", "addrLine2": "Indianapolis, IN 46220-3022", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4501177, "firstName": "Lucas", "lastName": "Johns", "suffix": null, "degree": "Third Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "1206 Frederick Dr S", "addrLine2": "Indianapolis, IN 46260-3423", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4363295, "firstName": "Nicholas", "lastName": "Jose", "suffix": "SR", "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "1050 Carters Grv", "addrLine2": "Indianapolis, IN 46260-2228", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}, {"memberNumber": 4667131, "firstName": "Matthew", "lastName": "Kaehr", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "9047 Cornucopia Dr", "addrLine2": "Indianapolis, IN 46268-3204", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 1214877, "firstName": "William", "lastName": "Kelly", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 59, "memberSince": 1968, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "2890 Kessler Boulevard East Dr", "addrLine2": "Indianapolis, IN 46220-2903", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4447934, "firstName": "Mark", "lastName": "Kiefer", "suffix": null, "degree": "First Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "8046 Morningside Dr", "addrLine2": "Indianapolis, IN 46240-2529", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4363298, "firstName": "John", "lastName": "Koke", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9073 Sweet Bay Ct", "addrLine2": "Indianapolis, IN 46260-1554", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4560182, "firstName": "Bruce", "lastName": "Konicek", "suffix": null, "degree": "First Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "12956 Birkenstock St", "addrLine2": "Carmel, IN 46032-7093", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 160, "lastYrPaid": 2022}, {"memberNumber": 5045072, "firstName": "Chet", "lastName": "Kubit", "suffix": null, "degree": "Third Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9252 Washington Blvd", "addrLine2": "Indianapolis, IN 46240-1064", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5019683, "firstName": "William", "lastName": "Kuhn", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7341 Frederick Dr E", "addrLine2": "Indianapolis, IN 46260-3414", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4381377, "firstName": "Stanley", "lastName": "Kwiatkowski", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "2940 Kipling Dr", "addrLine2": "Carmel, IN 46033-0046", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4363308, "firstName": "James", "lastName": "Lake", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "677 W 77Th Street North Dr", "addrLine2": "Indianapolis, IN 46260-3504", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4467717, "firstName": "Carlos", "lastName": "Lam", "suffix": null, "degree": "First Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "3926 E 65Th St", "addrLine2": "Indianapolis, IN 46220-4450", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 5017934, "firstName": "Kenneth", "lastName": "Larkey", "suffix": null, "degree": "Third Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "13332 W Letts Ln", "addrLine2": "Carmel, IN 46074-5504", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4363315, "firstName": "John", "lastName": "Lehner", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "10905 Weston Dr", "addrLine2": "Carmel, IN 46032-8676", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 1691621, "firstName": "John", "lastName": "Leicht", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 53, "memberSince": 1974, "clergy": false, "duesBucket": "behind1to2", "state": "legacyGrace", "addrLine1": "431 Round Hill Rd", "addrLine2": "Indianapolis, IN 46260-2911", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}, {"memberNumber": 4883820, "firstName": "Thomas", "lastName": "Leipzig", "suffix": "MD", "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "202 E 75Th St", "addrLine2": "Indianapolis, IN 46240-2844", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 160, "lastYrPaid": 2022}, {"memberNumber": 4699299, "firstName": "Bryan", "lastName": "Leniski", "suffix": null, "degree": "Third Degree", "yrsSvc": 13, "memberSince": 2014, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "15841 River Birch Rd", "addrLine2": "Westfield, IN 46074-9791", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 320, "lastYrPaid": 2018}, {"memberNumber": 765330, "firstName": "John", "lastName": "Leppert", "suffix": null, "degree": "Third Degree", "yrsSvc": 62, "memberSince": 1965, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8547 Olde Mill Circle West Dr", "addrLine2": "Indianapolis, IN 46260-2372", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4138774, "firstName": "David", "lastName": "Lewis", "suffix": null, "degree": "Third Degree", "yrsSvc": 21, "memberSince": 2006, "clergy": false, "duesBucket": "behind3plus", "state": "legacyGrace", "addrLine1": "8910 N Kennedys Crossing Rd", "addrLine2": "Brazil, IN 47834-7883", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 180, "lastYrPaid": 2022}, {"memberNumber": 2175028, "firstName": "Daniel", "lastName": "Lorentz", "suffix": null, "degree": "Third Degree", "yrsSvc": 47, "memberSince": 1980, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "410 W 63Rd St", "addrLine2": "Indianapolis, IN 46260-4720", "email": null, "phone": null, "lastVerified": null, "outstandingDues": -28.55, "lastYrPaid": 2026}, {"memberNumber": 5374184, "firstName": "Anthony", "lastName": "Lorenz", "suffix": null, "degree": "Third Degree", "yrsSvc": 4, "memberSince": 2023, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8077 Lieber Rd", "addrLine2": "Indianapolis, IN 46260-2836", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4447928, "firstName": "Frank", "lastName": "Loughery", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9451 Pleasant View Ln", "addrLine2": "Zionsville, IN 46077-9815", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4467719, "firstName": "Mark", "lastName": "Loughery", "suffix": null, "degree": "Third Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "557 E 81St St", "addrLine2": "Indianapolis, IN 46240-2561", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5073644, "firstName": "Brandon", "lastName": "Lucas", "suffix": null, "degree": "Third Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "860 Kessler Blvd W Dr", "addrLine2": "Indianapolis, IN 46228-1431", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 4363319, "firstName": "Matthew", "lastName": "Lucchese", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "1306 E 82Nd St", "addrLine2": "Indianapolis, IN 46240-2351", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5064238, "firstName": "Gregory", "lastName": "Mark", "suffix": null, "degree": "First Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9071 Cornucopia Dr", "addrLine2": "Indianapolis, IN 46268-3286", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4383084, "firstName": "Mark", "lastName": "Maurer", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "2520 1St St", "addrLine2": "Monroe, WI 53566-1218", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4617801, "firstName": "Kevin", "lastName": "Mc Cusker", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "10699 Kings Mill Dr", "addrLine2": "Carmel, IN 46032-9464", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4375859, "firstName": "Michael", "lastName": "Mc Laughlin", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "210 Coatsville Dr", "addrLine2": "Westfield, IN 46074-8496", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4648876, "firstName": "Stephen", "lastName": "Mc Laughlin", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "210 Coatsville Dr", "addrLine2": "Westfield, IN 46074-8496", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 3906576, "firstName": "Brian", "lastName": "Mc Queen", "suffix": null, "degree": "Third Degree", "yrsSvc": 24, "memberSince": 2003, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7402 Holliday Dr E", "addrLine2": "Indianapolis, IN 46260-3612", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4749573, "firstName": "Shawn", "lastName": "Mc Williams", "suffix": null, "degree": "First Degree", "yrsSvc": 13, "memberSince": 2014, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "6333 Glen Coe Dr", "addrLine2": "Indianapolis, IN 46260-4736", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4849697, "firstName": "Victor", "lastName": "Melchiorre", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "253 Williams Ln", "addrLine2": "Indianapolis, IN 46260-2904", "email": null, "phone": null, "lastVerified": null, "outstandingDues": -80, "lastYrPaid": 2028}, {"memberNumber": 4673609, "firstName": "Matthew", "lastName": "Miller", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7701 Normandy Blvd", "addrLine2": "Indianapolis, IN 46278-1555", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4608098, "firstName": "Thomas", "lastName": "Miller", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "207 W 77Th St", "addrLine2": "Indianapolis, IN 46260-3607", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4783407, "firstName": "Scott", "lastName": "Molander", "suffix": null, "degree": "Third Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8450 N Park Ave", "addrLine2": "Indianapolis, IN 46240-2242", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4608113, "firstName": "Michael", "lastName": "Moore", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "555 Pine Dr", "addrLine2": "Indianapolis, IN 46260-1452", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 4635511, "firstName": "Christopher", "lastName": "Moran", "suffix": null, "degree": "First Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "noRecord", "state": "dataIssue", "addrLine1": "430 Good Ave", "addrLine2": "Indianapolis, IN 46219-8118", "email": null, "phone": null, "lastVerified": null, "outstandingDues": "No Record", "lastYrPaid": "No Record"}, {"memberNumber": 4757609, "firstName": "Patrick", "lastName": "Moran", "suffix": null, "degree": "First Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "noRecord", "state": "dataIssue", "addrLine1": "7641 Prairie Lake Dr", "addrLine2": "Indianapolis, IN 46256-1961", "email": null, "phone": null, "lastVerified": null, "outstandingDues": "No Record", "lastYrPaid": "No Record"}, {"memberNumber": 5557915, "firstName": "Joseph", "lastName": "Moriarty", "suffix": null, "degree": "Third Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": true, "duesBucket": "current", "state": "clergy", "addrLine1": "7575 Holliday Dr E", "addrLine2": "Indianapolis, IN 46260-3613", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4424211, "firstName": "James", "lastName": "Naughton", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8416 Olin Rd", "addrLine2": "Indianapolis, IN 46278-1056", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4306710, "firstName": "Adam", "lastName": "Nelson", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "431 Natalie Ln", "addrLine2": "Indianapolis, IN 46260-3402", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4280526, "firstName": "Joseph", "lastName": "Newton", "suffix": null, "degree": "Third Degree", "yrsSvc": 19, "memberSince": 2008, "clergy": true, "duesBucket": "current", "state": "clergy", "addrLine1": "1400 N Meridian St", "addrLine2": "Indianapolis, IN 46202-2305", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4486609, "firstName": "Frank", "lastName": "Niemiec", "suffix": null, "degree": "Third Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "7754 Cherrybark Dr", "addrLine2": "Indianapolis, IN 46236-8186", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 4819987, "firstName": "Jeffrey", "lastName": "O Brien", "suffix": null, "degree": "Third Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "7423 Sylvan Ridge Rd", "addrLine2": "Indianapolis, IN 46240-3546", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4855538, "firstName": "Thomas", "lastName": "O Brien", "suffix": null, "degree": "Second Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "2151 Finchley Rd", "addrLine2": "Carmel, IN 46032-7291", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4390590, "firstName": "Lawrence", "lastName": "O Bryan", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "2048 Bechtel Rd", "addrLine2": "Indianapolis, IN 46260-1504", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4589675, "firstName": "Daniel", "lastName": "Oldiges", "suffix": null, "degree": "First Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "351 Spring Mill Ct", "addrLine2": "Carmel, IN 46032-9518", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 1969156, "firstName": "David", "lastName": "Orlando", "suffix": null, "degree": "Third Degree", "yrsSvc": 49, "memberSince": 1978, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "19621 Sumrall Pl", "addrLine2": "Westfield, IN 46074-4904", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5316301, "firstName": "Hyacinthe", "lastName": "Ouedraogo", "suffix": null, "degree": "Third Degree", "yrsSvc": 5, "memberSince": 2022, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "7743 Beverly Hills Dr Apt E", "addrLine2": "Indianapolis, IN 46268-5366", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4839588, "firstName": "James", "lastName": "Pappas", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8150 E Avery Dr", "addrLine2": "Indianapolis, IN 46268-1720", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5525479, "firstName": "D. Andy", "lastName": "Paterson", "suffix": null, "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "neverPaid", "state": "onboardingGrace", "addrLine1": "5675 Grandview Dr", "addrLine2": "Indianapolis, IN 46228-1846", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": "Never Paid?"}, {"memberNumber": 4440240, "firstName": "Jon Paul", "lastName": "Patterson", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "12356 Misty Way", "addrLine2": "Indianapolis, IN 46236-9189", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 5045069, "firstName": "Austin", "lastName": "Pittman", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "neverPaid", "state": "neverEngaged", "addrLine1": "645 E 84Th St", "addrLine2": "Indianapolis, IN 46240-2221", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 320, "lastYrPaid": "Never Paid?"}, {"memberNumber": 3371412, "firstName": "Charles", "lastName": "Poirier", "suffix": null, "degree": "Third Degree", "yrsSvc": 31, "memberSince": 1996, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "14045 Springmill Ponds Cir", "addrLine2": "Carmel, IN 46032-8501", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4418916, "firstName": "Nick", "lastName": "Prather", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "2174 Woodland Dr", "addrLine2": "Indianapolis, IN 46260", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5038655, "firstName": "Joby", "lastName": "Puthussery", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": true, "duesBucket": "current", "state": "clergy", "addrLine1": "610 S 6Th St", "addrLine2": "Clinton, IN 47842-2036", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4849648, "firstName": "Jeffrey", "lastName": "Quinn", "suffix": null, "degree": "First Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "7177 Edgewater Pl", "addrLine2": "Indianapolis, IN 46240-3020", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4758700, "firstName": "Matthew", "lastName": "Ranft", "suffix": null, "degree": "First Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "8720 Staghorn Rd", "addrLine2": "Indianapolis, IN 46260-1547", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 4440237, "firstName": "William", "lastName": "Rauck", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "8412 Chokecherry Ter", "addrLine2": "Pensacola, FL 32514-1917", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 5019677, "firstName": "Isaac", "lastName": "Richey", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "440 W 73Rd St", "addrLine2": "Indianapolis, IN 46260-4145", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 20, "lastYrPaid": 2026}, {"memberNumber": 4363334, "firstName": "Leonard", "lastName": "Richey", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "440 W 73Rd St", "addrLine2": "Indianapolis, IN 46260-4145", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 2113492, "firstName": "Robert", "lastName": "Roberts", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 48, "memberSince": 1979, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "910 Forest Boulevard South Dr", "addrLine2": "Indianapolis, IN 46240-2672", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4067929, "firstName": "Paul", "lastName": "Roeder", "suffix": null, "degree": "Third Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "3668 Birchwood Ave", "addrLine2": "Indianapolis, IN 46205-3615", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4699302, "firstName": "Nicholas", "lastName": "Rohrer", "suffix": null, "degree": "First Degree", "yrsSvc": 13, "memberSince": 2014, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "941 W 77Th Street North Dr", "addrLine2": "Indianapolis, IN 46260-3307", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 280, "lastYrPaid": 2019}, {"memberNumber": 4550609, "firstName": "Benjamin", "lastName": "Rotz", "suffix": null, "degree": "First Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "16530 Brookhollow Dr", "addrLine2": "Westfield, IN 46062-7150", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 5319673, "firstName": "Jonathan", "lastName": "Ruffing", "suffix": null, "degree": "Third Degree", "yrsSvc": 5, "memberSince": 2022, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "8515 Springview Dr", "addrLine2": "Indianapolis, IN 46260-2310", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5369964, "firstName": "Brad", "lastName": "Rumancik", "suffix": null, "degree": "Third Degree", "yrsSvc": 4, "memberSince": 2023, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "702 Brookside Dr", "addrLine2": "Marthasville, MO 63357-4018", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 1701314, "firstName": "Richard", "lastName": "Ruwe", "suffix": null, "degree": "Third Degree", "yrsSvc": 65, "memberSince": 1962, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "C/O Matthew Zintel\nPo Box 5867", "addrLine2": "Florence, SC 29502-5867", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 1243652, "firstName": "Richard", "lastName": "Ryan", "suffix": null, "degree": "Third Degree", "yrsSvc": 59, "memberSince": 1968, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "5430 Broadmoor Plz", "addrLine2": "Indianapolis, IN 46228-2025", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4403596, "firstName": "Michael", "lastName": "Sale", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8090 N College Ave", "addrLine2": "Indianapolis, IN 46240-2507", "email": "maccsale@sbcglobal.net", "phone": "317-506-9580", "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 1367766, "firstName": "Joseph", "lastName": "Schaedel", "suffix": null, "degree": "Third Degree", "yrsSvc": 57, "memberSince": 1970, "clergy": true, "duesBucket": "current", "state": "clergy", "addrLine1": "530 Bent Tree Ln", "addrLine2": "Indianapolis, IN 46260-2352", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 2587208, "firstName": "Christopher", "lastName": "Scheer", "suffix": null, "degree": "Third Degree", "yrsSvc": 42, "memberSince": 1985, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1248 Pawtucket Dr", "addrLine2": "Westfield, IN 46074-8376", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 2492389, "firstName": "Kenneth", "lastName": "Scheer", "suffix": null, "degree": "Third Degree", "yrsSvc": 43, "memberSince": 1984, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8427 Carefree Cir", "addrLine2": "Indianapolis, IN 46236-8707", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4849653, "firstName": "William", "lastName": "Scheidler", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "7730 N Illinois St", "addrLine2": "Indianapolis, IN 46260-3661", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4486612, "firstName": "Paul", "lastName": "Scherrer", "suffix": null, "degree": "First Degree", "yrsSvc": 16, "memberSince": 2011, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "7990 Oakland Rd", "addrLine2": "Indianapolis, IN 46240-2746", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 5489716, "firstName": "Tony", "lastName": "Schilte", "suffix": null, "degree": "Third Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "460 Haldale Dr", "addrLine2": "Carmel, IN 46032-1133", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4363338, "firstName": "Andrew", "lastName": "Schrage", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "644 W 77Th Street North Dr", "addrLine2": "Indianapolis, IN 46260-3505", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 5384084, "firstName": "Bill", "lastName": "Schrage", "suffix": null, "degree": "Third Degree", "yrsSvc": 4, "memberSince": 2023, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "1 Indiana Sq", "addrLine2": "Indianapolis, IN 46204-2004", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4390585, "firstName": "Bradley", "lastName": "Schrage", "suffix": null, "degree": "First Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "1738 Sweet Gum Dr", "addrLine2": "Indianapolis, IN 46260-1570", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 5592999, "firstName": "John", "lastName": "Schutzman", "suffix": "MD", "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "9631 Summerlakes Dr", "addrLine2": "Carmel, IN 46032-9394", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4404825, "firstName": "David", "lastName": "Sears", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "2107 Haynes Ave", "addrLine2": "Indianapolis, IN 46240-3238", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4855531, "firstName": "Tobin", "lastName": "Senefeld", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "6329 Glen Coe Dr", "addrLine2": "Indianapolis, IN 46260-4736", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4980600, "firstName": "Joseph", "lastName": "Seufert", "suffix": null, "degree": "First Degree", "yrsSvc": 10, "memberSince": 2017, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7227 Washington Blvd", "addrLine2": "Indianapolis, IN 46240-3050", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 3274036, "firstName": "Steven", "lastName": "Shockley", "suffix": null, "degree": "Third Degree", "yrsSvc": 32, "memberSince": 1995, "clergy": false, "duesBucket": "behind3plus", "state": "legacyGrace", "addrLine1": "802 S 18Th St", "addrLine2": "Chesterton, IN 46304-2828", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 160, "lastYrPaid": 2022}, {"memberNumber": 2997124, "firstName": "Frank", "lastName": "Short", "suffix": null, "degree": "Third Degree", "yrsSvc": 36, "memberSince": 1991, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "Po Box 40228", "addrLine2": "Indianapolis, IN 46240-0228", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4861208, "firstName": "Andrew", "lastName": "Small", "suffix": null, "degree": "First Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "12712 Devon Ln", "addrLine2": "Carmel, IN 46032-8890", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4363342, "firstName": "William", "lastName": "Snyder", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "527 E 84Th St", "addrLine2": "Indianapolis, IN 46240-2219", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5047332, "firstName": "William", "lastName": "Spangler", "suffix": "III", "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "1045 Fairway Dr", "addrLine2": "Indianapolis, IN 46260-4000", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 160, "lastYrPaid": 2022}, {"memberNumber": 5591323, "firstName": "Leo", "lastName": "Stenz", "suffix": null, "degree": "First Degree", "yrsSvc": 2, "memberSince": 2025, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "855 W 96Th St", "addrLine2": "Indianapolis, IN 46260-1215", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4874024, "firstName": "Jonathon", "lastName": "Sturgill", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "7071 Warwick Rd", "addrLine2": "Indianapolis, IN 46220-1050", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4861215, "firstName": "Louis", "lastName": "Talley", "suffix": null, "degree": "Third Degree", "yrsSvc": 11, "memberSince": 2016, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "20902 Stewart Estate Ct", "addrLine2": "Westfield, IN 46074-0507", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4796490, "firstName": "Scott", "lastName": "Tod", "suffix": null, "degree": "First Degree", "yrsSvc": 12, "memberSince": 2015, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "7332 N Illinois St", "addrLine2": "Indianapolis, IN 46260-3617", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4674565, "firstName": "Terry", "lastName": "Townsend", "suffix": null, "degree": "First Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "107 Boulder Dr", "addrLine2": "Berea, OH 44017-3120", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 240, "lastYrPaid": 2020}, {"memberNumber": 4424017, "firstName": "Eric", "lastName": "Tromiczak", "suffix": null, "degree": "First Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "8006 Sequoia Ct", "addrLine2": "Indianapolis, IN 46240-2793", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 320, "lastYrPaid": 2018}, {"memberNumber": 4363345, "firstName": "Gregory", "lastName": "Vanzo", "suffix": null, "degree": "Third Degree", "yrsSvc": 18, "memberSince": 2009, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "5875 Echo Way", "addrLine2": "Indianapolis, IN 46278-1981", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 5498451, "firstName": "Matt", "lastName": "Velazquez", "suffix": null, "degree": "First Degree", "yrsSvc": 3, "memberSince": 2024, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "831 Park Central Dr N Apt D", "addrLine2": "Indianapolis, IN 46260-4568", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4381363, "firstName": "Robert", "lastName": "Vickers", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "2837 Thornton Ln", "addrLine2": "Indianapolis, IN 46268-1257", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 120, "lastYrPaid": 2023}, {"memberNumber": 4635513, "firstName": "William", "lastName": "Wales", "suffix": null, "degree": "First Degree", "yrsSvc": 14, "memberSince": 2013, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "1272 Helford Ln", "addrLine2": "Carmel, IN 46032-8329", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}, {"memberNumber": 723394, "firstName": "William", "lastName": "Watts", "suffix": "JR", "degree": "Third Degree", "yrsSvc": 60, "memberSince": 1967, "clergy": false, "duesBucket": "behind1to2", "state": "legacyGrace", "addrLine1": "5909 Gladden Dr", "addrLine2": "Indianapolis, IN 46220-2565", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 5019678, "firstName": "Michael", "lastName": "Wertz", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "2601 Cardigan Rd", "addrLine2": "Indianapolis, IN 46268-2014", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 200, "lastYrPaid": 2021}, {"memberNumber": 4435585, "firstName": "Jeffrey", "lastName": "Whiting", "suffix": null, "degree": "Third Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "current", "state": "core", "addrLine1": "8801 Dunsmuir Dr", "addrLine2": "Indianapolis, IN 46260-1744", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 4403592, "firstName": "Michael", "lastName": "Williams", "suffix": null, "degree": "First Degree", "yrsSvc": 17, "memberSince": 2010, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "8360 Compton St", "addrLine2": "Indianapolis, IN 46240-2330", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4990688, "firstName": "Stephen", "lastName": "Winchester", "suffix": null, "degree": "First Degree", "yrsSvc": 9, "memberSince": 2018, "clergy": false, "duesBucket": "behind3plus", "state": "valuedBehind", "addrLine1": "1003 West 77Th St", "addrLine2": "Indianapolis, IN 46260", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 160, "lastYrPaid": 2022}, {"memberNumber": 5089214, "firstName": "Jay", "lastName": "Wirts", "suffix": null, "degree": "Third Degree", "yrsSvc": 8, "memberSince": 2019, "clergy": false, "duesBucket": "behind1to2", "state": "contributingBehind", "addrLine1": "170 E 71St St", "addrLine2": "Indianapolis, IN 46220-1012", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 40, "lastYrPaid": 2025}, {"memberNumber": 4937413, "firstName": "William", "lastName": "Wolfred", "suffix": null, "degree": "First Degree", "yrsSvc": 10, "memberSince": 2017, "clergy": false, "duesBucket": "neverPaid", "state": "neverEngaged", "addrLine1": "4509 Somerset Way S", "addrLine2": "Carmel, IN 46033-3334", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 360, "lastYrPaid": "Never Paid?"}, {"memberNumber": 4546243, "firstName": "Xavier", "lastName": "Yesudasan", "suffix": null, "degree": "First Degree", "yrsSvc": 15, "memberSince": 2012, "clergy": true, "duesBucket": "current", "state": "clergy", "addrLine1": "St Lukes Church\n330 N Green St", "addrLine2": "Brownsburg, IN 46112-1023", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 0, "lastYrPaid": 2026}, {"memberNumber": 1546252, "firstName": "Michael", "lastName": "Zunk", "suffix": null, "degree": "Third Degree", "yrsSvc": 54, "memberSince": 1973, "clergy": false, "duesBucket": "behind1to2", "state": "legacyGrace", "addrLine1": "210 Olde Mill Circle South Dr", "addrLine2": "Indianapolis, IN 46260-2375", "email": null, "phone": null, "lastVerified": null, "outstandingDues": 80, "lastYrPaid": 2024}];
+
+function fullName(m) {
+    return [m.firstName, m.lastName].filter(Boolean).join(' ') + (m.suffix ? ' ' + m.suffix : '');
+}
+
+function expText(m) {
+    if (m.duesBucket === 'noRecord') return 'No dues record on file';
+    if (m.duesBucket === 'neverPaid') return 'No dues ever recorded';
+    if (typeof m.lastYrPaid === 'number') return 'Behind since ' + (m.lastYrPaid + 1);
+    return 'Dues not current';
+}
+
+function applyMember(indexOrMember) {
+    const m = (indexOrMember !== null && typeof indexOrMember === 'object') ? indexOrMember : MEMBERS[indexOrMember];
+    const cfg = states[m.state];
+    const name = fullName(m);
+
+    const cardVisual = document.getElementById('cardVisual');
+    const ribbon = document.getElementById('cardRibbon');
+    const watermark = document.getElementById('cardWatermark');
+    cardVisual.classList.remove('exempt');
+    watermark.style.display = 'none';
+
+    ribbon.textContent = cfg.ribbon;
+    document.getElementById('cardName').textContent = name;
+    document.getElementById('cardSince').textContent = m.memberSince ? ('Member Since ' + m.memberSince) : '';
+    document.getElementById('cardMemberId').textContent = '#' + m.memberNumber;
+    document.getElementById('cardDegree').textContent = m.degree || '—';
+    document.getElementById('cardYos').textContent = (m.yrsSvc !== null && m.yrsSvc !== undefined) ? m.yrsSvc : '?';
+
+    if (cfg.card === 'exempt') { cardVisual.classList.add('exempt'); }
+    if (cfg.card === 'lapsed') {
+        watermark.style.display = 'flex';
+        document.getElementById('cardWatermarkLabel').textContent = 'Lapsed';
+        document.getElementById('cardExpText').textContent = expText(m);
+    }
+    if (cfg.card === 'unknown') {
+        watermark.style.display = 'flex';
+        document.getElementById('cardWatermarkLabel').textContent = 'Unverified';
+        document.getElementById('cardExpText').textContent = expText(m);
+    }
+
+    const statusBox = document.getElementById('statusBox');
+    statusBox.className = 'status-box ' + cfg.tone;
+    document.getElementById('statusLabel').textContent = cfg.statusLabel;
+    document.getElementById('statusMessage').textContent = cfg.msg;
+}
 
 function initMemberSelect() {
     const select = document.getElementById('memberSelect');
@@ -466,139 +262,15 @@ function initMemberSelect() {
         opt.textContent = `${m.lastName}, ${m.firstName}${m.suffix ? ' ' + m.suffix : ''} — #${m.memberNumber}`;
         group.appendChild(opt);
     });
-    // Default to a representative Core Member so the page loads looking normal
     const defaultIdx = MEMBERS.findIndex(m => m.state === 'core');
     select.value = defaultIdx >= 0 ? defaultIdx : 0;
     applyMember(select.value);
 }
 
-function fullName(m) {
-    return [m.firstName, m.lastName].filter(Boolean).join(' ') + (m.suffix ? ' ' + m.suffix : '');
-}
-
-function expText(m) {
-    if (m.duesBucket === 'noRecord') return 'No dues record on file';
-    if (m.duesBucket === 'neverPaid') return 'No dues ever recorded';
-    if (typeof m.lastYrPaid === 'number') return 'Behind since ' + (m.lastYrPaid + 1);
-    return 'Dues not current';
-}
-
-function setText(id, text, emptyClass) {
-    const el = document.getElementById(id);
-    el.textContent = text;
-    if (emptyClass) el.classList.toggle('empty', !text || text.startsWith('Not on file'));
-}
-
-function applyMember(indexOrMember) {
-    const m = (indexOrMember !== null && typeof indexOrMember === 'object') ? indexOrMember : MEMBERS[indexOrMember];
-    const cfg = states[m.state];
-    const name = fullName(m);
-
-    // welcome + verified line
-    document.getElementById('welcomeName').textContent = 'Welcome back, ' + m.firstName;
-    document.getElementById('verifiedText').textContent = m.lastVerified ? ('Last verified ' + m.lastVerified) : 'Not yet verified';
-
-    // profile fields
-    setText('profileName', name);
-    setText('profileAddress', [m.addrLine1, m.addrLine2].filter(Boolean).join(', ') || 'No address on file', true);
-    setText('profilePhone', m.phone || 'Not on file — add yours', true);
-    setText('profileEmail', m.email || 'Not on file — add yours', true);
-    document.getElementById('editName').value = name;
-    document.getElementById('editAddress').value = [m.addrLine1, m.addrLine2].filter(Boolean).join(', ');
-    document.getElementById('editPhone').value = m.phone || '';
-    document.getElementById('editEmail').value = m.email || '';
-
-    // membership info
-    document.getElementById('memberIdValue').textContent = '#' + m.memberNumber;
-    document.getElementById('degreeValue').textContent = m.degree || 'Not on file';
-    document.getElementById('yosValue').textContent = (m.yrsSvc !== null ? m.yrsSvc : '?') + ' years';
-    document.getElementById('roleValue').textContent = m.clergy ? 'Clergy' : 'Member';
-
-    const duesEl = document.getElementById('duesValue');
-    const payPrompt = document.getElementById('payPrompt');
-    const payBtn = document.getElementById('payDuesBtn');
-    duesEl.classList.remove('dues-current', 'dues-owed');
-    payPrompt.style.display = 'none';
-    if (m.clergy) {
-        duesEl.textContent = 'Exempt';
-        duesEl.classList.add('dues-current');
-    } else {
-        const owedRaw = (m.outstandingDues === null || m.outstandingDues === undefined) ? '' : String(m.outstandingDues);
-        const owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
-        if (!isNaN(owed) && owed > 0) {
-            duesEl.textContent = '$' + owed.toFixed(2) + ' owed';
-            duesEl.classList.add('dues-owed');
-            payBtn.textContent = 'Pay $' + owed.toFixed(2) + ' Now';
-            payPrompt.style.display = 'block';
-        } else if (m.duesBucket === 'neverPaid' || m.duesBucket === 'noRecord') {
-            duesEl.textContent = 'No payment on record';
-            duesEl.classList.add('dues-owed');
-            payBtn.textContent = 'Pay Dues';
-            payPrompt.style.display = 'block';
-        } else {
-            duesEl.textContent = 'Current';
-            duesEl.classList.add('dues-current');
-        }
-    }
-
-    const paidThroughEl = document.getElementById('paidThroughValue');
-    if (m.clergy) {
-        paidThroughEl.textContent = '—';
-    } else if (typeof m.lastYrPaid === 'number') {
-        paidThroughEl.textContent = m.lastYrPaid;
-    } else {
-        paidThroughEl.textContent = 'None on file';
-    }
-
-    // card visual
-    const cardVisual = document.getElementById('cardVisual');
-    const ribbon = document.getElementById('cardRibbon');
-    const watermark = document.getElementById('cardWatermark');
-    cardVisual.classList.remove('exempt');
-    watermark.style.display = 'none';
-
-    ribbon.textContent = cfg.ribbon;
-    document.getElementById('cardName').textContent = name;
-    document.getElementById('cardSince').textContent = m.memberSince ? ('Member Since ' + m.memberSince) : '';
-    document.getElementById('cardMemberId').textContent = '#' + m.memberNumber;
-    document.getElementById('cardDegree').textContent = m.degree || '—';
-
-    if (cfg.card === 'exempt') { cardVisual.classList.add('exempt'); }
-    if (cfg.card === 'lapsed') {
-        watermark.style.display = 'flex';
-        document.getElementById('cardWatermarkLabel').textContent = 'Lapsed';
-        document.getElementById('cardExpText').textContent = expText(m);
-    }
-    if (cfg.card === 'unknown') {
-        watermark.style.display = 'flex';
-        document.getElementById('cardWatermarkLabel').textContent = 'Unverified';
-        document.getElementById('cardExpText').textContent = expText(m);
-    }
-
-    // status box
-    const statusBox = document.getElementById('statusBox');
-    statusBox.className = 'status-box ' + cfg.tone;
-    document.getElementById('statusLabel').textContent = cfg.statusLabel;
-    document.getElementById('statusMessage').textContent = cfg.msg;
-
-    // collapse edit mode back to view when switching members
-    document.getElementById('viewMode').style.display = 'block';
-    document.getElementById('editMode').style.display = 'none';
-    document.getElementById('editToggleBtn').style.display = 'inline-block';
-    document.getElementById('flagForm').classList.remove('open');
-    document.getElementById('flagConfirm').classList.remove('open');
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    initMemberSelect();
-    tryLiveLogin();
-});
-
-/* ---- Live wiring: pull the actual logged-in member from the sheet ---- */
+/* ---- Live wiring: same sheet, same tab, same classification as Home ---- */
 const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
 const SHEET_GID = '1292747386'; // St Luke KOC Membership DB tab
 const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-
 const DEGREE_MAP = {'1st':'First Degree','2nd':'Second Degree','3rd':'Third Degree'};
 
 function parseYear(v) {
@@ -663,17 +335,9 @@ async function fetchLiveMember(memberNumber) {
         yrsBehindRaw: cell(row, 'Yrs Behind'),
     };
     const cls = classify(fields);
-    const city = (cell(row, 'City') || '').toString().trim();
-    const stateAbbr = (cell(row, 'State') || '').toString().trim();
-    const zipc = cell(row, 'Postal Code');
-    const line2Parts = [city, stateAbbr].filter(Boolean);
-    let addrLine2 = line2Parts.join(', ');
-    if (zipc) addrLine2 += ' ' + zipc;
-
     const degreeRaw = (cell(row, 'Degree Level') || '').toString().trim();
     const lastYrPaidRaw = cell(row, 'Last Yr Paid');
     const lastYrPaid = (typeof lastYrPaidRaw === 'number') ? lastYrPaidRaw : (parseInt(lastYrPaidRaw) || null);
-    const outstandingDuesRaw = cell(row, 'Outstanding Dues');
 
     return {
         memberNumber: cell(row, 'Member Number'),
@@ -686,13 +350,7 @@ async function fetchLiveMember(memberNumber) {
         clergy: fields.clergyRaw === 'Yes',
         duesBucket: cls.duesBucket,
         state: cls.state,
-        addrLine1: titleCase(cell(row, 'Street Address')),
-        addrLine2: addrLine2 || null,
-        email: cell(row, 'email'),
-        phone: cell(row, 'phone'),
-        lastVerified: cell(row, 'Member Last Verify Date'),
         lastYrPaid: lastYrPaid,
-        outstandingDues: outstandingDuesRaw,
     };
 }
 
@@ -715,26 +373,10 @@ async function tryLiveLogin() {
     }
 }
 
-function toggleEdit() {
-    const view = document.getElementById('viewMode');
-    const edit = document.getElementById('editMode');
-    const btn = document.getElementById('editToggleBtn');
-    const editing = edit.style.display !== 'none';
-    view.style.display = editing ? 'block' : 'none';
-    edit.style.display = editing ? 'none' : 'block';
-    btn.style.display = editing ? 'inline-block' : 'none';
-}
-
-function toggleFlag() {
-    document.getElementById('flagForm').classList.toggle('open');
-    document.getElementById('flagConfirm').classList.remove('open');
-}
-function submitFlag() {
-    document.getElementById('flagForm').classList.remove('open');
-    document.getElementById('flagConfirm').classList.add('open');
-}
-function openRemoveModal() { document.getElementById('removeModal').classList.add('open'); }
-function closeRemoveModal() { document.getElementById('removeModal').classList.remove('open'); }
+window.addEventListener('DOMContentLoaded', () => {
+    initMemberSelect();
+    tryLiveLogin();
+});
 </script>
 
 </body>
