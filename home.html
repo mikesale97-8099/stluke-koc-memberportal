@@ -95,6 +95,38 @@ nav a.signout:hover { color:var(--accent); }
 }
 @media (max-width:900px){ .layout { grid-template-columns:1fr; } }
 
+/* ---------- Mobile ---------- */
+@media (max-width:640px){
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    .logo-main { font-size:0.95rem; }
+    nav ul { flex-wrap:wrap; width:100%; justify-content:center; order:3; border-top:1px solid #F0F1F3; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
+    nav a.signout { padding:0.6rem 1rem; font-size:0.8rem; }
+
+    .review-panel { padding:0.7rem 1rem; }
+    .review-panel .inner { gap:0.5rem; }
+    .review-panel select { max-width:100%; flex:1; min-width:0; }
+    .review-panel .note { margin-left:0; width:100%; }
+
+    .welcome { padding:1.25rem 1rem 0; }
+    .welcome h1 { font-size:1.5rem; }
+
+    .layout { padding:1rem 1rem 0; gap:1.25rem; }
+    .card-panel { padding:1.25rem; }
+
+    .field-row { grid-template-columns:1fr; gap:0.15rem; padding:0.6rem 0; }
+    .info-grid { grid-template-columns:1fr; gap:0.9rem; }
+
+    .quick-actions { flex-direction:column; }
+    .card-name { font-size:1.3rem; }
+    .card-meta { flex-wrap:wrap; gap:1rem 1.5rem; }
+
+    .modal { padding:1.5rem; }
+    .modal-actions { flex-direction:column-reverse; }
+    .modal-actions .btn { width:100%; }
+}
+
 .card-panel {
     background:white; border-radius:16px; padding:1.75rem; box-shadow:0 4px 15px var(--shadow);
 }
