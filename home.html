@@ -67,8 +67,9 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .rolodex-badge.tone-neutral { background:#F3F4F6; color:var(--text-medium); }
 .rolodex-badge.tone-exempt { background:#FBF6EC; color:#8A6D2F; }
 .identity-message { font-family:'Lora',serif; font-size:0.95rem; color:var(--text-dark); margin-top:1rem; }
-.identity-footer { margin-top:1rem; padding-top:0.9rem; border-top:1px dashed #E5E7EB; display:flex; flex-direction:column; gap:0.6rem; }
-.identity-footer-verify { display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
+.identity-footer { margin-top:1rem; padding-top:0.9rem; border-top:1px dashed #E5E7EB; display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; }
+.identity-footer-verify { display:flex; flex-direction:column; gap:0.4rem; }
+.confirm-row-inline { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
 .verified-text { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); }
 .verify-link { background:none; border:none; color:var(--primary); text-decoration:underline; font-family:'Lato',sans-serif; font-size:0.8rem; cursor:pointer; padding:0; }
 .verify-link:disabled { color:var(--text-medium); text-decoration:none; cursor:default; }
@@ -201,10 +202,12 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <div class="identity-footer">
             <div class="identity-footer-verify">
                 <span class="verified-text" id="verifiedText">Not yet verified</span>
-                <button class="verify-link" id="confirmBtn" onclick="confirmInfo()">&#10003; I've reviewed this</button>
-                <span class="confirm-status" id="confirmStatus"></span>
+                <div class="confirm-row-inline">
+                    <button class="verify-link" id="confirmBtn" onclick="confirmInfo()">&#10003; I've reviewed this</button>
+                    <span class="confirm-status" id="confirmStatus"></span>
+                </div>
             </div>
-            <button class="verify-link flag-jump" onclick="jumpToFlag()">Something wrong? Flag it &darr;</button>
+            <button class="verify-link flag-jump" onclick="jumpToFlag()">Flag problems I see in my data &darr;</button>
         </div>
     </div>
 
@@ -256,10 +259,10 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <div class="field-row"><label class="field-label" for="editPhone">Phone</label><input type="text" id="editPhone"></div>
             <div class="field-row"><label class="field-label" for="editEmail">Email</label><input type="text" id="editEmail"></div>
             <div class="edit-actions">
-                <button class="btn btn-primary" onclick="toggleEdit()">Save changes</button>
+                <button class="btn btn-primary" id="saveContactBtn" onclick="saveContactChanges()">Save changes</button>
                 <button class="btn btn-outline" onclick="toggleEdit()">Cancel</button>
             </div>
-            <p class="edit-hint">Saving updates your "last verified" date automatically.</p>
+            <p class="edit-hint" id="saveStatus">Saving updates your profile right away and logs the change for a steward to double-check against the source records.</p>
         </div>
     </div>
 
@@ -274,13 +277,14 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <div class="flag-form" id="flagForm">
             <label for="flagCategory">What's this about?</label>
             <select id="flagCategory">
-                <option value="membership">Membership (degree, years of service, role)</option>
-                <option value="dues">Dues (status, amount owed, payment history)</option>
-                <option value="other">Something else</option>
+                <option value="Membership">Membership (degree, years of service, role)</option>
+                <option value="Dues">Dues (status, amount owed, payment history)</option>
+                <option value="Other">Something else</option>
             </select>
-            <textarea placeholder="Tell us what looks wrong — a steward will follow up."></textarea>
+            <textarea id="flagText" placeholder="Tell us what looks wrong — a steward will follow up."></textarea>
+            <p class="edit-hint" id="flagStatus"></p>
             <div class="edit-actions">
-                <button class="btn btn-primary" onclick="submitFlag()">Send to stewards</button>
+                <button class="btn btn-primary" id="submitFlagBtn" onclick="submitFlag()">Send to stewards</button>
                 <button class="btn btn-outline" onclick="toggleFlag()">Cancel</button>
             </div>
         </div>
@@ -429,20 +433,121 @@ function toggleEdit() {
     view.style.display = editing ? 'block' : 'none';
     edit.style.display = editing ? 'none' : 'block';
     btn.style.display = editing ? 'inline-block' : 'none';
+    if (!editing) {
+        const status = document.getElementById('saveStatus');
+        status.textContent = 'Saving updates your profile right away and logs the change for a steward to double-check against the source records.';
+        status.style.color = '';
+    }
 }
 
 function toggleFlag() {
     document.getElementById('flagForm').classList.toggle('open');
     document.getElementById('flagConfirm').classList.remove('open');
+    document.getElementById('flagStatus').textContent = '';
 }
 function jumpToFlag() {
     document.getElementById('flagForm').classList.add('open');
     document.getElementById('flagConfirm').classList.remove('open');
     document.getElementById('flagSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-function submitFlag() {
-    document.getElementById('flagForm').classList.remove('open');
-    document.getElementById('flagConfirm').classList.add('open');
+
+async function submitFlag() {
+    if (!CURRENT_MEMBER) return;
+    const category = document.getElementById('flagCategory').value;
+    const text = document.getElementById('flagText').value.trim();
+    const status = document.getElementById('flagStatus');
+    const btn = document.getElementById('submitFlagBtn');
+
+    if (!text) {
+        status.textContent = 'Add a note describing the issue before sending.';
+        status.className = 'edit-hint';
+        status.style.color = 'var(--accent)';
+        return;
+    }
+
+    btn.disabled = true;
+    status.textContent = 'Sending\u2026';
+    status.style.color = '';
+
+    try {
+        const url = new URL(VERIFY_ENDPOINT_URL);
+        url.searchParams.set('action', 'logChange');
+        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
+        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
+        url.searchParams.set('type', 'Flag');
+        url.searchParams.set('category', category);
+        url.searchParams.set('field', 'General');
+        url.searchParams.set('newValue', text);
+
+        const data = await jsonp(url.toString());
+        btn.disabled = false;
+        if (data.success) {
+            document.getElementById('flagForm').classList.remove('open');
+            document.getElementById('flagConfirm').classList.add('open');
+            document.getElementById('flagText').value = '';
+            status.textContent = '';
+        } else {
+            status.textContent = data.error || 'Could not send \u2014 try again.';
+            status.style.color = 'var(--accent)';
+        }
+    } catch (e) {
+        btn.disabled = false;
+        status.textContent = 'Could not reach the log endpoint \u2014 try again.';
+        status.style.color = 'var(--accent)';
+    }
+}
+
+async function saveContactChanges() {
+    if (!CURRENT_MEMBER) return;
+    const btn = document.getElementById('saveContactBtn');
+    const status = document.getElementById('saveStatus');
+
+    const newFields = {
+        nickname: document.getElementById('editNickname').value.trim(),
+        address1: document.getElementById('editAddress1').value.trim(),
+        city: document.getElementById('editCity').value.trim(),
+        stateAbbr: document.getElementById('editState').value.trim(),
+        zip: document.getElementById('editZip').value.trim(),
+        phone: document.getElementById('editPhone').value.trim(),
+        email: document.getElementById('editEmail').value.trim(),
+    };
+
+    btn.disabled = true;
+    status.textContent = 'Saving\u2026';
+    status.style.color = '';
+
+    try {
+        const url = new URL(VERIFY_ENDPOINT_URL);
+        url.searchParams.set('action', 'saveContact');
+        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
+        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
+        url.searchParams.set('fields', JSON.stringify(newFields));
+
+        const data = await jsonp(url.toString());
+        btn.disabled = false;
+
+        if (data.success) {
+            Object.assign(CURRENT_MEMBER, newFields);
+            const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+            CURRENT_MEMBER.lastVerified = today;
+
+            let msg = data.changed && data.changed.length ? ('Saved: ' + data.changed.join(', ') + '.') : 'No changes to save.';
+            if (data.skipped && data.skipped.length) {
+                msg += ' (' + data.skipped.join(', ') + ' not saved \u2014 that column doesn\u2019t exist in the sheet yet.)';
+            }
+            status.textContent = msg;
+            status.style.color = 'var(--green)';
+
+            applyMember(CURRENT_MEMBER);
+        } else {
+            status.textContent = data.error || 'Could not save \u2014 try again.';
+            status.style.color = 'var(--accent)';
+        }
+    } catch (e) {
+        btn.disabled = false;
+        status.textContent = 'Could not reach the save endpoint \u2014 try again.';
+        status.style.color = 'var(--accent)';
+    }
 }
 function openRemoveModal() { document.getElementById('removeModal').classList.add('open'); }
 function closeRemoveModal() { document.getElementById('removeModal').classList.remove('open'); }
