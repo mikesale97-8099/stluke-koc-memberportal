@@ -143,8 +143,10 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
     nav .container { flex-wrap:wrap; }
     .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
     .logo-main { font-size:0.95rem; }
-    nav ul { flex-wrap:wrap; width:100%; justify-content:center; order:3; border-top:1px solid #F0F1F3; }
-    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
+    nav ul { flex-wrap:nowrap; width:100%; justify-content:flex-start; order:3; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; white-space:nowrap; }
     nav a.signout { padding:0.6rem 1rem; font-size:0.8rem; }
     .review-panel { padding:0.7rem 1rem; }
     .review-panel select { max-width:100%; }

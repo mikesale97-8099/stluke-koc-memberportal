@@ -100,7 +100,7 @@ function handleSaveContact(params) {
 
     const newValue = String(fields[key] || '').trim();
     const oldValue = String(sheet.getRange(rowNum, colIdx + 1).getValue() || '').trim();
-    if (newValue === oldValue) return; // no real change, nothing to write or log
+    if (newValue.toLowerCase() === oldValue.toLowerCase()) return; // no real change, just display-casing formatting
 
     sheet.getRange(rowNum, colIdx + 1).setValue(newValue);
     logSheet().appendRow([new Date(), memberNumber, memberName, 'Self-edit', 'Contact', label, oldValue, newValue, '', '']);
