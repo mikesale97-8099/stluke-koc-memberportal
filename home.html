@@ -67,14 +67,15 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .rolodex-badge.tone-neutral { background:#F3F4F6; color:var(--text-medium); }
 .rolodex-badge.tone-exempt { background:#FBF6EC; color:#8A6D2F; }
 .identity-message { font-family:'Lora',serif; font-size:0.95rem; color:var(--text-dark); margin-top:1rem; }
-.identity-footer { margin-top:1rem; padding-top:0.9rem; border-top:1px dashed #E5E7EB; display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
+.identity-footer { margin-top:1rem; padding-top:0.9rem; border-top:1px dashed #E5E7EB; display:flex; flex-direction:column; gap:0.6rem; }
+.identity-footer-verify { display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; }
 .verified-text { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); }
 .verify-link { background:none; border:none; color:var(--primary); text-decoration:underline; font-family:'Lato',sans-serif; font-size:0.8rem; cursor:pointer; padding:0; }
 .verify-link:disabled { color:var(--text-medium); text-decoration:none; cursor:default; }
 .confirm-status { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); }
 .confirm-status.ok { color:var(--green); font-weight:600; }
 .confirm-status.err { color:var(--accent); font-weight:600; }
-.flag-jump { color:var(--amber) !important; margin-left:auto; }
+.flag-jump { color:var(--amber) !important; }
 
 .btn { font-family:'Lato', sans-serif; font-weight:600; font-size:0.85rem; cursor:pointer; border-radius:50px; padding:0.55rem 1.2rem; border:2px solid transparent; transition:all .2s; }
 .btn-primary { background:var(--secondary); color:white; }
@@ -138,7 +139,12 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .btn-ghost:hover { border-color:var(--text-medium); }
 
 @media (max-width:640px){
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    .logo-main { font-size:0.95rem; }
+    nav ul { flex-wrap:wrap; width:100%; justify-content:center; order:3; border-top:1px solid #F0F1F3; }
     nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
+    nav a.signout { padding:0.6rem 1rem; font-size:0.8rem; }
     .review-panel { padding:0.7rem 1rem; }
     .review-panel select { max-width:100%; }
     .page, .section-card.full { padding-left:1rem; padding-right:1rem; }
@@ -193,9 +199,11 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         </div>
         <p class="identity-message" id="statusMessage">You're all set. Thank you for staying active in council life.</p>
         <div class="identity-footer">
-            <span class="verified-text" id="verifiedText">Not yet verified</span>
-            <button class="verify-link" id="confirmBtn" onclick="confirmInfo()">&#10003; I've reviewed this</button>
-            <span class="confirm-status" id="confirmStatus"></span>
+            <div class="identity-footer-verify">
+                <span class="verified-text" id="verifiedText">Not yet verified</span>
+                <button class="verify-link" id="confirmBtn" onclick="confirmInfo()">&#10003; I've reviewed this</button>
+                <span class="confirm-status" id="confirmStatus"></span>
+            </div>
             <button class="verify-link flag-jump" onclick="jumpToFlag()">Something wrong? Flag it &darr;</button>
         </div>
     </div>
@@ -472,6 +480,17 @@ function titleCase(s) {
     return (s || '').toString().replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
 }
 
+function formatGvizDate(v) {
+    if (v === null || v === undefined) return null;
+    const s = String(v);
+    const m = s.match(/^Date\((\d+),(\d+),(\d+)/);
+    if (m) {
+        const d = new Date(parseInt(m[1]), parseInt(m[2]), parseInt(m[3]));
+        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    return s;
+}
+
 function classify(fields) {
     const clergy = (fields.clergyRaw || '').toString().trim() === 'Yes';
     const yrsSvc = parseInt(fields.yrsSvcRaw);
@@ -542,7 +561,7 @@ async function fetchLiveMember(memberNumber) {
         zip: cell(row, 'Postal Code'),
         email: cell(row, 'email'),
         phone: cell(row, 'phone'),
-        lastVerified: cell(row, 'Member Last Verify Date'),
+        lastVerified: formatGvizDate(cell(row, 'Member Last Verify Date')),
         outstandingDues: cell(row, 'Outstanding Dues'),
         lastYrPaid: lastYrPaid,
     };
