@@ -224,6 +224,7 @@ function renderGroup(groupName) {
     const list = document.getElementById('groupList');
 
     if (groupName === DIRECTORY_GROUP_NAME) {
+        header.className = 'member-row header directory';
         header.innerHTML = '<div>Name</div><div>Position(s)</div><div>Phone</div><div>Email</div>';
         if (!DIRECTORY_MEMBERS.length) {
             list.innerHTML = '<div class="empty-state">No members have opted into the directory yet.</div>';
@@ -246,6 +247,7 @@ function renderGroup(groupName) {
         return;
     }
 
+    header.className = 'member-row header';
     header.innerHTML = '<div>Position</div><div>Member</div><div>Status</div>';
     const rows = POSITIONS.filter(p => p.group === groupName);
     if (!rows.length) {
