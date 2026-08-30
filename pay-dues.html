@@ -20,7 +20,7 @@
     --green-bg: #F0FDF4;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { max-width:100%; overflow-x:hidden; }
+html { max-width:100%; }
 body { font-family:'Lora', serif; color:var(--text-dark); background:var(--light-bg); line-height:1.6; padding-bottom:4rem; }
 a { color:inherit; }
 :focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
@@ -67,6 +67,8 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
 .btn-outline:hover { background:var(--primary); color:white; }
 
+.payable-to { font-family:'Lato',sans-serif; font-size:0.88rem; color:var(--text-dark); margin-top:0.8rem; }
+.payable-to strong { color:var(--primary); }
 .mail-block { margin-top:1.1rem; background:var(--light-bg); border-radius:10px; padding:1rem 1.1rem; font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-dark); white-space:pre-line; line-height:1.5; }
 .mail-note { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); margin-top:0.7rem; }
 .mail-note strong { color:var(--text-dark); }
@@ -116,7 +118,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
         </ul>
-        <a href="#" class="signout">Sign out</a>
+        <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
     </div>
 </nav>
 </header>
@@ -146,7 +148,8 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
         <div class="option-card">
             <h2>Mail a Check</h2>
-            <p>Prefer a check? Make it payable to the council and mail it to:</p>
+            <p>Prefer a check? Here's who to make it out to and where to send it:</p>
+            <p class="payable-to">Payable to: <strong id="payableTo">Loading&hellip;</strong></p>
             <div class="mail-block" id="mailAddress">Dave Fink
 Knights of Columbus
 Dave's Street
@@ -236,7 +239,7 @@ async function fetchLiveMember(memberNumber) {
     };
 }
 
-async function fetchMailAddress() {
+async function fetchAssumptionsRow(labelPrefix) {
     const res = await fetch(GVIZ_ASSUMPTIONS_URL);
     const text = await res.text();
     const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
@@ -244,11 +247,19 @@ async function fetchMailAddress() {
     const json = JSON.parse(match[1]);
     const row = json.table.rows.find(r => {
         const label = r.c[0] && (r.c[0].v || r.c[0].f);
-        return label && String(label).trim().toLowerCase().startsWith('dues check mail to');
+        return label && String(label).trim().toLowerCase().startsWith(labelPrefix);
     });
     if (!row || !row.c[1]) return null;
     const cell = row.c[1];
     return (cell.v !== null && cell.v !== undefined) ? cell.v : cell.f;
+}
+
+async function fetchMailAddress() {
+    return fetchAssumptionsRow('dues check mail to');
+}
+
+async function fetchPayableTo() {
+    return fetchAssumptionsRow('dues check payable to');
 }
 
 async function tryLiveLogin() {
@@ -272,15 +283,18 @@ async function tryLiveLogin() {
 
 async function loadMailAddress() {
     const el = document.getElementById('mailAddress');
+    const payableEl = document.getElementById('payableTo');
     try {
         const addr = await fetchMailAddress();
-        if (addr) {
-            el.textContent = addr;
-        } else {
-            el.textContent = 'Could not find the mailing address on the Assumptions tab \u2014 check with a steward.';
-        }
+        el.textContent = addr || 'Could not find the mailing address on the Assumptions tab \u2014 check with a data administrator.';
     } catch (e) {
-        el.textContent = 'Could not load the mailing address right now \u2014 check with a steward or try again shortly.';
+        el.textContent = 'Could not load the mailing address right now \u2014 check with a data administrator or try again shortly.';
+    }
+    try {
+        const payable = await fetchPayableTo();
+        payableEl.textContent = payable || 'Not on file \u2014 check with a data administrator.';
+    } catch (e) {
+        payableEl.textContent = 'Could not load right now.';
     }
 }
 

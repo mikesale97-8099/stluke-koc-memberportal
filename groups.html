@@ -18,7 +18,7 @@
     --green-bg: #F0FDF4;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { max-width:100%; overflow-x:hidden; }
+html { max-width:100%; }
 body { font-family:'Lora', serif; color:var(--text-dark); background:var(--light-bg); line-height:1.6; padding-bottom:4rem; }
 a { color:inherit; }
 
@@ -69,10 +69,12 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
     .member-row { grid-template-columns:1fr; gap:0.3rem; }
     .member-row.header { display:none; }
 }
+.site-header { position:sticky; top:0; z-index:1000; }
 </style>
 </head>
 <body>
 
+<header class="site-header">
 <div class="review-panel">
     <div class="inner">
         <span class="tag">Live</span>
@@ -94,14 +96,15 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
             <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="groups.html" class="navlink preserve-member active">Groups</a></li>
         </ul>
-        <a href="#" class="signout">Sign out</a>
+        <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
     </div>
 </nav>
+</header>
 
 <div class="page">
 
     <h1>Groups</h1>
-    <p class="sub">Board Members, Activity Leaders, and other council groups — who's currently serving, and who has in the past.</p>
+    <p class="sub">Board Members, Activity Leaders, and other council groups — who's currently serving.</p>
 
     <div class="selector-row">
         <label for="groupSelect">Group:</label>
