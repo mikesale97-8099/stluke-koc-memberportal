@@ -69,8 +69,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .rolodex-badge.tone-neutral { background:#F3F4F6; color:var(--text-medium); }
 .rolodex-badge.tone-exempt { background:#FBF6EC; color:#8A6D2F; }
 .identity-message { font-family:'Lora',serif; font-size:0.95rem; color:var(--text-dark); margin-top:1rem; }
-.identity-footer { margin-top:1rem; padding-top:0.9rem; border-top:1px dashed #E5E7EB; display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; }
-.identity-footer-verify { display:flex; flex-direction:column; gap:0.4rem; }
+.identity-footer { margin-top:1rem; padding-top:0.9rem; border-top:1px dashed #E5E7EB; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; }
 .confirm-row-inline { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
 .verified-text { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); }
 .verify-link { background:none; border:none; color:var(--primary); text-decoration:underline; font-family:'Lato',sans-serif; font-size:0.8rem; cursor:pointer; padding:0; }
@@ -115,16 +114,17 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .btn-pay { width:100%; padding:0.8rem; font-size:0.9rem; }
 
 /* Flag — single entry point, category selector with a catch-all */
-.flag-block { background:white; border-radius:16px; padding:1.5rem 1.75rem; box-shadow:0 4px 15px var(--shadow); margin-top:1.5rem; }
-.flag-block .flag-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; }
-.flag-block h2 { font-family:'Crimson Pro', serif; font-size:1.1rem; color:var(--primary); font-weight:700; }
-.flag-block p.sub { font-family:'Lato',sans-serif; font-size:0.82rem; color:var(--text-medium); margin-top:0.2rem; }
-.flag-form { display:none; margin-top:1.1rem; padding-top:1.1rem; border-top:1px dashed #E5E7EB; }
+.verify-box { background:white; border-radius:16px; padding:1.75rem; box-shadow:0 4px 15px var(--shadow); margin-top:1.5rem; text-align:center; }
+.verify-box h2 { font-family:'Crimson Pro', serif; font-size:1.25rem; color:var(--primary); font-weight:700; }
+.verify-box p.sub { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-top:0.4rem; }
+.verify-choice { display:flex; align-items:center; justify-content:center; gap:1.25rem; flex-wrap:wrap; margin-top:1.25rem; }
+.verify-box .confirm-status { display:block; margin-top:0.75rem; font-family:'Lato',sans-serif; font-size:0.82rem; color:var(--text-medium); }
+.flag-form { display:none; margin-top:1.25rem; padding-top:1.1rem; border-top:1px dashed #E5E7EB; text-align:left; }
 .flag-form.open { display:block; }
 .flag-form label { font-family:'Lato',sans-serif; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-medium); display:block; margin-bottom:0.4rem; }
 .flag-form select { font-family:'Lato',sans-serif; font-size:0.92rem; padding:0.55rem 0.7rem; border-radius:8px; border:1.5px solid #D1D5DB; width:100%; max-width:280px; margin-bottom:0.9rem; }
 .flag-form textarea { width:100%; min-height:80px; font-family:'Lora',serif; font-size:0.9rem; padding:0.7rem; border:1.5px solid #D1D5DB; border-radius:8px; resize:vertical; }
-.flag-confirm { display:none; margin-top:0.9rem; padding:0.85rem 1rem; background:var(--green-bg); border-left:3px solid var(--green); border-radius:6px; font-family:'Lato',sans-serif; font-size:0.85rem; color:#166534; }
+.flag-confirm { display:none; margin-top:0.9rem; padding:0.85rem 1rem; background:var(--green-bg); border-left:3px solid var(--green); border-radius:6px; font-family:'Lato',sans-serif; font-size:0.85rem; color:#166534; text-align:left; }
 .flag-confirm.open { display:block; }
 
 .page-footer { max-width:1000px; margin:2.5rem auto 0; padding:0 1.5rem; text-align:center; }
@@ -212,14 +212,8 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         </div>
         <p class="identity-message" id="statusMessage">You're all set. Thank you for staying active in council life.</p>
         <div class="identity-footer">
-            <div class="identity-footer-verify">
-                <span class="verified-text" id="verifiedText">Not yet verified</span>
-                <div class="confirm-row-inline">
-                    <button class="verify-link" id="confirmBtn" onclick="confirmInfo()">&#10003; I've reviewed this</button>
-                    <span class="confirm-status" id="confirmStatus"></span>
-                </div>
-            </div>
-            <button class="verify-link flag-jump" onclick="jumpToFlag()">Flag problems I see in my data &darr;</button>
+            <span class="verified-text" id="verifiedText">Not yet verified</span>
+            <button class="verify-link flag-jump" onclick="jumpToVerifyBox()">Looks right, or something to flag? &darr;</button>
         </div>
     </div>
 
@@ -285,14 +279,16 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         </div>
     </div>
 
-    <div class="flag-block" id="flagSection">
-        <div class="flag-head">
-            <div>
-                <h2>Flag an Issue</h2>
-                <p class="sub">See something wrong with your membership or dues info? Use the button to flag it for a data administrator. Contact info is self-service — fix it anytime with the Update button in Contact Profile above.</p>
-            </div>
-            <button class="btn-text" onclick="toggleFlag()">Flag an issue</button>
+    <div class="verify-box" id="verifySection">
+        <h2>Everything look right?</h2>
+        <p class="sub" id="verifyBoxStatus">Not yet verified.</p>
+
+        <div class="verify-choice" id="verifyChoice">
+            <button class="btn btn-primary" id="confirmBtn" onclick="confirmInfo()">&#10003; My data looks good</button>
+            <button class="btn-text" onclick="toggleFlag()">My dues/membership data doesn't look right</button>
         </div>
+        <p class="confirm-status" id="confirmStatus"></p>
+
         <div class="flag-form" id="flagForm">
             <label for="flagCategory">What's this about?</label>
             <select id="flagCategory">
@@ -369,6 +365,7 @@ function applyMember(indexOrMember) {
     document.getElementById('statusMessage').textContent = cfg.msg;
 
     document.getElementById('verifiedText').textContent = m.lastVerified ? ('Last verified ' + m.lastVerified) : 'Not yet verified';
+    document.getElementById('verifyBoxStatus').textContent = m.lastVerified ? ('Confirmed as of ' + m.lastVerified + '.') : 'Not yet verified.';
 
     const nickEl = document.getElementById('profileNickname');
     const a1 = document.getElementById('profileAddress1');
@@ -443,7 +440,7 @@ function applyMember(indexOrMember) {
     document.getElementById('flagForm').classList.remove('open');
     document.getElementById('flagConfirm').classList.remove('open');
     document.getElementById('confirmBtn').disabled = false;
-    document.getElementById('confirmBtn').textContent = '\u2713 I\u2019ve reviewed this';
+    document.getElementById('confirmBtn').textContent = '\u2713 My data looks good';
     const confirmStatusEl = document.getElementById('confirmStatus');
     confirmStatusEl.textContent = '';
     confirmStatusEl.className = 'confirm-status';
@@ -471,10 +468,8 @@ function toggleFlag() {
     document.getElementById('flagConfirm').classList.remove('open');
     document.getElementById('flagStatus').textContent = '';
 }
-function jumpToFlag() {
-    document.getElementById('flagForm').classList.add('open');
-    document.getElementById('flagConfirm').classList.remove('open');
-    document.getElementById('flagSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+function jumpToVerifyBox() {
+    document.getElementById('verifySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 async function submitFlag() {
@@ -810,6 +805,7 @@ async function confirmInfo() {
         if (data.success) {
             const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
             document.getElementById('verifiedText').textContent = 'Last verified ' + today;
+            document.getElementById('verifyBoxStatus').textContent = 'Confirmed as of ' + today + '.';
             status.textContent = 'Thanks \u2014 saved to your record.';
             status.className = 'confirm-status ok';
             btn.textContent = '\u2713 Confirmed';
