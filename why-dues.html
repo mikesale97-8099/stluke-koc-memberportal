@@ -91,10 +91,12 @@ nav a.signout:hover { color:var(--accent); }
     .hero { padding:2rem 1.25rem 0; }
     .hero h1 { font-size:1.7rem; }
 }
+.site-header { position:sticky; top:0; z-index:1000; }
 </style>
 </head>
 <body>
 
+<header class="site-header">
 <nav>
     <div class="container">
         <div class="logo-section">
@@ -107,11 +109,12 @@ nav a.signout:hover { color:var(--accent); }
             <li><a href="home.html" class="navlink preserve-member">Home</a></li>
             <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
             <li><a href="#" class="navlink active">Why Dues?</a></li>
-            <li><a href="#" class="navlink">Connections</a></li>
+            <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
         </ul>
         <a href="#" class="signout">Sign out</a>
     </div>
 </nav>
+</header>
 
 <div class="hero">
     <h1>Where Your Dues Go</h1>

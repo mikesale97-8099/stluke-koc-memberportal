@@ -61,6 +61,8 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .rolodex-id { flex:1; min-width:220px; }
 .rolodex-name { font-family:'Crimson Pro', serif; font-size:1.5rem; font-weight:700; color:var(--text-dark); }
 .rolodex-meta { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-top:0.25rem; }
+.rolodex-positions { margin-top:0.5rem; }
+.position-pill { display:inline-block; background:var(--light-bg); color:var(--primary); border-radius:50px; padding:0.2rem 0.75rem; margin-right:0.4rem; margin-top:0.3rem; font-family:'Lato',sans-serif; font-size:0.75rem; font-weight:600; }
 .rolodex-badge { font-family:'Lato',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:0.4rem 0.9rem; border-radius:50px; white-space:nowrap; }
 .rolodex-badge.tone-good { background:var(--green-bg); color:var(--green); }
 .rolodex-badge.tone-warm { background:var(--amber-bg); color:var(--amber); }
@@ -157,10 +159,12 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
     .modal-actions { flex-direction:column-reverse; }
     .modal-actions .btn { width:100%; }
 }
+.site-header { position:sticky; top:0; z-index:1000; }
 </style>
 </head>
 <body>
 
+<header class="site-header">
 <div class="review-panel">
     <div class="inner">
         <span class="tag">Live</span>
@@ -182,11 +186,12 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <li><a href="home.html" class="navlink active">Home</a></li>
             <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
             <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
-            <li><a href="#" class="navlink">Connections</a></li>
+            <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
         </ul>
         <a href="#" class="signout">Sign out</a>
     </div>
 </nav>
+</header>
 
 <div class="page">
 
@@ -197,6 +202,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <div class="rolodex-id">
                 <div class="rolodex-name" id="rxName">Daniel R. Fitzgerald</div>
                 <div class="rolodex-meta">Member #<span id="rxId">0142</span></div>
+                <div class="rolodex-positions" id="rxPositions" style="display:none;"></div>
             </div>
             <span class="rolodex-badge tone-good" id="rxBadge">Core Member</span>
         </div>
@@ -234,12 +240,12 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
     <div class="section-card full" style="margin-top:1.5rem;">
         <div class="section-head">
             <h2>Contact Profile</h2>
-            <button class="btn btn-outline" id="editToggleBtn" onclick="toggleEdit()">Edit</button>
+            <button class="btn btn-outline" id="editToggleBtn" onclick="toggleEdit()">Update</button>
         </div>
-        <p class="section-note">Add a nickname if you go by something else — that's what shows in your greeting. Legal name issues go through Flag an Issue below.</p>
+        <p class="section-note">Add a preferred name if you go by something else — that's what shows in your greeting. Legal name issues go through Flag an Issue below.</p>
         <div class="empty-banner" id="emptyBanner" style="display:none;">Your contact info is empty — worth filling in so stewards and brothers can reach you.</div>
         <div id="viewMode">
-            <div class="field-row"><span class="field-label">Nickname</span><span class="field-value" id="profileNickname">Not on file</span></div>
+            <div class="field-row"><span class="field-label">Preferred Name</span><span class="field-value" id="profileNickname">Not on file</span></div>
             <div class="field-row"><span class="field-label">Address 1</span><span class="field-value" id="profileAddress1">4218 Birchwood Ln</span></div>
             <div class="field-row"><span class="field-label">City</span><span class="field-value" id="profileCity">Indianapolis</span></div>
             <div class="field-row"><span class="field-label">State</span><span class="field-value" id="profileState">IN</span></div>
@@ -248,7 +254,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <div class="field-row"><span class="field-label">Email</span><span class="field-value" id="profileEmail">Not on file</span></div>
         </div>
         <div id="editMode" style="display:none;">
-            <div class="field-row"><label class="field-label" for="editNickname">Nickname</label><input type="text" id="editNickname" placeholder="What you go by"></div>
+            <div class="field-row"><label class="field-label" for="editNickname">Preferred Name</label><input type="text" id="editNickname" placeholder="What you go by"></div>
             <div class="field-row"><label class="field-label" for="editAddress1">Address 1</label><input type="text" id="editAddress1"></div>
             <div class="field-row"><label class="field-label" for="editCity">City</label><input type="text" id="editCity"></div>
             <div class="field-row"><label class="field-label" for="editState">State</label>
@@ -425,6 +431,8 @@ function applyMember(indexOrMember) {
     const confirmStatusEl = document.getElementById('confirmStatus');
     confirmStatusEl.textContent = '';
     confirmStatusEl.className = 'confirm-status';
+
+    updatePositionsLine(m.memberNumber);
 }
 
 function toggleEdit() {
@@ -661,7 +669,7 @@ async function fetchLiveMember(memberNumber) {
         firstName: titleCase(cell(row, 'First Name')),
         lastName: titleCase(cell(row, 'Last Name')),
         suffix: cell(row, 'Suffix'),
-        nickname: cell(row, 'Nickname'),
+        nickname: cell(row, 'Preferred Name'),
         degree: DEGREE_MAP[degreeRaw] || degreeRaw || null,
         yrsSvc: parseInt(cell(row, 'YRS SVC')) || null,
         clergy: fields.clergyRaw === 'Yes',
@@ -772,6 +780,51 @@ window.addEventListener('DOMContentLoaded', () => {
     initMemberSelect();
     tryLiveLogin();
 });
+
+/* ---- Positions (Groups feature): active positions shown on the rolodex ---- */
+const POSITIONS_GID = '620591520'; // Positions tab
+const GVIZ_POSITIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${POSITIONS_GID}`;
+let POSITIONS_CACHE = null;
+
+async function fetchAllPositions() {
+    if (POSITIONS_CACHE) return POSITIONS_CACHE;
+    const res = await fetch(GVIZ_POSITIONS_URL);
+    const text = await res.text();
+    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+    if (!match) throw new Error('Unexpected sheet response');
+    const json = JSON.parse(match[1]);
+    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const idx = (label) => cols.indexOf(label);
+    const cell = (row, label) => {
+        const i = idx(label);
+        if (i === -1) return null;
+        const c = row.c[i];
+        if (!c) return null;
+        return (c.v !== null && c.v !== undefined) ? c.v : c.f;
+    };
+    POSITIONS_CACHE = json.table.rows.map(row => ({
+        group: (cell(row, 'Group') || '').toString().trim(),
+        position: (cell(row, 'Position') || '').toString().trim(),
+        memberNumber: String(cell(row, 'Member Number') || '').replace(/^0+/, ''),
+        endDate: cell(row, 'End Date'),
+    }));
+    return POSITIONS_CACHE;
+}
+
+async function updatePositionsLine(memberNumber) {
+    const el = document.getElementById('rxPositions');
+    if (!memberNumber) { el.style.display = 'none'; return; }
+    const target = String(memberNumber).replace(/^0+/, '');
+    try {
+        const all = await fetchAllPositions();
+        const active = all.filter(p => p.memberNumber === target && !p.endDate && p.position);
+        if (!active.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+        el.innerHTML = active.map(p => `<span class="position-pill">${p.position}</span>`).join('');
+        el.style.display = 'block';
+    } catch (e) {
+        el.style.display = 'none'; // fail quiet — positions are a bonus, not core to the page
+    }
+}
 
 /* Carry the logged-in member across pages via preserve-member links */
 (function () {

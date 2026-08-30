@@ -72,7 +72,7 @@ function handleSaveContact(params) {
 
   // field key -> [sheet column name, friendly label for the log]
   const FIELD_MAP = {
-    nickname:  ['Nickname', 'Nickname'],
+    nickname:  ['Preferred Name', 'Preferred Name'],
     address1:  ['Street Address', 'Address 1'],
     city:      ['City', 'City'],
     stateAbbr: ['State', 'State'],

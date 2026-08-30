@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Groups — St. Luke Knights of Columbus Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1E3A8A;
+    --secondary: #C5A572;
+    --accent: #B91C1C;
+    --light-bg: #F9FAFB;
+    --text-dark: #1F2937;
+    --text-medium: #6B7280;
+    --shadow: rgba(30, 58, 138, 0.15);
+    --green: #15803D;
+    --green-bg: #F0FDF4;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { max-width:100%; overflow-x:hidden; }
+body { font-family:'Lora', serif; color:var(--text-dark); background:var(--light-bg); line-height:1.6; padding-bottom:4rem; }
+a { color:inherit; }
+
+.review-panel { background:#fff; border-bottom:2px dashed #9CA3AF; padding:0.9rem 1.5rem; }
+.review-panel .inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.review-panel .tag { font-family:'Lato', sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; background:#374151; color:#fff; padding:0.3rem 0.6rem; border-radius:4px; }
+.review-panel .note { font-family:'Lato', sans-serif; font-size:0.8rem; color:var(--text-medium); }
+
+nav { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); }
+nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:stretch; flex-wrap:wrap; }
+.logo-section { padding:0.7rem 1.5rem; display:flex; align-items:center; }
+.logo { font-family:'Crimson Pro', serif; color:var(--primary); line-height:1.15; text-decoration:none; }
+.logo-main { display:block; font-size:1.05rem; font-weight:700; }
+.logo-sub { display:block; font-size:0.72rem; color:var(--text-medium); font-family:'Lato',sans-serif; }
+nav ul { list-style:none; display:flex; margin:0; flex-wrap:wrap; }
+nav ul li { display:flex; align-items:center; }
+nav a.navlink { font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium); text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; }
+nav a.navlink.active { color:var(--primary); font-weight:700; border-bottom-color:var(--secondary); }
+nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); padding:1.1rem 1.5rem; text-decoration:none; }
+
+.page { max-width:800px; margin:0 auto; padding:0 1.5rem; }
+h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); font-weight:700; margin-top:2rem; }
+.sub { font-family:'Lato',sans-serif; font-size:0.92rem; color:var(--text-medium); margin-top:0.4rem; }
+
+.selector-row { margin-top:1.5rem; display:flex; align-items:center; gap:0.9rem; flex-wrap:wrap; }
+.selector-row label { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
+.selector-row select { font-family:'Lato', sans-serif; font-size:1rem; padding:0.6rem 1rem; border-radius:10px; border:1.5px solid #D1D5DB; background:white; min-width:220px; }
+
+.group-card { background:white; border-radius:16px; box-shadow:0 4px 15px var(--shadow); margin-top:1.25rem; overflow:hidden; }
+.member-row { display:grid; grid-template-columns:1.4fr 1.4fr 1fr; gap:1rem; padding:1rem 1.5rem; border-bottom:1px solid #F0F1F3; align-items:center; }
+.member-row:last-child { border-bottom:none; }
+.member-row.header { background:var(--light-bg); font-family:'Lato',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-medium); }
+.member-row .position { font-family:'Lato',sans-serif; font-weight:600; color:var(--primary); }
+.member-row .name { font-family:'Crimson Pro', serif; font-size:1.05rem; font-weight:700; }
+.status-pill { font-family:'Lato',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; padding:0.3rem 0.7rem; border-radius:50px; display:inline-block; }
+.status-pill.active { background:var(--green-bg); color:var(--green); }
+.status-pill.ended { background:#F3F4F6; color:var(--text-medium); }
+
+.empty-state { padding:2rem; text-align:center; font-family:'Lato',sans-serif; color:var(--text-medium); }
+
+@media (max-width:640px){
+    nav ul { flex-wrap:nowrap; width:100%; justify-content:flex-start; order:3; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; white-space:nowrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    .page { padding:0 1rem; }
+    .member-row { grid-template-columns:1fr; gap:0.3rem; }
+    .member-row.header { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="review-panel">
+    <div class="inner">
+        <span class="tag">Live</span>
+        <span class="note" id="statusNote">Loading positions from the sheet&hellip;</span>
+    </div>
+</div>
+
+<nav>
+    <div class="container">
+        <div class="logo-section">
+            <a href="home.html" class="logo preserve-member">
+                <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
+                <span class="logo-sub">Member Portal · Council 14895</span>
+            </a>
+        </div>
+        <ul>
+            <li><a href="home.html" class="navlink preserve-member">Home</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
+            <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
+            <li><a href="groups.html" class="navlink preserve-member active">Groups</a></li>
+        </ul>
+        <a href="#" class="signout">Sign out</a>
+    </div>
+</nav>
+
+<div class="page">
+
+    <h1>Groups</h1>
+    <p class="sub">Board Members, Activity Leaders, and other council groups — who's currently serving, and who has in the past.</p>
+
+    <div class="selector-row">
+        <label for="groupSelect">Group:</label>
+        <select id="groupSelect" onchange="renderGroup(this.value)"></select>
+    </div>
+
+    <div class="group-card">
+        <div class="member-row header">
+            <div>Position</div>
+            <div>Member</div>
+            <div>Status</div>
+        </div>
+        <div id="groupList">
+            <div class="empty-state">Loading&hellip;</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
+const POSITIONS_GID = '620591520'; // Positions tab
+const GVIZ_POSITIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${POSITIONS_GID}`;
+
+let POSITIONS = [];
+
+function formatDate(v) {
+    if (v === null || v === undefined || v === '') return null;
+    const s = String(v);
+    const m = s.match(/^Date\((\d+),(\d+),(\d+)/);
+    let d;
+    if (m) {
+        d = new Date(parseInt(m[1]), parseInt(m[2]), parseInt(m[3]));
+    } else {
+        d = new Date(s);
+        if (isNaN(d.getTime())) return s; // fall back to raw text rather than hiding it
+    }
+    return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+}
+
+async function fetchPositions() {
+    const res = await fetch(GVIZ_POSITIONS_URL);
+    const text = await res.text();
+    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+    if (!match) throw new Error('Unexpected sheet response');
+    const json = JSON.parse(match[1]);
+    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const idx = (label) => cols.indexOf(label);
+    const cell = (row, label) => {
+        const i = idx(label);
+        if (i === -1) return null;
+        const c = row.c[i];
+        if (!c) return null;
+        return (c.v !== null && c.v !== undefined) ? c.v : c.f;
+    };
+
+    return json.table.rows
+        .map(row => ({
+            group: (cell(row, 'Group') || '').toString().trim(),
+            position: (cell(row, 'Position') || '').toString().trim(),
+            name: (cell(row, 'Name') || '').toString().trim(),
+            startDate: cell(row, 'Start Date'),
+            endDate: cell(row, 'End Date'),
+        }))
+        .filter(p => p.group && p.position && p.name);
+}
+
+function renderGroup(groupName) {
+    const list = document.getElementById('groupList');
+    const rows = POSITIONS.filter(p => p.group === groupName);
+    if (!rows.length) {
+        list.innerHTML = '<div class="empty-state">No positions recorded for this group yet.</div>';
+        return;
+    }
+    list.innerHTML = rows.map(p => {
+        const active = !p.endDate;
+        const startText = formatDate(p.startDate);
+        const endText = formatDate(p.endDate);
+        const statusHtml = active
+            ? `<span class="status-pill active">Active${startText ? ' since ' + startText : ''}</span>`
+            : `<span class="status-pill ended">Ended ${endText || ''}</span>`;
+        return `<div class="member-row">
+            <div class="position">${p.position}</div>
+            <div class="name">${p.name}</div>
+            <div>${statusHtml}</div>
+        </div>`;
+    }).join('');
+}
+
+function initGroupSelect() {
+    const groups = [...new Set(POSITIONS.map(p => p.group))];
+    const select = document.getElementById('groupSelect');
+    select.innerHTML = '';
+    groups.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        select.appendChild(opt);
+    });
+    if (groups.length) {
+        select.value = groups[0];
+        renderGroup(groups[0]);
+    } else {
+        document.getElementById('groupList').innerHTML = '<div class="empty-state">No positions found in the sheet yet.</div>';
+    }
+}
+
+async function init() {
+    const status = document.getElementById('statusNote');
+    try {
+        POSITIONS = await fetchPositions();
+        status.textContent = `Connected — ${POSITIONS.length} position record${POSITIONS.length === 1 ? '' : 's'} loaded.`;
+        initGroupSelect();
+    } catch (e) {
+        status.textContent = 'Could not reach the Positions tab — check sharing settings (Anyone with the link — Viewer).';
+        document.getElementById('groupList').innerHTML = '<div class="empty-state">Could not load positions right now.</div>';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', init);
+
+/* Carry the logged-in member across pages via preserve-member links */
+(function () {
+    const memberParam = new URLSearchParams(window.location.search).get("member");
+    if (!memberParam) return;
+    document.querySelectorAll("a.preserve-member").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.href);
+        url.searchParams.set("member", memberParam);
+        a.setAttribute("href", url.pathname + url.search);
+    });
+})();
+</script>
+
+</body>
+</html>
