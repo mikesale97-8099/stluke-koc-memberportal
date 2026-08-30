@@ -126,6 +126,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
 .page-footer { max-width:1000px; margin:2.5rem auto 0; padding:0 1.5rem; text-align:center; }
 .page-footer p { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); margin-bottom:0.75rem; }
+.data-refresh { font-size:0.72rem !important; color:#9CA3AF !important; margin-bottom:0.5rem !important; }
 .remove-link { font-family:'Lato',sans-serif; font-size:0.8rem; color:#9CA3AF; text-decoration:underline; background:none; border:none; cursor:pointer; }
 .remove-link:hover { color:var(--accent); }
 
@@ -278,7 +279,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <div class="flag-head">
             <div>
                 <h2>Flag an Issue</h2>
-                <p class="sub">Something look wrong with your membership or dues info? Let a data administrator know — contact info you can just fix yourself above.</p>
+                <p class="sub">See something wrong with your membership or dues info? Use the button to flag it for a data administrator. Contact info is self-service — fix it anytime with the Update button in Contact Profile above.</p>
             </div>
             <button class="btn-text" onclick="toggleFlag()">Flag an issue</button>
         </div>
@@ -303,14 +304,15 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
 <div class="page-footer">
     <p>St. Luke Knights of Columbus, Council 14895 · Indianapolis, IN · council14895@gmail.com</p>
+    <p class="data-refresh" id="dataRefreshLine"></p>
     <button class="remove-link" onclick="openRemoveModal()">Request removal from the council</button>
 </div>
 
 <div class="modal-overlay" id="removeModal">
     <div class="modal">
         <h3>Before you go</h3>
-        <p>This will notify the data administrators and mark your membership as pending removal. It can't be undone from here.</p>
-        <p class="fine">If this is about dues, participation, or something else — a quick "Flag an issue" or a note to a brother might solve it without leaving.</p>
+        <p>This will notify a data administrator, who'll forward your request to the right council contact — this step can't be undone from here.</p>
+        <p class="fine">If this is about dues, or something else — a quick "Flag an issue" or a note to a brother might solve it without leaving. Either way, we value you as a brother knight and understand if you can't participate at the level you'd like right now.</p>
         <div class="modal-actions">
             <button class="btn btn-ghost" onclick="closeRemoveModal()">Never mind</button>
             <button class="btn btn-danger" onclick="closeRemoveModal()">Yes, request removal</button>
@@ -592,9 +594,36 @@ function initMemberSelect() {
 /* ---- Live wiring: real sheet fetch, classification, login handoff, verified write-back ---- */
 const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
 const SHEET_GID = '1292747386'; // St Luke KOC Membership DB tab
+const ASSUMPTIONS_GID = '753284304'; // Assumptions tab
 const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
+const GVIZ_ASSUMPTIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${ASSUMPTIONS_GID}`;
 const VERIFY_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbw-wxkf1XzXM-tvhj-tsmDVdHdgI5YcWI63yj7W3RQyee7mrWmi2h88bvIykQq0Jb50FQ/exec';
 const DEGREE_MAP = {'1st':'First Degree','2nd':'Second Degree','3rd':'Third Degree'};
+
+async function fetchAssumptionsRow(labelPrefix) {
+    const res = await fetch(GVIZ_ASSUMPTIONS_URL);
+    const text = await res.text();
+    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+    if (!match) throw new Error('Unexpected sheet response');
+    const json = JSON.parse(match[1]);
+    const row = json.table.rows.find(r => {
+        const label = r.c[0] && (r.c[0].v || r.c[0].f);
+        return label && String(label).trim().toLowerCase().startsWith(labelPrefix);
+    });
+    if (!row || !row.c[1]) return null;
+    const cell = row.c[1];
+    return (cell.v !== null && cell.v !== undefined) ? cell.v : cell.f;
+}
+
+async function loadDataRefreshLine() {
+    const el = document.getElementById('dataRefreshLine');
+    try {
+        const raw = await fetchAssumptionsRow('data last refreshed on');
+        el.textContent = raw ? ('Data last updated ' + formatGvizDate(raw) + ' (manual refresh).') : '';
+    } catch (e) {
+        el.textContent = ''; // quiet fail — this is a nice-to-have, not core to the page
+    }
+}
 
 function titleCase(s) {
     return (s || '').toString().replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
@@ -779,6 +808,7 @@ async function confirmInfo() {
 window.addEventListener('DOMContentLoaded', () => {
     initMemberSelect();
     tryLiveLogin();
+    loadDataRefreshLine();
 });
 
 /* ---- Positions (Groups feature): active positions shown on the rolodex ---- */
