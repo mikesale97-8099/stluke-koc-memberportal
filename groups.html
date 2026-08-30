@@ -57,6 +57,11 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
 .status-pill.active { background:var(--green-bg); color:var(--green); }
 .status-pill.ended { background:#F3F4F6; color:var(--text-medium); }
 
+.member-row.directory { grid-template-columns:1.3fr 1.3fr 1fr 1.3fr; }
+.member-row.directory .contact-value { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-dark); }
+.member-row.directory .contact-value.empty { color:var(--text-medium); font-style:italic; }
+.position-pill { display:inline-block; background:var(--light-bg); color:var(--primary); border-radius:50px; padding:0.2rem 0.7rem; margin:0.15rem 0.3rem 0.15rem 0; font-family:'Lato',sans-serif; font-size:0.75rem; font-weight:600; }
+
 .empty-state { padding:2rem; text-align:center; font-family:'Lato',sans-serif; color:var(--text-medium); }
 
 @media (max-width:640px){
@@ -67,6 +72,7 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
     .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
     .page { padding:0 1rem; }
     .member-row { grid-template-columns:1fr; gap:0.3rem; }
+    .member-row.directory { grid-template-columns:1fr; }
     .member-row.header { display:none; }
 }
 .site-header { position:sticky; top:0; z-index:1000; }
@@ -112,7 +118,7 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
     </div>
 
     <div class="group-card">
-        <div class="member-row header">
+        <div class="member-row header" id="groupHeader">
             <div>Position</div>
             <div>Member</div>
             <div>Status</div>
@@ -127,9 +133,14 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
 <script>
 const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
 const POSITIONS_GID = '620591520'; // Positions tab
+const MEMBERSHIP_GID = '1292747386'; // St Luke KOC Membership DB tab
 const GVIZ_POSITIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${POSITIONS_GID}`;
+const GVIZ_MEMBERSHIP_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${MEMBERSHIP_GID}`;
+const DIRECTORY_GROUP_NAME = 'Member Directory';
 
 let POSITIONS = [];
+let DIRECTORY_MEMBERS = [];
+let ACTIVE_POSITIONS_BY_MEMBER = {};
 
 function formatDate(v) {
     if (v === null || v === undefined || v === '') return null;
@@ -140,40 +151,102 @@ function formatDate(v) {
         d = new Date(parseInt(m[1]), parseInt(m[2]), parseInt(m[3]));
     } else {
         d = new Date(s);
-        if (isNaN(d.getTime())) return s; // fall back to raw text rather than hiding it
+        if (isNaN(d.getTime())) return s;
     }
     return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
 }
 
-async function fetchPositions() {
-    const res = await fetch(GVIZ_POSITIONS_URL);
-    const text = await res.text();
-    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
-    if (!match) throw new Error('Unexpected sheet response');
-    const json = JSON.parse(match[1]);
+function titleCase(s) {
+    return (s || '').toString().replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
+}
+
+function gvizCellReader(json) {
     const cols = json.table.cols.map(c => (c.label || '').trim());
     const idx = (label) => cols.indexOf(label);
-    const cell = (row, label) => {
+    return (row, label) => {
         const i = idx(label);
         if (i === -1) return null;
         const c = row.c[i];
         if (!c) return null;
         return (c.v !== null && c.v !== undefined) ? c.v : c.f;
     };
+}
 
+async function fetchGvizJson(url) {
+    const res = await fetch(url);
+    const text = await res.text();
+    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
+    if (!match) throw new Error('Unexpected sheet response');
+    return JSON.parse(match[1]);
+}
+
+async function fetchPositions() {
+    const json = await fetchGvizJson(GVIZ_POSITIONS_URL);
+    const cell = gvizCellReader(json);
     return json.table.rows
         .map(row => ({
             group: (cell(row, 'Group') || '').toString().trim(),
             position: (cell(row, 'Position') || '').toString().trim(),
             name: (cell(row, 'Name') || '').toString().trim(),
+            memberNumber: String(cell(row, 'Member Number') || '').replace(/^0+/, ''),
             startDate: cell(row, 'Start Date'),
             endDate: cell(row, 'End Date'),
         }))
         .filter(p => p.group && p.position && p.name);
 }
 
+async function fetchDirectoryMembers() {
+    const json = await fetchGvizJson(GVIZ_MEMBERSHIP_URL);
+    const cell = gvizCellReader(json);
+    return json.table.rows
+        .map(row => ({
+            memberNumber: String(cell(row, 'Member Number') || '').replace(/^0+/, ''),
+            name: [titleCase(cell(row, 'First Name')), titleCase(cell(row, 'Last Name'))].filter(Boolean).join(' '),
+            phone: (cell(row, 'phone') || '').toString().trim(),
+            email: (cell(row, 'email') || '').toString().trim(),
+            optIn: String(cell(row, 'Directory Opt-In') || '').trim().toLowerCase() === 'yes',
+        }))
+        .filter(m => m.optIn && m.memberNumber);
+}
+
+function buildActivePositionsIndex() {
+    const map = {};
+    POSITIONS.forEach(p => {
+        if (p.endDate || !p.memberNumber) return;
+        if (!map[p.memberNumber]) map[p.memberNumber] = [];
+        map[p.memberNumber].push(p.position);
+    });
+    return map;
+}
+
 function renderGroup(groupName) {
+    const header = document.getElementById('groupHeader');
     const list = document.getElementById('groupList');
+
+    if (groupName === DIRECTORY_GROUP_NAME) {
+        header.innerHTML = '<div>Name</div><div>Position(s)</div><div>Phone</div><div>Email</div>';
+        if (!DIRECTORY_MEMBERS.length) {
+            list.innerHTML = '<div class="empty-state">No members have opted into the directory yet.</div>';
+            return;
+        }
+        list.innerHTML = DIRECTORY_MEMBERS.map(m => {
+            const positions = ACTIVE_POSITIONS_BY_MEMBER[m.memberNumber] || [];
+            const positionsHtml = positions.length
+                ? positions.map(p => `<span class="position-pill">${p}</span>`).join('')
+                : '<span class="contact-value empty">—</span>';
+            const phoneHtml = m.phone ? `<span class="contact-value">${m.phone}</span>` : '<span class="contact-value empty">Not on file</span>';
+            const emailHtml = m.email ? `<span class="contact-value">${m.email}</span>` : '<span class="contact-value empty">Not on file</span>';
+            return `<div class="member-row directory">
+                <div class="name">${m.name}</div>
+                <div>${positionsHtml}</div>
+                <div>${phoneHtml}</div>
+                <div>${emailHtml}</div>
+            </div>`;
+        }).join('');
+        return;
+    }
+
+    header.innerHTML = '<div>Position</div><div>Member</div><div>Status</div>';
     const rows = POSITIONS.filter(p => p.group === groupName);
     if (!rows.length) {
         list.innerHTML = '<div class="empty-state">No positions recorded for this group yet.</div>';
@@ -196,6 +269,7 @@ function renderGroup(groupName) {
 
 function initGroupSelect() {
     const groups = [...new Set(POSITIONS.map(p => p.group))];
+    groups.unshift(DIRECTORY_GROUP_NAME);
     const select = document.getElementById('groupSelect');
     select.innerHTML = '';
     groups.forEach(g => {
@@ -204,23 +278,22 @@ function initGroupSelect() {
         opt.textContent = g;
         select.appendChild(opt);
     });
-    if (groups.length) {
-        select.value = groups[0];
-        renderGroup(groups[0]);
-    } else {
-        document.getElementById('groupList').innerHTML = '<div class="empty-state">No positions found in the sheet yet.</div>';
-    }
+    select.value = DIRECTORY_GROUP_NAME;
+    renderGroup(DIRECTORY_GROUP_NAME);
 }
 
 async function init() {
     const status = document.getElementById('statusNote');
     try {
-        POSITIONS = await fetchPositions();
-        status.textContent = `Connected — ${POSITIONS.length} position record${POSITIONS.length === 1 ? '' : 's'} loaded.`;
+        const [positions, directory] = await Promise.all([fetchPositions(), fetchDirectoryMembers()]);
+        POSITIONS = positions;
+        DIRECTORY_MEMBERS = directory;
+        ACTIVE_POSITIONS_BY_MEMBER = buildActivePositionsIndex();
+        status.textContent = `Connected — ${POSITIONS.length} position record${POSITIONS.length === 1 ? '' : 's'}, ${DIRECTORY_MEMBERS.length} directory member${DIRECTORY_MEMBERS.length === 1 ? '' : 's'} loaded.`;
         initGroupSelect();
     } catch (e) {
-        status.textContent = 'Could not reach the Positions tab — check sharing settings (Anyone with the link — Viewer).';
-        document.getElementById('groupList').innerHTML = '<div class="empty-state">Could not load positions right now.</div>';
+        status.textContent = 'Could not reach the sheet — check sharing settings (Anyone with the link — Viewer).';
+        document.getElementById('groupList').innerHTML = '<div class="empty-state">Could not load groups right now.</div>';
     }
 }
 

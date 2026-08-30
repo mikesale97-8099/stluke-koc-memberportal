@@ -79,6 +79,7 @@ function handleSaveContact(params) {
     zip:       ['Postal Code', 'Zip Code'],
     phone:     ['phone', 'Phone'],
     email:     ['email', 'Email'],
+    directoryOptIn: ['Directory Opt-In', 'Member Directory'],
   };
 
   let rowIdx = -1;
