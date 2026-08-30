@@ -625,9 +625,13 @@ async function fetchAssumptionsRow(labelPrefix) {
         const label = r.c[0] && (r.c[0].v || r.c[0].f);
         return label && String(label).trim().toLowerCase().startsWith(labelPrefix);
     });
-    if (!row || !row.c[1]) return null;
-    const cell = row.c[1];
-    return (cell.v !== null && cell.v !== undefined) ? cell.v : cell.f;
+    if (!row) return null;
+    for (const idx of [1, 2]) {
+        const cell = row.c[idx];
+        if (cell && (cell.v !== null && cell.v !== undefined)) return cell.v;
+        if (cell && cell.f) return cell.f;
+    }
+    return null;
 }
 
 async function loadDataRefreshLine() {
