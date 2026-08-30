@@ -89,17 +89,6 @@ nav a.signout:hover { color:var(--accent); }
 .watermark span { font-family:'Lato',sans-serif; font-weight:800; font-size:2.1rem; letter-spacing:0.1em; color:rgba(185,28,28,0.28); border:4px solid rgba(185,28,28,0.28); border-radius:8px; padding:0.3rem 1.3rem; transform:rotate(-14deg); text-transform:uppercase; }
 .watermark .exp { position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:0.78rem; font-weight:700; color:rgba(185,28,28,0.6); letter-spacing:0.03em; }
 
-.status-box { margin-top:1.5rem; padding:1.1rem 1.25rem; border-radius:12px; text-align:left; }
-.status-box .status-label { font-family:'Lato',sans-serif; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.35rem; display:block; }
-.status-box p { font-size:0.95rem; }
-.status-box.tone-good { background:var(--green-bg); }
-.status-box.tone-good .status-label { color:var(--green); }
-.status-box.tone-warm { background:var(--amber-bg); }
-.status-box.tone-warm .status-label { color:var(--amber); }
-.status-box.tone-neutral { background:#F3F4F6; }
-.status-box.tone-neutral .status-label { color:var(--text-medium); }
-.status-box.tone-exempt { background:#FBF6EC; }
-.status-box.tone-exempt .status-label { color:#8A6D2F; }
 
 .btn { font-family:'Lato', sans-serif; font-weight:600; font-size:0.88rem; cursor:pointer; border-radius:50px; padding:0.75rem 1.4rem; border:2px solid transparent; transition:all .2s; text-decoration:none; display:inline-block; }
 .btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
@@ -205,11 +194,6 @@ nav a.signout:hover { color:var(--accent); }
 
     <p class="card-disclaimer">This is a facsimile of your paper card and not officially recognized. Your official card for the current year can be picked up at a monthly council meeting from the Financial Secretary.</p>
 
-    <div class="status-box tone-good" id="statusBox">
-        <span class="status-label" id="statusLabel">Core Member</span>
-        <p id="statusMessage">You're all set. Thank you for staying active in council life.</p>
-    </div>
-
     <p class="wallet-note">This page itself is your digital card — bookmark it or add it to your home screen for quick access.</p>
 
     <a href="home.html" class="back-link preserve-member">&larr; Back to My Profile</a>
@@ -281,11 +265,6 @@ function applyMember(indexOrMember) {
         document.getElementById('cardWatermarkLabel').textContent = 'Unverified';
         document.getElementById('cardExpText').textContent = expText(m);
     }
-
-    const statusBox = document.getElementById('statusBox');
-    statusBox.className = 'status-box ' + cfg.tone;
-    document.getElementById('statusLabel').textContent = cfg.statusLabel;
-    document.getElementById('statusMessage').textContent = cfg.msg;
 }
 
 function initMemberSelect() {
