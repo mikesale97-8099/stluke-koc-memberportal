@@ -232,8 +232,11 @@ function duesPaidToText(m) {
     return 'No payment on record';
 }
 
+let CURRENT_MEMBER = null;
+
 function applyMember(indexOrMember) {
     const m = (indexOrMember !== null && typeof indexOrMember === 'object') ? indexOrMember : MEMBERS[indexOrMember];
+    CURRENT_MEMBER = m;
     const cfg = states[m.state] || states[DEFAULT_TIER];
     const name = fullName(m);
 
