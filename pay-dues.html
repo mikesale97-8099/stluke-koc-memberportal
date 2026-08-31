@@ -99,7 +99,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
     <div class="inner">
         <span class="tag">Live</span>
         <label for="memberSelect">Browse as a member (demo):</label>
-        <select id="memberSelect" onchange="applyMember(parseInt(this.value))"></select>
+        <select id="memberSelect" onchange="applyMember(parseInt(this.value)); document.getElementById('memberNote').textContent = 'Snapshot data \u00b7 arriving from login loads your live record instead';"></select>
         <span class="note" id="memberNote">Snapshot data · arriving from login loads your live record instead</span>
     </div>
 </div>
