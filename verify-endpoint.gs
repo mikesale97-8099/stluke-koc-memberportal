@@ -134,7 +134,7 @@ function handleLogChange(params) {
 
   const memberNumber = String(params.memberNumber || '').trim();
   const memberName = String(params.memberName || '').trim();
-  const type = String(params.type || '').trim();       // 'Self-edit' or 'Flag'
+  const type = String(params.type || '').trim();       // 'Self-edit', 'Flag', or 'Contact Request'
   const category = String(params.category || '').trim(); // 'Contact' / 'Membership' / 'Dues'
   const field = String(params.field || '').trim();
   const oldValue = params.oldValue !== undefined ? String(params.oldValue) : '';
