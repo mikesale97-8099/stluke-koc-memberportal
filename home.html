@@ -132,6 +132,8 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .data-refresh { font-size:0.72rem !important; color:#9CA3AF !important; margin-bottom:0.5rem !important; }
 .remove-link { font-family:'Lato',sans-serif; font-size:0.8rem; color:#9CA3AF; text-decoration:underline; background:none; border:none; cursor:pointer; }
 .remove-link:hover { color:var(--accent); }
+.box-secondary-actions { margin-top:1.5rem; padding-top:1.1rem; border-top:1px dashed #E5E7EB; display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
+.box-secondary-actions .btn-text { font-size:0.82rem; color:var(--text-medium); }
 
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(31,41,55,0.55); z-index:2000; align-items:center; justify-content:center; padding:1.5rem; }
 .modal-overlay.open { display:flex; }
@@ -304,6 +306,12 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             </div>
         </div>
         <div class="flag-confirm" id="flagConfirm">Thanks — a data administrator has been notified and will follow up with you directly.</div>
+
+        <div class="box-secondary-actions">
+            <button class="btn-text" id="contactMeBtn" onclick="requestContact()">Please contact me to discuss my membership</button>
+            <button class="btn-text remove-link" onclick="openRemoveModal()">Request removal from the council</button>
+        </div>
+        <p class="edit-hint" id="contactStatus"></p>
     </div>
 
 </div>
@@ -311,7 +319,6 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 <div class="page-footer">
     <p>St. Luke Knights of Columbus, Council 14895 · Indianapolis, IN · council14895@gmail.com</p>
     <p class="data-refresh" id="dataRefreshLine"></p>
-    <button class="remove-link" onclick="openRemoveModal()">Request removal from the council</button>
 </div>
 
 <div class="modal-overlay" id="removeModal">
@@ -445,6 +452,9 @@ function applyMember(indexOrMember) {
     const confirmStatusEl = document.getElementById('confirmStatus');
     confirmStatusEl.textContent = '';
     confirmStatusEl.className = 'confirm-status';
+    document.getElementById('contactMeBtn').disabled = false;
+    document.getElementById('contactMeBtn').textContent = 'Please contact me to discuss my membership';
+    document.getElementById('contactStatus').textContent = '';
 
     updatePositionsLine(m.memberNumber);
 }
@@ -509,6 +519,42 @@ async function submitFlag() {
             document.getElementById('flagText').value = '';
             status.textContent = '';
         } else {
+            status.textContent = data.error || 'Could not send \u2014 try again.';
+            status.style.color = 'var(--accent)';
+        }
+    } catch (e) {
+        btn.disabled = false;
+        status.textContent = 'Could not reach the log endpoint \u2014 try again.';
+        status.style.color = 'var(--accent)';
+    }
+}
+
+async function requestContact() {
+    if (!CURRENT_MEMBER) return;
+    const btn = document.getElementById('contactMeBtn');
+    const status = document.getElementById('contactStatus');
+
+    btn.disabled = true;
+    status.textContent = 'Sending\u2026';
+    status.style.color = '';
+
+    try {
+        const url = new URL(VERIFY_ENDPOINT_URL);
+        url.searchParams.set('action', 'logChange');
+        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
+        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
+        url.searchParams.set('type', 'Contact Request');
+        url.searchParams.set('category', 'Membership');
+        url.searchParams.set('field', 'General');
+        url.searchParams.set('newValue', 'Member has requested contact to discuss their membership.');
+
+        const data = await jsonp(url.toString());
+        if (data.success) {
+            btn.textContent = '\u2713 Request sent';
+            status.textContent = 'The data administrator will forward your request and someone will be reaching out soon.';
+            status.style.color = '';
+        } else {
+            btn.disabled = false;
             status.textContent = data.error || 'Could not send \u2014 try again.';
             status.style.color = 'var(--accent)';
         }
