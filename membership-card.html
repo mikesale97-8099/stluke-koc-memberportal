@@ -385,7 +385,6 @@ async function tryLiveLogin() {
         if (live) {
             applyMember(live);
             showMainContent();
-            document.getElementById('reviewPanel').style.display = 'block';
             if (note) note.textContent = 'Logged in live \u2014 record #' + memberNumber + ' pulled straight from the sheet just now.';
         } else if (owner) {
             if (note) note.textContent = 'Could not find member #' + memberNumber + ' in the live sheet \u2014 showing snapshot data below instead.';
