@@ -832,7 +832,7 @@ function jsonp(url) {
 
         setTimeout(() => {
             if (!done) { cleanup(); reject(new Error('JSONP request timed out')); }
-        }, 10000);
+        }, 20000);
     });
 }
 
