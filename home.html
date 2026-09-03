@@ -32,6 +32,7 @@ a { color:inherit; }
 /* Mockup-only review panel */
 .review-panel { background:#fff; border-bottom:2px dashed #9CA3AF; padding:0.9rem 1.5rem; }
 .review-panel .inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.demo-controls { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
 .review-panel .tag { font-family:'Lato', sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; background:#374151; color:#fff; padding:0.3rem 0.6rem; border-radius:4px; }
 .review-panel label { font-family:'Lato', sans-serif; font-size:0.85rem; color:var(--text-medium); }
 .review-panel select { font-family:'Lato', sans-serif; font-size:0.9rem; padding:0.4rem 0.6rem; border-radius:6px; border:1.5px solid #D1D5DB; background:#fff; width:100%; max-width:340px; }
@@ -53,6 +54,9 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
 /* Page shell */
 .page { max-width:1000px; margin:0 auto; padding:0 1.5rem; }
+.not-logged-in { max-width:500px; margin:4rem auto; padding:0 1.5rem; text-align:center; }
+.not-logged-in h1 { font-family:'Crimson Pro', serif; font-size:1.8rem; color:var(--primary); font-weight:700; }
+.not-logged-in p { font-family:'Lato',sans-serif; font-size:0.95rem; color:var(--text-medium); margin:0.75rem 0 1.5rem; }
 .greeting-line { font-family:'Crimson Pro', serif; font-size:1.3rem; font-weight:700; color:var(--primary); margin-top:2rem; }
 
 /* Unified identity card — name/badge, tone message, verify action, one visual unit */
@@ -171,11 +175,13 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 <body>
 
 <header class="site-header">
-<div class="review-panel">
+<div class="review-panel" id="reviewPanel" style="display:none;">
     <div class="inner">
         <span class="tag">Live</span>
-        <label for="memberSelect">Browse as a member (demo):</label>
-        <select id="memberSelect" onchange="applyMember(parseInt(this.value)); document.getElementById('memberNote').textContent = 'Snapshot data \u00b7 arriving from login loads your live record instead';"></select>
+        <span class="demo-controls" id="demoControls">
+            <label for="memberSelect">Browse as a member (demo):</label>
+            <select id="memberSelect" onchange="applyMember(parseInt(this.value)); document.getElementById('memberNote').textContent = 'Snapshot data \u00b7 arriving from login loads your live record instead';"></select>
+        </span>
         <span class="note" id="memberNote">Snapshot data · arriving from login loads your live record instead</span>
     </div>
 </div>
@@ -199,7 +205,13 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 </nav>
 </header>
 
-<div class="page">
+<div class="not-logged-in" id="notLoggedIn" style="display:none;">
+    <h1>Please log in</h1>
+    <p>You need to log in through the member portal to view this page.</p>
+    <a href="landing.html" class="btn btn-primary">Go to login</a>
+</div>
+
+<div class="page" id="mainContent" style="display:none;">
 
     <p class="greeting-line" id="greetingLine">Welcome back, Daniel</p>
 
@@ -786,22 +798,48 @@ async function fetchLiveMember(memberNumber) {
     };
 }
 
+const ADMIN_KEY = 'stluke14895';
+function isOwnerMode() {
+    return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY;
+}
+function showMainContent() {
+    document.getElementById('notLoggedIn').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+}
+function showNotLoggedIn() {
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('notLoggedIn').style.display = 'block';
+}
+
 async function tryLiveLogin() {
     const memberNumber = new URLSearchParams(window.location.search).get('member');
     const note = document.getElementById('memberNote');
-    if (!memberNumber) return;
+    const owner = isOwnerMode();
 
-    note.textContent = 'Loading your live record\u2026';
+    if (!memberNumber) {
+        if (!owner) showNotLoggedIn(); // no login, not the owner — nothing to show
+        return;
+    }
+
+    if (note) note.textContent = 'Loading your live record\u2026';
     try {
         const live = await fetchLiveMember(memberNumber);
         if (live) {
             applyMember(live);
-            note.textContent = 'Logged in live \u2014 record #' + memberNumber + ' pulled straight from the sheet just now.';
+            showMainContent();
+            document.getElementById('reviewPanel').style.display = 'block';
+            if (note) note.textContent = 'Logged in live \u2014 record #' + memberNumber + ' pulled straight from the sheet just now.';
+        } else if (owner) {
+            if (note) note.textContent = 'Could not find member #' + memberNumber + ' in the live sheet \u2014 showing snapshot data below instead.';
         } else {
-            note.textContent = 'Could not find member #' + memberNumber + ' in the live sheet \u2014 showing snapshot data below instead.';
+            showNotLoggedIn();
         }
     } catch (e) {
-        note.textContent = 'Could not reach the live sheet \u2014 showing snapshot data below instead.';
+        if (owner) {
+            if (note) note.textContent = 'Could not reach the live sheet \u2014 showing snapshot data below instead.';
+        } else {
+            showNotLoggedIn();
+        }
     }
 }
 
@@ -877,8 +915,14 @@ async function confirmInfo() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    initMemberSelect();
-    tryLiveLogin();
+    if (isOwnerMode()) {
+        document.getElementById('reviewPanel').style.display = 'block';
+        initMemberSelect(); // builds demo dropdown + applies a default member
+        showMainContent();
+    } else {
+        document.getElementById('demoControls').style.display = 'none'; // no demo browsing for non-owners
+    }
+    tryLiveLogin(); // real ?member= login works for anyone with a link, owner or not
     loadDataRefreshLine();
     loadTierMessages();
 });
