@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events — St. Luke Knights of Columbus Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1E3A8A;
+    --primary-light: #2563EB;
+    --secondary: #C5A572;
+    --secondary-light: #D4B583;
+    --accent: #B91C1C;
+    --light-bg: #F9FAFB;
+    --text-dark: #1F2937;
+    --text-medium: #6B7280;
+    --shadow: rgba(30, 58, 138, 0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { max-width:100%; }
+body {
+    font-family:'Lora', serif;
+    color:var(--text-dark);
+    background:var(--light-bg);
+    line-height:1.65;
+    padding-bottom:4rem;
+}
+a { color:inherit; }
+:focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
+
+nav { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); }
+nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:stretch; }
+.logo-section { padding:0.7rem 1.5rem; display:flex; align-items:center; }
+.logo { font-family:'Crimson Pro', serif; color:var(--primary); line-height:1.15; text-decoration:none; }
+.logo-main { display:block; font-size:1.05rem; font-weight:700; letter-spacing:0.2px; }
+.logo-sub { display:block; font-size:0.72rem; font-weight:400; color:var(--text-medium); font-family:'Lato',sans-serif; }
+nav ul { list-style:none; display:flex; margin:0; }
+nav ul li { display:flex; align-items:center; }
+nav a.navlink {
+    font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium);
+    text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; transition:all .2s;
+}
+nav a.navlink:hover { color:var(--primary); background:rgba(30,58,138,0.05); }
+nav a.navlink.active { color:var(--primary); font-weight:700; border-bottom-color:var(--secondary); }
+nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); padding:1.1rem 1.5rem; text-decoration:none; }
+nav a.signout:hover { color:var(--accent); }
+.site-header { position:sticky; top:0; z-index:1000; }
+
+.hero { max-width:760px; margin:0 auto; padding:2.5rem 2rem 0; text-align:center; }
+.hero h1 { font-family:'Crimson Pro', serif; font-size:2.1rem; color:var(--primary); font-weight:700; }
+.hero p { font-family:'Lora',serif; font-size:1.02rem; color:var(--text-medium); margin-top:0.75rem; }
+
+.events-container {
+    display:grid; grid-template-columns:320px 1fr; gap:1.75rem;
+    max-width:1200px; margin:0 auto; padding:2rem 2rem 0;
+}
+
+.activities-menu {
+    position:sticky; top:90px; height:fit-content;
+    background:white; border-radius:16px; padding:1.25rem;
+    box-shadow:0 4px 15px var(--shadow);
+}
+.activities-menu h3 {
+    font-family:'Crimson Pro', serif; font-size:1.25rem; color:var(--primary);
+    margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:2px solid var(--secondary);
+}
+.category-section { margin-bottom:0.75rem; }
+.category-header {
+    font-family:'Crimson Pro', serif; font-size:1.02rem; font-weight:700; color:var(--primary);
+    padding:0.7rem 0.5rem; border-left:4px solid var(--secondary); cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center; transition:background .2s;
+}
+.category-header:hover { background:var(--light-bg); }
+.category-header::after { content:'\25BC'; font-size:0.7rem; transition:transform .2s; }
+.category-header.collapsed::after { transform:rotate(-90deg); }
+.menu-list { list-style:none; padding:0; margin:0 0 0 0.5rem; max-height:1000px; overflow:hidden; transition:max-height .3s ease; }
+.menu-list.collapsed { max-height:0; }
+.menu-item {
+    padding:0.7rem 0.9rem; margin:0.4rem 0; border-radius:8px; cursor:pointer;
+    background:var(--light-bg); border-left:3px solid transparent; font-family:'Lato',sans-serif;
+    font-size:0.88rem; transition:all .2s;
+}
+.menu-item:hover { background:#E5E7EB; border-left-color:var(--secondary); }
+.menu-item.active { background:var(--primary); color:white; border-left-color:var(--secondary); font-weight:600; }
+
+.activity-detail {
+    background:white; border-radius:16px; padding:1.75rem;
+    box-shadow:0 4px 15px var(--shadow); min-height:300px; display:none;
+}
+.activity-detail.active { display:block; }
+.detail-header { border-bottom:2px solid var(--secondary); padding-bottom:0.7rem; margin-bottom:0.9rem; }
+.detail-title { font-family:'Crimson Pro', serif; font-size:1.6rem; color:var(--primary); margin-bottom:0.25rem; }
+.detail-frequency { font-family:'Lato',sans-serif; color:var(--text-medium); font-size:0.9rem; font-style:italic; }
+.detail-description { font-family:'Lora',serif; font-size:0.98rem; color:var(--text-dark); margin-bottom:0.9rem; }
+.badge {
+    display:inline-block; background:#FEF3C7; color:#92400E; font-family:'Lato',sans-serif;
+    padding:0.35rem 0.75rem; border-radius:20px; font-size:0.8rem; font-weight:600; margin:0 0 0.75rem;
+}
+.opportunities-section h4 { font-family:'Crimson Pro', serif; font-size:1.05rem; color:var(--primary); margin-bottom:0.5rem; }
+.opportunities-list { display:grid; gap:0.35rem; }
+.opportunity-item {
+    display:flex; align-items:center; gap:0.6rem; padding:0.5rem 0.8rem;
+    background:var(--light-bg); border-radius:6px; font-family:'Lato',sans-serif; font-size:0.88rem;
+}
+.opportunity-item::before { content:'\2713'; color:var(--secondary); font-weight:700; }
+
+.actions { max-width:1200px; margin:2rem auto 0; padding:0 2rem; display:flex; gap:0.9rem; justify-content:center; flex-wrap:wrap; }
+.btn {
+    font-family:'Lato', sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer;
+    border-radius:50px; padding:0.7rem 1.5rem; border:2px solid transparent; text-decoration:none; display:inline-block;
+}
+.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
+.btn-outline:hover { background:var(--primary); color:white; }
+
+.contact-note {
+    max-width:1200px; margin:1.5rem auto 0; padding:0 2rem;
+    font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); text-align:center;
+}
+
+@media (max-width:968px){
+    .events-container { grid-template-columns:1fr; padding:1.5rem 1.25rem 0; }
+    .activities-menu { position:relative; top:0; }
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    nav ul { flex-wrap:nowrap; width:100%; justify-content:flex-start; order:3; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; white-space:nowrap; }
+    .hero { padding:2rem 1.25rem 0; }
+    .hero h1 { font-size:1.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+<nav>
+    <div class="container">
+        <div class="logo-section">
+            <a href="home.html" class="logo preserve-member">
+                <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
+                <span class="logo-sub">Member Portal · Council 14895</span>
+            </a>
+        </div>
+        <ul>
+            <li><a href="home.html" class="navlink preserve-member">Home</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
+            <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
+            <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
+            <li><a href="#" class="navlink active">Events</a></li>
+        </ul>
+        <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
+    </div>
+</nav>
+</header>
+
+<div class="hero">
+    <h1>Council Events &amp; Volunteer Activities</h1>
+    <p>What we do throughout the year — browse by category to see how you can get involved.</p>
+</div>
+
+<div class="events-container">
+    <div class="activities-menu">
+        <h3>Select an Activity</h3>
+
+        <div class="category-section">
+            <div class="category-header" onclick="toggleCategory(this)">
+                <span>&#9767; Faith</span>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item active" onclick="showActivity(1)">K of C Mass</li>
+                <li class="menu-item" onclick="showActivity(16)">Special Needs Mass</li>
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <div class="category-header" onclick="toggleCategory(this)">
+                <span>&#128110; Family</span>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item" onclick="showActivity(3)">Fall Festival</li>
+                <li class="menu-item" onclick="showActivity(6)">Pancake Breakfast</li>
+                <li class="menu-item" onclick="showActivity(11)">Fish Fry</li>
+                <li class="menu-item" onclick="showActivity(12)">MVPS Dinner</li>
+                <li class="menu-item" onclick="showActivity(13)">Mary's Way</li>
+                <li class="menu-item" onclick="showActivity(4)">Soccer Challenge</li>
+                <li class="menu-item" onclick="showActivity(8)">Basketball Free Throw</li>
+                <li class="menu-item" onclick="showActivity(14)">Bocce Championship</li>
+                <li class="menu-item" onclick="showActivity(15)">Hot Dog Night</li>
+                <li class="menu-item" onclick="showActivity(17)">School Open House</li>
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <div class="category-header" onclick="toggleCategory(this)">
+                <span>&#129309; Community</span>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item" onclick="showActivity(2)">Blood Drive</li>
+                <li class="menu-item" onclick="showActivity(7)">Coats for Kids</li>
+                <li class="menu-item" onclick="showActivity(10)">40 Cans for Lent</li>
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <div class="category-header" onclick="toggleCategory(this)">
+                <span>&#10084; Life</span>
+            </div>
+            <ul class="menu-list">
+                <li class="menu-item" onclick="showActivity(5)">40 Days for Life</li>
+                <li class="menu-item" onclick="showActivity(9)">Baby Bottle Drive</li>
+            </ul>
+        </div>
+    </div>
+
+    <div>
+        <div class="activity-detail active" id="activity-1">
+            <div class="detail-header">
+                <h2 class="detail-title">Knights of Columbus Mass</h2>
+                <p class="detail-frequency">3-4 times per year</p>
+            </div>
+            <p class="detail-description">Serve at special Knights of Columbus Masses throughout the year. These Masses highlight the Knights' presence in the parish and provide opportunities to welcome new members.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Serve as Eucharistic Minister</div>
+                    <div class="opportunity-item">Read as Lector</div>
+                    <div class="opportunity-item">Serve as Minister of Hospitality</div>
+                    <div class="opportunity-item">Man information table for sign-ups and questions</div>
+                    <div class="opportunity-item">Issue Yellow Sashes to Knights</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-2">
+            <div class="detail-header">
+                <h2 class="detail-title">Blood Drive</h2>
+                <p class="detail-frequency">3 times per year</p>
+            </div>
+            <p class="detail-description">Help organize blood drives with the Indiana Blood Bank and save lives through donations. Each donation can help save up to three lives!</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Coordinate sign-ups after Mass</div>
+                    <div class="opportunity-item">Donate blood yourself</div>
+                    <div class="opportunity-item">Assist donors and provide support</div>
+                    <div class="opportunity-item">Serve refreshments to donors</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-3">
+            <div class="detail-header">
+                <h2 class="detail-title">Fall Festival - Grillin' Knights</h2>
+                <p class="detail-frequency">Annual - September</p>
+            </div>
+            <p class="detail-description">Man the Knights' food booth at St. Luke's annual Fall Festival. Grill burgers and brats, serve hungry festival-goers, and be a visible presence for the Knights in our parish community.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Set up booth and equipment</div>
+                    <div class="opportunity-item">Prep food in the kitchen</div>
+                    <div class="opportunity-item">Serve food to guests</div>
+                    <div class="opportunity-item">Grill burgers, brats, and hot dogs</div>
+                    <div class="opportunity-item">Clean up and take down</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-4">
+            <div class="detail-header">
+                <h2 class="detail-title">Youth Soccer Challenge</h2>
+                <p class="detail-frequency">Annual - September</p>
+            </div>
+            <p class="detail-description">Help young athletes test their soccer skills in this fun competition. Kids love showing off their abilities, and you'll help make it a memorable experience!</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Sign up youth participants</div>
+                    <div class="opportunity-item">Set up field and equipment</div>
+                    <div class="opportunity-item">Run the competition</div>
+                    <div class="opportunity-item">Keep score and encourage kids</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-5">
+            <div class="detail-header">
+                <h2 class="detail-title">40 Days for Life</h2>
+                <p class="detail-frequency">2 campaigns per year</p>
+            </div>
+            <p class="detail-description">Join peaceful prayer vigils for the dignity of human life at 86th &amp; Georgetown. Stand as a witness for life and pray for mothers, babies, and an end to abortion.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Coordinate sign-ups at Mass</div>
+                    <div class="opportunity-item">Pray for 1 hour at vigil site</div>
+                    <div class="opportunity-item">Peaceful witness for life</div>
+                    <div class="opportunity-item">Invite others to join</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-6">
+            <div class="detail-header">
+                <h2 class="detail-title">Pancake Breakfast</h2>
+                <p class="detail-frequency">3 times per year</p>
+            </div>
+            <p class="detail-description">Our famous all-you-can-eat pancake breakfasts raise funds for charitable programs including Coats for Kids and Special Olympics. Great food and fellowship!</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Set up tables and equipment</div>
+                    <div class="opportunity-item">Cook pancakes (we'll teach you!)</div>
+                    <div class="opportunity-item">Serve food to guests</div>
+                    <div class="opportunity-item">Pour coffee and clean tables</div>
+                    <div class="opportunity-item">Take down and clean up</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-7">
+            <div class="detail-header">
+                <h2 class="detail-title">Coats for Kids</h2>
+                <p class="detail-frequency">Annual - Late October</p>
+            </div>
+            <span class="badge">165+ Coats Distributed Annually</span>
+            <p class="detail-description">Provide warm winter coats to students at Holy Angels School. Make sure every child stays warm during Indiana winters. Seeing the smiles on kids' faces makes this incredibly rewarding!</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Help coordinate coat purchases</div>
+                    <div class="opportunity-item">Organize and sort coats by size</div>
+                    <div class="opportunity-item">Distribute coats at school</div>
+                    <div class="opportunity-item">Help kids try on and fit coats</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-8">
+            <div class="detail-header">
+                <h2 class="detail-title">Youth Basketball Free Throw Contest</h2>
+                <p class="detail-frequency">Annual - January</p>
+            </div>
+            <p class="detail-description">Host the annual youth basketball free throw contest. Help kids test their basketball skills and compete for prizes. Winners can advance to district and state competitions!</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Advertise the event at parish</div>
+                    <div class="opportunity-item">Coordinate gym scheduling</div>
+                    <div class="opportunity-item">Run the competition</div>
+                    <div class="opportunity-item">Keep score and track results</div>
+                    <div class="opportunity-item">Encourage young athletes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-9">
+            <div class="detail-header">
+                <h2 class="detail-title">Baby Bottle Drive</h2>
+                <p class="detail-frequency">Annual - January/February</p>
+            </div>
+            <p class="detail-description">Pro-Life fundraiser supporting local pregnancy centers. Partner with the St. Luke Pro-Life Committee to distribute and collect baby bottles filled with donations.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Advertise the campaign</div>
+                    <div class="opportunity-item">Distribute bottles after Masses</div>
+                    <div class="opportunity-item">Collect filled bottles</div>
+                    <div class="opportunity-item">Count and deliver donations</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-10">
+            <div class="detail-header">
+                <h2 class="detail-title">40 Cans for Lent</h2>
+                <p class="detail-frequency">Annual - Throughout Lent</p>
+            </div>
+            <span class="badge">Goal: 10,000 Pounds!</span>
+            <p class="detail-description">Major food drive benefiting the St. Vincent de Paul Boulevard Place Food Pantry. Help us reach our goal of 10,000 pounds of food to feed families in need.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Advertise the food drive</div>
+                    <div class="opportunity-item">Collect donations at all weekend Masses</div>
+                    <div class="opportunity-item">Sort and organize collected food</div>
+                    <div class="opportunity-item">Transport food to Boulevard Pantry</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-11">
+            <div class="detail-header">
+                <h2 class="detail-title">Fish Fry</h2>
+                <p class="detail-frequency">Two Fridays in Lent</p>
+            </div>
+            <span class="badge">Major Event — Many Volunteers Needed</span>
+            <p class="detail-description">Our biggest fundraising event! Delicious fried and baked fish dinners served to hundreds of parishioners and community members. Multiple volunteers needed for each dinner to make it a success.</p>
+            <div class="opportunities-section">
+                <h4>Many Roles Available:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Staff Narthex info tables (all Lent weekends)</div>
+                    <div class="opportunity-item">Kitchen workers and prep</div>
+                    <div class="opportunity-item">Door sales and ticketing</div>
+                    <div class="opportunity-item">Serving line and concessions</div>
+                    <div class="opportunity-item">Beer &amp; Wine sales</div>
+                    <div class="opportunity-item">Beer &amp; Wine serving</div>
+                    <div class="opportunity-item">Beer Baron and Wine Lord coordination</div>
+                    <div class="opportunity-item">Setup and cleanup</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-12">
+            <div class="detail-header">
+                <h2 class="detail-title">St. Joseph MVPS Dinner</h2>
+                <p class="detail-frequency">Annual</p>
+            </div>
+            <p class="detail-description">Support this special dinner honoring St. Joseph parish's Most Valuable Parishioners. Help serve and celebrate these dedicated parish members.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Help set up venue</div>
+                    <div class="opportunity-item">Serve dinner to guests</div>
+                    <div class="opportunity-item">Clear tables</div>
+                    <div class="opportunity-item">Clean up after event</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-13">
+            <div class="detail-header">
+                <h2 class="detail-title">Mary's Way Dinner</h2>
+                <p class="detail-frequency">Annual</p>
+            </div>
+            <p class="detail-description">Support this special parish dinner honoring Mary, Mother of God. Help create a memorable evening for parish families.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Set up tables and decorations</div>
+                    <div class="opportunity-item">Serve dinner to guests</div>
+                    <div class="opportunity-item">Clear and clean tables</div>
+                    <div class="opportunity-item">Take down and restore venue</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-14">
+            <div class="detail-header">
+                <h2 class="detail-title">Bocce League Championship &amp; Cookout</h2>
+                <p class="detail-frequency">Annual - Summer</p>
+            </div>
+            <p class="detail-description">End-of-season celebration for our bocce league! Food, fellowship, and friendly competition. Help make this summer gathering a success.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Set up bocce courts</div>
+                    <div class="opportunity-item">Organize and grill cookout food</div>
+                    <div class="opportunity-item">Coordinate games and prizes</div>
+                    <div class="opportunity-item">Clean up and take down equipment</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-15">
+            <div class="detail-header">
+                <h2 class="detail-title">Summer Hot Dog Night</h2>
+                <p class="detail-frequency">One night per summer</p>
+            </div>
+            <p class="detail-description">Casual summer gathering with hot dogs and fellowship for parish families. A relaxed, fun evening to build community.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Grill hot dogs and brats</div>
+                    <div class="opportunity-item">Set up food station and condiments</div>
+                    <div class="opportunity-item">Serve guests</div>
+                    <div class="opportunity-item">Clean up after event</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-16">
+            <div class="detail-header">
+                <h2 class="detail-title">Mass for Special Needs</h2>
+                <p class="detail-frequency">Periodic</p>
+            </div>
+            <p class="detail-description">Support special Masses designed for individuals with special needs and their families. Help create a welcoming, accessible worship experience.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Assist with liturgical roles</div>
+                    <div class="opportunity-item">Provide hospitality and welcome</div>
+                    <div class="opportunity-item">Help families feel comfortable</div>
+                    <div class="opportunity-item">Support special needs individuals</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-detail" id="activity-17">
+            <div class="detail-header">
+                <h2 class="detail-title">School Open House</h2>
+                <p class="detail-frequency">Annual</p>
+            </div>
+            <p class="detail-description">Recruit new members by having a Knights presence at the school open house event. Share information about the Knights and invite Catholic men to join.</p>
+            <div class="opportunities-section">
+                <h4>Ways to Help:</h4>
+                <div class="opportunities-list">
+                    <div class="opportunity-item">Staff recruitment information table</div>
+                    <div class="opportunity-item">Answer questions about the Knights</div>
+                    <div class="opportunity-item">Share your Knights experience</div>
+                    <div class="opportunity-item">Distribute membership information</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="contact-note">Want to help with one of these? Reach out at council14895@gmail.com and let us know which one.</p>
+
+<div class="actions">
+    <a href="home.html" class="btn btn-outline preserve-member">Back to My Profile</a>
+</div>
+
+<script>
+function toggleCategory(header) {
+    header.classList.toggle('collapsed');
+    header.nextElementSibling.classList.toggle('collapsed');
+}
+
+function showActivity(num) {
+    document.querySelectorAll('.activity-detail').forEach(d => d.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('activity-' + num).classList.add('active');
+    event.target.closest('.menu-item').classList.add('active');
+    if (window.innerWidth <= 968) {
+        document.querySelector('.activity-detail.active').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+/* Carry the logged-in member across pages via preserve-member links */
+(function () {
+    const memberParam = new URLSearchParams(window.location.search).get("member");
+    if (!memberParam) return;
+    document.querySelectorAll("a.preserve-member").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.href);
+        url.searchParams.set("member", memberParam);
+        a.setAttribute("href", url.pathname + url.search);
+    });
+})();
+</script>
+
+</body>
+</html>
