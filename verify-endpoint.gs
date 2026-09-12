@@ -140,7 +140,7 @@ function handleLogChange(params) {
   const oldValue = params.oldValue !== undefined ? String(params.oldValue) : '';
   const newValue = String(params.newValue || '').trim();
 
-  if (!memberNumber || !type || !newValue) {
+  if (!type || !newValue) {
     return { success: false, error: 'Missing required fields for change log entry' };
   }
 
