@@ -193,14 +193,14 @@ nav a.signout:hover { color:var(--accent); }
             </div>
             <div class="cert-row cert-dues">
                 <span class="cert-label">Dues Paid To:</span>
-                <span class="cert-value" id="cardDuesPaidTo">July 1, 2027</span>
+                <span class="cert-value" id="cardDuesPaidTo">December 31, 2026</span>
             </div>
             <div class="cert-meta-line">Member since <span id="cardSince">2012</span> · <span id="cardYos">14</span> years of service</div>
         </div>
 
         <div class="watermark" id="cardWatermark" style="display:none;">
             <span id="cardWatermarkLabel">Lapsed</span>
-            <div class="exp" id="cardExpText">Expired July 1, 2024</div>
+            <div class="exp" id="cardExpText">Behind since 2025</div>
         </div>
     </div>
 
@@ -239,7 +239,7 @@ const DEGREE_ORDINAL = {'First Degree':'1st','Second Degree':'2nd','Third Degree
 
 function duesPaidToText(m) {
     if (m.clergy) return 'N/A — Exempt';
-    if (typeof m.lastYrPaid === 'number') return 'July 1, ' + (m.lastYrPaid + 1);
+    if (typeof m.lastYrPaid === 'number') return 'December 31, ' + m.lastYrPaid;
     return 'No payment on record';
 }
 
