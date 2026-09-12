@@ -14,6 +14,7 @@ function doGet(e) {
   let result;
   if (action === 'logChange') result = handleLogChange(e.parameter);
   else if (action === 'saveContact') result = handleSaveContact(e.parameter);
+  else if (action === 'recordLogin') result = handleRecordLogin(e.parameter);
   else result = handleVerify(e.parameter);
 
   const callback = e.parameter && e.parameter.callback;
@@ -35,6 +36,7 @@ function doPost(e) {
   let result;
   if (action === 'logChange') result = handleLogChange(params);
   else if (action === 'saveContact') result = handleSaveContact(params);
+  else if (action === 'recordLogin') result = handleRecordLogin(params);
   else result = handleVerify(params);
   return jsonResponse(result);
 }
@@ -117,6 +119,52 @@ function handleSaveContact(params) {
   }
 
   return { success: true, changed: changed, skipped: skipped, verifiedDate: new Date().toISOString() };
+}
+
+/**
+ * Increments Login Count and stamps Last Login for a member. Uses a short
+ * script lock so two near-simultaneous logins don't clobber each other's
+ * increment. Both columns are optional — if either is missing from the
+ * sheet, that part is silently skipped rather than failing the whole call.
+ */
+function handleRecordLogin(params) {
+  const memberNumber = String(params.memberNumber || '').replace(/^0+/, '').trim();
+  if (!memberNumber) return { success: false, error: 'Missing memberNumber' };
+
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(5000);
+  } catch (e) {
+    return { success: false, error: 'Could not acquire lock \u2014 try again' };
+  }
+
+  try {
+    const SHEET_NAME = 'St Luke KOC Membership DB';
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const memberNumberCol = headers.indexOf('Member Number');
+    const loginCountCol = headers.indexOf('Login Count');
+    const lastLoginCol = headers.indexOf('Last Login');
+    if (memberNumberCol === -1) return { success: false, error: 'Member Number column not found' };
+
+    for (let i = 1; i < data.length; i++) {
+      if (String(data[i][memberNumberCol]).replace(/^0+/, '').trim() === memberNumber) {
+        const rowNum = i + 1;
+        if (loginCountCol !== -1) {
+          const current = parseInt(data[i][loginCountCol], 10) || 0;
+          sheet.getRange(rowNum, loginCountCol + 1).setValue(current + 1);
+        }
+        if (lastLoginCol !== -1) {
+          sheet.getRange(rowNum, lastLoginCol + 1).setValue(new Date());
+        }
+        return { success: true };
+      }
+    }
+    return { success: false, error: 'Member not found' };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function logSheet() {
