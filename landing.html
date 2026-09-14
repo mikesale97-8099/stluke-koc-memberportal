@@ -313,8 +313,8 @@ async function submitHelpRequest() {
     status.textContent = 'Sending\u2026';
     status.style.color = '';
 
-    let noteText = 'Tried logging in with email "' + emailTried + '" \u2014 no match found on file.';
-    if (note) noteText += ' Note from member: ' + note;
+    let newValue = emailTried;
+    if (note) newValue += ' | Note: ' + note;
 
     try {
         const url = new URL(VERIFY_ENDPOINT_URL);
@@ -323,8 +323,9 @@ async function submitHelpRequest() {
         url.searchParams.set('memberName', name);
         url.searchParams.set('type', 'Contact Request');
         url.searchParams.set('category', 'Contact');
-        url.searchParams.set('field', 'Login Help');
-        url.searchParams.set('newValue', noteText);
+        url.searchParams.set('field', 'Add Email');
+        url.searchParams.set('oldValue', '(none on file)');
+        url.searchParams.set('newValue', newValue);
 
         const data = await jsonp(url.toString());
         if (data.success) {
