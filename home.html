@@ -150,6 +150,13 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .btn-danger:hover { background:#991B1B; }
 .btn-ghost { background:none; border:2px solid #D1D5DB; color:var(--text-medium); }
 .btn-ghost:hover { border-color:var(--text-medium); }
+.status-option { border:1.5px solid #E5E7EB; border-radius:12px; padding:1rem 1.1rem; margin-bottom:0.9rem; }
+.status-option h4 { font-family:'Crimson Pro', serif; font-size:1.05rem; color:var(--primary); margin-bottom:0.3rem; }
+.status-option-desc { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-bottom:0.7rem; }
+.modal .status-option-desc { font-size:0.85rem; color:var(--text-medium); margin-bottom:0.7rem; }
+.btn-full { width:100%; text-align:center; }
+.status-request-status { font-family:'Lato',sans-serif; font-size:0.82rem; margin-bottom:0.5rem; min-height:1.2em; }
+.modal .status-request-status { font-size:0.82rem; margin-bottom:0.5rem; }
 
 @media (max-width:640px){
     nav .container { flex-wrap:wrap; }
@@ -322,7 +329,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
         <div class="box-secondary-actions">
             <button class="btn-text" id="contactMeBtn" onclick="requestContact()">Please contact me to discuss my membership</button>
-            <button class="btn-text remove-link" onclick="openRemoveModal()">Request removal from the council</button>
+            <button class="btn-text remove-link" onclick="openRemoveModal()">Leaving, or going inactive?</button>
         </div>
         <p class="edit-hint" id="contactStatus"></p>
     </div>
@@ -337,11 +344,25 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 <div class="modal-overlay" id="removeModal">
     <div class="modal">
         <h3>Before you go</h3>
-        <p>This will notify a data administrator, who'll forward your request to the right council contact.</p>
-        <p class="fine">If this is about dues, or something else — a quick "Flag an issue" or a note to a brother might solve it without leaving. Either way, we value you as a brother knight and understand if you can't participate at the level you'd like right now.</p>
+        <p>Choose whichever fits. Either way, this notifies a data administrator, and someone will reach out to confirm with you before anything changes.</p>
+
+        <div class="status-option">
+            <h4>Go Inactive</h4>
+            <p class="status-option-desc">You remain a council member — just paused, not removed.</p>
+            <button class="btn btn-outline btn-full" id="inactiveBtn" onclick="submitStatusRequest('Inactive')">Request Inactive Status</button>
+        </div>
+
+        <div class="status-option">
+            <h4>Leave the Council</h4>
+            <p class="status-option-desc">Your name is passed along to Supreme for removal from our council.</p>
+            <button class="btn btn-danger btn-full" id="removalBtn" onclick="submitStatusRequest('Removal')">Request Removal</button>
+        </div>
+
+        <p class="fine">If this is about dues, or something else — a quick "Flag an issue" or a note to a brother might solve it without leaving. Either way, we value you as a brother knight.</p>
+        <p class="status-request-status" id="statusRequestStatus"></p>
+
         <div class="modal-actions">
             <button class="btn btn-ghost" onclick="closeRemoveModal()">Never mind</button>
-            <button class="btn btn-danger" onclick="closeRemoveModal()">Yes, request removal</button>
         </div>
     </div>
 </div>
@@ -636,8 +657,56 @@ function goToPayDues() {
     window.location.href = 'pay-dues.html?member=' + encodeURIComponent(CURRENT_MEMBER.memberNumber);
 }
 
-function openRemoveModal() { document.getElementById('removeModal').classList.add('open'); }
+function openRemoveModal() {
+    document.getElementById('removeModal').classList.add('open');
+    document.getElementById('inactiveBtn').disabled = false;
+    document.getElementById('removalBtn').disabled = false;
+    document.getElementById('inactiveBtn').textContent = 'Request Inactive Status';
+    document.getElementById('removalBtn').textContent = 'Request Removal';
+    document.getElementById('statusRequestStatus').textContent = '';
+}
 function closeRemoveModal() { document.getElementById('removeModal').classList.remove('open'); }
+
+async function submitStatusRequest(kind) {
+    if (!CURRENT_MEMBER) return;
+    const btn = document.getElementById(kind === 'Inactive' ? 'inactiveBtn' : 'removalBtn');
+    const otherBtn = document.getElementById(kind === 'Inactive' ? 'removalBtn' : 'inactiveBtn');
+    const status = document.getElementById('statusRequestStatus');
+
+    btn.disabled = true;
+    otherBtn.disabled = true;
+    status.textContent = 'Sending\u2026';
+    status.style.color = '';
+
+    try {
+        const url = new URL(VERIFY_ENDPOINT_URL);
+        url.searchParams.set('action', 'logChange');
+        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
+        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
+        url.searchParams.set('type', 'Status Request');
+        url.searchParams.set('category', 'Membership');
+        url.searchParams.set('field', kind === 'Inactive' ? 'Request Inactive Status' : 'Request Removal');
+        url.searchParams.set('newValue', kind === 'Inactive'
+            ? 'Member has requested to be moved to Inactive status.'
+            : 'Member has requested removal from the council (for Supreme).');
+
+        const data = await jsonp(url.toString());
+        if (data.success) {
+            btn.textContent = '\u2713 Sent';
+            status.textContent = 'Thanks \u2014 a data administrator will reach out to confirm.';
+        } else {
+            btn.disabled = false;
+            otherBtn.disabled = false;
+            status.textContent = data.error || 'Could not send \u2014 try again.';
+            status.style.color = 'var(--accent)';
+        }
+    } catch (e) {
+        btn.disabled = false;
+        otherBtn.disabled = false;
+        status.textContent = 'Could not reach the log endpoint \u2014 try again.';
+        status.style.color = 'var(--accent)';
+    }
+}
 
 function initMemberSelect() {
     const select = document.getElementById('memberSelect');
