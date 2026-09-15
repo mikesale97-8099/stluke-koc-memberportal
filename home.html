@@ -329,7 +329,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
         <div class="box-secondary-actions">
             <button class="btn-text" id="contactMeBtn" onclick="requestContact()">Please contact me to discuss my membership</button>
-            <button class="btn-text remove-link" onclick="openRemoveModal()">Leaving, or going inactive?</button>
+            <button class="btn-text remove-link" onclick="openRemoveModal()">I want to leave the council</button>
         </div>
         <p class="edit-hint" id="contactStatus"></p>
     </div>
@@ -349,13 +349,13 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <div class="status-option">
             <h4>Go Inactive</h4>
             <p class="status-option-desc">You remain a council member — just paused, not removed.</p>
-            <button class="btn btn-outline btn-full" id="inactiveBtn" onclick="submitStatusRequest('Inactive')">Request Inactive Status</button>
+            <button class="btn btn-primary btn-full" id="inactiveBtn" onclick="submitStatusRequest('Inactive')">Request Inactive Status</button>
         </div>
 
         <div class="status-option">
             <h4>Leave the Council</h4>
             <p class="status-option-desc">Your name is passed along to Supreme for removal from our council.</p>
-            <button class="btn btn-danger btn-full" id="removalBtn" onclick="submitStatusRequest('Removal')">Request Removal</button>
+            <button class="btn btn-outline btn-full" id="removalBtn" onclick="submitStatusRequest('Removal')">Request Removal</button>
         </div>
 
         <p class="fine">If this is about dues, or something else — a quick "Flag an issue" or a note to a brother might solve it without leaving. Either way, we value you as a brother knight.</p>
