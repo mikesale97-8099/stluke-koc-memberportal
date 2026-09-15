@@ -362,7 +362,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <p class="status-request-status" id="statusRequestStatus"></p>
 
         <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeRemoveModal()">Never mind</button>
+            <button class="btn btn-ghost" id="dismissModalBtn" onclick="closeRemoveModal()">Never mind</button>
         </div>
     </div>
 </div>
@@ -664,6 +664,7 @@ function openRemoveModal() {
     document.getElementById('inactiveBtn').textContent = 'Request Inactive Status';
     document.getElementById('removalBtn').textContent = 'Request Removal';
     document.getElementById('statusRequestStatus').textContent = '';
+    document.getElementById('dismissModalBtn').textContent = 'Never mind';
 }
 function closeRemoveModal() { document.getElementById('removeModal').classList.remove('open'); }
 
@@ -694,6 +695,7 @@ async function submitStatusRequest(kind) {
         if (data.success) {
             btn.textContent = '\u2713 Sent';
             status.textContent = 'Thanks \u2014 a data administrator will reach out to confirm.';
+            document.getElementById('dismissModalBtn').textContent = 'Return to Profile';
         } else {
             btn.disabled = false;
             otherBtn.disabled = false;
