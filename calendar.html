@@ -62,6 +62,22 @@ nav a.signout:hover { color:var(--accent); }
 .info-row strong { min-width:70px; color:var(--primary); }
 
 .month-select-row { display:flex; align-items:center; justify-content:center; margin-top:1.75rem; }
+
+.theme-filter { display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; margin-top:1.75rem; }
+.theme-btn {
+    display:flex; align-items:center; gap:0.45rem; font-family:'Lato',sans-serif; font-size:0.85rem; font-weight:600;
+    padding:0.55rem 1.05rem; border-radius:50px; border:1.5px solid #D1D5DB; background:white; color:var(--text-medium);
+    cursor:pointer; transition:all .15s;
+}
+.theme-btn:hover { border-color:var(--secondary); }
+.theme-btn.active { background:var(--primary); border-color:var(--primary); color:white; }
+.theme-btn .icon { font-size:1rem; }
+
+.theme-pill {
+    display:inline-flex; align-items:center; gap:0.3rem; font-family:'Lato',sans-serif; font-size:0.72rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.03em; color:var(--primary); background:var(--light-bg);
+    padding:0.2rem 0.6rem; border-radius:50px;
+}
 .month-dropdown { position:relative; }
 .month-dropdown-btn {
     font-family:'Lato', sans-serif; font-size:0.9rem; font-weight:600; padding:0.6rem 1.1rem; border-radius:10px;
@@ -172,6 +188,14 @@ nav a.signout:hover { color:var(--accent); }
         </div>
     </div>
 
+    <div class="theme-filter" id="themeFilter">
+        <button class="theme-btn active" data-theme="All" onclick="filterTheme('All')"><span class="icon">&#9673;</span> All</button>
+        <button class="theme-btn" data-theme="Faith" onclick="filterTheme('Faith')"><span class="icon">&#9767;</span> Faith</button>
+        <button class="theme-btn" data-theme="Family" onclick="filterTheme('Family')"><span class="icon">&#128110;</span> Family</button>
+        <button class="theme-btn" data-theme="Community" onclick="filterTheme('Community')"><span class="icon">&#129309;</span> Community</button>
+        <button class="theme-btn" data-theme="Life" onclick="filterTheme('Life')"><span class="icon">&#10084;</span> Life</button>
+    </div>
+
     <div class="month-select-row">
         <div class="month-dropdown" id="monthDropdown">
             <button class="month-dropdown-btn" id="monthDropdownBtn" onclick="toggleMonthDropdown()">
@@ -206,6 +230,9 @@ const ACTIVITY_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQD
 
 let EVENTS = [];
 let MONTH_ORDER = [];
+let currentTheme = 'All';
+
+const THEME_ICON = { Faith: '&#9767;', Family: '&#128110;', Community: '&#129309;', Life: '&#10084;' };
 
 /* Minimal CSV parser that handles quoted fields with embedded commas/quotes */
 function parseCSV(text) {
@@ -245,6 +272,7 @@ async function loadEvents() {
             activity: (r[idx('Activity')] || '').trim(),
             waysToHelp: (r[idx('Ways to Help')] || '').trim(),
             leader: (r[idx('Leader')] || '').trim(),
+            type: (r[idx('Type')] || '').trim(),
         })).filter(e => e.activity);
 
         MONTH_ORDER = [...new Set(EVENTS.map(e => e.month))];
@@ -287,21 +315,24 @@ function updateMonthDropdownLabel(months) {
     else label.textContent = months.length + ' months selected';
 }
 
-function renderEvents(monthsFilter) {
-    const months = monthsFilter || [];
-    const container = document.getElementById('eventsContainer');
+function renderEvents() {
+    const months = selectedMonths();
     const monthsToShow = months.length ? months : MONTH_ORDER;
+    const container = document.getElementById('eventsContainer');
 
     let html = '';
     let anyVisible = false;
     monthsToShow.forEach(month => {
-        const monthEvents = EVENTS.filter(e => e.month === month);
+        const monthEvents = EVENTS.filter(e =>
+            e.month === month && (currentTheme === 'All' || e.type === currentTheme)
+        );
         if (!monthEvents.length) return;
         anyVisible = true;
         html += `<div class="month-group"><div class="month-label">${month}</div>`;
         monthEvents.forEach(e => {
+            const pill = e.type ? `<span class="theme-pill">${THEME_ICON[e.type] || ''} ${e.type}</span>` : '';
             html += `<div class="event-row">
-                <div class="event-top">${e.date ? `<span class="event-date">${e.date}</span>` : ''}</div>
+                <div class="event-top">${e.date ? `<span class="event-date">${e.date}</span>` : ''}${pill}</div>
                 <div class="event-title">${e.activity}</div>
                 ${e.waysToHelp ? `<div class="event-responsibility"><strong>Volunteers needed:</strong> ${e.waysToHelp}</div>` : ''}
                 ${e.leader ? `<div class="event-leader">Contact: ${e.leader}</div>` : ''}
@@ -314,13 +345,21 @@ function renderEvents(monthsFilter) {
     document.getElementById('noResults').classList.toggle('show', !anyVisible);
 }
 
+function filterTheme(theme) {
+    currentTheme = theme;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
+    applyFilters();
+}
+
 function applyFilters() {
     const months = selectedMonths();
     updateMonthDropdownLabel(months);
-    document.getElementById('filterHint').textContent = months.length
-        ? ('Showing ' + (months.length === 1 ? months[0] : months.length + ' selected months'))
-        : 'Showing all months';
-    renderEvents(months);
+    const parts = [];
+    if (currentTheme !== 'All') parts.push(currentTheme + ' events');
+    if (months.length === 1) parts.push('in ' + months[0]);
+    else if (months.length > 1) parts.push('in ' + months.length + ' selected months');
+    document.getElementById('filterHint').textContent = parts.length ? ('Showing ' + parts.join(' ')) : 'Showing all events';
+    renderEvents();
 }
 
 document.addEventListener('click', (e) => {
