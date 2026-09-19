@@ -166,7 +166,6 @@ nav a.signout:hover { color:var(--accent); }
             <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
             <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
-            <li><a href="events.html" class="navlink preserve-member">Events</a></li>
             <li><a href="#" class="navlink active">Calendar</a></li>
         </ul>
         <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
@@ -276,22 +275,76 @@ async function loadEvents() {
         })).filter(e => e.activity);
 
         MONTH_ORDER = [...new Set(EVENTS.map(e => e.month))];
+        const monthYears = computeMonthYears(EVENTS, MONTH_ORDER);
 
         loadNote.textContent = `Connected \u2014 ${EVENTS.length} events loaded from the council calendar.`;
         loadStatus.remove();
-        buildMonthCheckboxes();
-        renderEvents();
+        buildMonthCheckboxes(monthYears);
+        applyFilters();
     } catch (e) {
         loadNote.textContent = 'Could not reach the calendar sheet \u2014 check sharing settings on the published sheet.';
         loadStatus.textContent = 'Could not load events right now.';
     }
 }
 
-function buildMonthCheckboxes() {
+const MONTH_INDEX = { January:1, February:2, March:3, April:4, May:5, June:6, July:7, August:8, September:9, October:10, November:11, December:12 };
+
+/* Parses a date string like "Friday, August 7, 2026" -> {year, monthIdx} or null if unparseable (TBD, blank, etc.) */
+function parseEventDate(dateStr) {
+    if (!dateStr) return null;
+    const cleaned = dateStr.replace(/^[A-Za-z]+,\s*/, ''); // strip leading weekday name
+    const d = new Date(cleaned);
+    if (isNaN(d.getTime())) return null;
+    return { year: d.getFullYear(), monthIdx: d.getMonth() + 1 };
+}
+
+/* Determines the actual calendar year for each fiscal-year month label (Aug 2026, Sep 2026, ..., Jun 2027),
+   using real parsed dates where available and inferring the rest from sequence order (year rolls over
+   whenever the calendar month number decreases going down the fiscal-year list). */
+function computeMonthYears(events, monthOrder) {
+    const years = {};
+    monthOrder.forEach(m => {
+        const found = events.find(e => e.month === m && parseEventDate(e.date));
+        if (found) years[m] = parseEventDate(found.date).year;
+    });
+    // forward-fill any months with no parseable date, using the previous month's inferred year
+    for (let i = 0; i < monthOrder.length; i++) {
+        const m = monthOrder[i];
+        if (years[m] !== undefined) continue;
+        if (i === 0) continue; // nothing to infer from yet; handled by backward-fill below
+        const prevMonth = monthOrder[i - 1];
+        const prevYear = years[prevMonth];
+        if (prevYear === undefined) continue;
+        years[m] = (MONTH_INDEX[m] > MONTH_INDEX[prevMonth]) ? prevYear : prevYear + 1;
+    }
+    // backward-fill in case the very first month(s) had no parseable date
+    for (let i = monthOrder.length - 1; i >= 0; i--) {
+        const m = monthOrder[i];
+        if (years[m] !== undefined) continue;
+        const nextMonth = monthOrder[i + 1];
+        const nextYear = years[nextMonth];
+        if (nextYear === undefined) continue;
+        years[m] = (MONTH_INDEX[m] < MONTH_INDEX[nextMonth]) ? nextYear : nextYear - 1;
+    }
+    return years;
+}
+
+function isMonthFullyPast(month, year) {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonthIdx = today.getMonth() + 1;
+    if (year === undefined) return false; // if we genuinely can't tell, don't hide it
+    if (year < currentYear) return true;
+    if (year > currentYear) return false;
+    return MONTH_INDEX[month] < currentMonthIdx;
+}
+
+function buildMonthCheckboxes(monthYears) {
     const grid = document.getElementById('monthCheckboxGrid');
-    grid.innerHTML = MONTH_ORDER.map(m =>
-        `<label><input type="checkbox" value="${m}" onchange="applyFilters()"> ${m}</label>`
-    ).join('');
+    grid.innerHTML = MONTH_ORDER.map(m => {
+        const checked = isMonthFullyPast(m, monthYears[m]) ? '' : 'checked';
+        return `<label><input type="checkbox" value="${m}" ${checked} onchange="applyFilters()"> ${m}</label>`;
+    }).join('');
 }
 
 function toggleMonthDropdown() {
