@@ -149,6 +149,7 @@ nav a.signout:hover { color:var(--accent); }
             <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
             <li><a href="#" class="navlink active">Events</a></li>
+            <li><a href="calendar.html" class="navlink preserve-member">Calendar</a></li>
         </ul>
         <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
     </div>
@@ -548,6 +549,22 @@ function showActivity(num) {
         url.searchParams.set("member", memberParam);
         a.setAttribute("href", url.pathname + url.search);
     });
+})();
+/* Deep link support: ?activity=N opens that activity and expands its category */
+(function () {
+    const activityId = new URLSearchParams(window.location.search).get("activity");
+    if (!activityId) return;
+    const menuItem = document.querySelector(`.menu-item[onclick="showActivity(${activityId})"]`);
+    if (!menuItem) return;
+    const menuList = menuItem.closest('.menu-list');
+    const categoryHeader = menuList.previousElementSibling;
+    menuList.classList.remove('collapsed');
+    if (categoryHeader) categoryHeader.classList.remove('collapsed');
+    document.querySelectorAll('.activity-detail').forEach(d => d.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('activity-' + activityId).classList.add('active');
+    menuItem.classList.add('active');
+    document.getElementById('activity-' + activityId).scrollIntoView({ behavior: 'smooth', block: 'start' });
 })();
 </script>
 

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar — St. Luke Knights of Columbus Member Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1E3A8A;
+    --primary-light: #2563EB;
+    --secondary: #C5A572;
+    --secondary-light: #D4B583;
+    --accent: #B91C1C;
+    --light-bg: #F9FAFB;
+    --text-dark: #1F2937;
+    --text-medium: #6B7280;
+    --shadow: rgba(30, 58, 138, 0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { max-width:100%; }
+body { font-family:'Lora', serif; color:var(--text-dark); background:var(--light-bg); line-height:1.65; padding-bottom:4rem; }
+a { color:inherit; }
+:focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
+
+.review-panel { background:#fff; border-bottom:1px solid #E5E7EB; padding:0.6rem 1.5rem; }
+.review-panel .inner { max-width:800px; margin:0 auto; display:flex; align-items:center; gap:0.7rem; }
+.review-panel .tag { font-family:'Lato', sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; background:#374151; color:#fff; padding:0.25rem 0.55rem; border-radius:4px; }
+.review-panel .note { font-family:'Lato', sans-serif; font-size:0.78rem; color:var(--text-medium); }
+
+nav { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); }
+nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:stretch; }
+.logo-section { padding:0.7rem 1.5rem; display:flex; align-items:center; }
+.logo { font-family:'Crimson Pro', serif; color:var(--primary); line-height:1.15; text-decoration:none; }
+.logo-main { display:block; font-size:1.05rem; font-weight:700; letter-spacing:0.2px; }
+.logo-sub { display:block; font-size:0.72rem; font-weight:400; color:var(--text-medium); font-family:'Lato',sans-serif; }
+nav ul { list-style:none; display:flex; margin:0; }
+nav ul li { display:flex; align-items:center; }
+nav a.navlink {
+    font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium);
+    text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; transition:all .2s;
+}
+nav a.navlink:hover { color:var(--primary); background:rgba(30,58,138,0.05); }
+nav a.navlink.active { color:var(--primary); font-weight:700; border-bottom-color:var(--secondary); }
+nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); padding:1.1rem 1.5rem; text-decoration:none; }
+nav a.signout:hover { color:var(--accent); }
+.site-header { position:sticky; top:0; z-index:1000; }
+
+.hero { max-width:760px; margin:0 auto; padding:2.5rem 2rem 0; text-align:center; }
+.hero h1 { font-family:'Crimson Pro', serif; font-size:2.1rem; color:var(--primary); font-weight:700; }
+.hero p { font-family:'Lora',serif; font-size:1.02rem; color:var(--text-medium); margin-top:0.75rem; }
+
+.page { max-width:800px; margin:0 auto; padding:0 2rem; }
+
+.meeting-box {
+    background:white; padding:1.75rem; border-radius:16px; box-shadow:0 6px 20px var(--shadow);
+    margin:1.75rem 0 0; border-top:4px solid var(--primary);
+}
+.meeting-box h3 { font-family:'Crimson Pro', serif; font-size:1.4rem; color:var(--primary); margin-bottom:1.1rem; }
+.meeting-info { display:grid; gap:0.8rem; }
+.info-row { display:flex; gap:1rem; line-height:1.6; font-family:'Lato',sans-serif; font-size:0.92rem; flex-wrap:wrap; }
+.info-row strong { min-width:70px; color:var(--primary); }
+
+.month-select-row { display:flex; align-items:center; justify-content:center; margin-top:1.75rem; }
+.month-dropdown { position:relative; }
+.month-dropdown-btn {
+    font-family:'Lato', sans-serif; font-size:0.9rem; font-weight:600; padding:0.6rem 1.1rem; border-radius:10px;
+    border:1.5px solid #D1D5DB; background:white; color:var(--text-dark); cursor:pointer;
+    display:flex; align-items:center; gap:0.5rem; min-width:180px; justify-content:space-between;
+}
+.month-dropdown-btn:hover { border-color:var(--secondary); }
+.month-dropdown-btn .caret { font-size:0.7rem; color:var(--text-medium); }
+.month-dropdown-panel {
+    display:none; position:absolute; top:calc(100% + 0.4rem); left:50%; transform:translateX(-50%);
+    background:white; border-radius:12px; box-shadow:0 8px 24px var(--shadow); border:1px solid #E5E7EB;
+    padding:0.9rem; z-index:50; width:280px;
+}
+.month-dropdown-panel.open { display:block; }
+.month-dropdown-actions { display:flex; justify-content:space-between; margin-bottom:0.7rem; padding-bottom:0.6rem; border-bottom:1px solid #F0F1F3; }
+.month-dropdown-actions button {
+    font-family:'Lato',sans-serif; font-size:0.78rem; font-weight:600; color:var(--primary);
+    background:none; border:none; cursor:pointer; padding:0;
+}
+.month-checkbox-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 0.75rem; }
+.month-checkbox-grid label { display:flex; align-items:center; gap:0.4rem; font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-dark); cursor:pointer; }
+.month-checkbox-grid input[type="checkbox"] { accent-color:var(--primary); cursor:pointer; }
+
+.filter-hint { text-align:center; font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); margin:0.75rem 0 0.5rem; }
+
+.month-group { margin-top:1.75rem; }
+.month-label {
+    font-family:'Crimson Pro', serif; font-size:1.35rem; color:var(--primary); font-weight:700;
+    padding-bottom:0.5rem; border-bottom:2px solid var(--secondary); margin-bottom:1rem;
+}
+
+.event-row {
+    background:white; border-radius:12px; padding:1.1rem 1.3rem; margin-bottom:0.9rem;
+    box-shadow:0 2px 8px var(--shadow); border-left:4px solid var(--accent);
+    display:flex; flex-direction:column; gap:0.4rem;
+}
+.event-top { display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap; }
+.event-date { color:var(--accent); font-weight:700; font-size:0.82rem; font-family:'Lato',sans-serif; }
+.event-title { font-family:'Crimson Pro', serif; font-size:1.15rem; color:var(--text-dark); font-weight:700; }
+.event-responsibility { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
+.event-responsibility strong { color:var(--text-dark); }
+.event-leader { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); font-style:italic; }
+
+.no-results, .load-status { text-align:center; padding:2.5rem 1rem; font-family:'Lato',sans-serif; color:var(--text-medium); }
+.no-results { display:none; }
+.no-results.show { display:block; }
+
+.actions { max-width:1200px; margin:2rem auto 0; padding:0 2rem; display:flex; gap:0.9rem; justify-content:center; flex-wrap:wrap; }
+.btn { font-family:'Lato', sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer; border-radius:50px; padding:0.7rem 1.5rem; border:2px solid transparent; text-decoration:none; display:inline-block; }
+.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
+.btn-outline:hover { background:var(--primary); color:white; }
+
+@media (max-width:640px){
+    .hero { padding:2rem 1.25rem 0; }
+    .hero h1 { font-size:1.6rem; }
+    .page { padding:0 1.25rem; }
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    nav ul { flex-wrap:nowrap; width:100%; justify-content:flex-start; order:3; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; white-space:nowrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="review-panel">
+    <div class="inner">
+        <span class="tag">Live</span>
+        <span class="note" id="loadNote">Loading the council calendar\u2026</span>
+    </div>
+</div>
+
+<header class="site-header">
+<nav>
+    <div class="container">
+        <div class="logo-section">
+            <a href="home.html" class="logo preserve-member">
+                <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
+                <span class="logo-sub">Member Portal · Council 14895</span>
+            </a>
+        </div>
+        <ul>
+            <li><a href="home.html" class="navlink preserve-member">Home</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
+            <li><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
+            <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
+            <li><a href="events.html" class="navlink preserve-member">Events</a></li>
+            <li><a href="#" class="navlink active">Calendar</a></li>
+        </ul>
+        <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
+    </div>
+</nav>
+</header>
+
+<div class="hero">
+    <h1>Council Calendar</h1>
+    <p>Regular meetings and this year's events, month by month.</p>
+</div>
+
+<div class="page">
+    <div class="meeting-box">
+        <h3>Regular Council Meetings</h3>
+        <div class="meeting-info">
+            <div class="info-row"><strong>When:</strong><span>First Thursday of each month at 7:00 PM</span></div>
+            <div class="info-row"><strong>Where:</strong><span>Blessed Fr. Michael McGivney Room, St. Luke Catholic Church</span></div>
+        </div>
+    </div>
+
+    <div class="month-select-row">
+        <div class="month-dropdown" id="monthDropdown">
+            <button class="month-dropdown-btn" id="monthDropdownBtn" onclick="toggleMonthDropdown()">
+                <span id="monthDropdownLabel">All Months</span> <span class="caret">&#9662;</span>
+            </button>
+            <div class="month-dropdown-panel" id="monthDropdownPanel">
+                <div class="month-dropdown-actions">
+                    <button type="button" onclick="setAllMonths(true)">Select All</button>
+                    <button type="button" onclick="setAllMonths(false)">Clear</button>
+                </div>
+                <div class="month-checkbox-grid" id="monthCheckboxGrid">
+                    <!-- populated once the sheet loads, in the order months actually appear -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="filter-hint" id="filterHint"></p>
+
+    <div id="eventsContainer">
+        <p class="load-status" id="loadStatus">Loading events&hellip;</p>
+    </div>
+
+    <p class="no-results" id="noResults">No events match this filter right now &mdash; try "Select All."</p>
+
+    <div class="actions">
+        <a href="home.html" class="btn btn-outline preserve-member">Back to My Profile</a>
+    </div>
+</div>
+
+<script>
+const ACTIVITY_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQDS_b-fdZjWOcOZ4OUD7TkNLLaCaXt-AN2cOHyltxZRwOOlcGICvdTd2JXGLpzoAx3fPFKq5SgNjd/pub?gid=2034915391&single=true&output=csv';
+
+let EVENTS = [];
+let MONTH_ORDER = [];
+
+/* Minimal CSV parser that handles quoted fields with embedded commas/quotes */
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i], next = text[i + 1];
+        if (inQuotes) {
+            if (c === '"' && next === '"') { field += '"'; i++; }
+            else if (c === '"') { inQuotes = false; }
+            else { field += c; }
+        } else {
+            if (c === '"') inQuotes = true;
+            else if (c === ',') { row.push(field); field = ''; }
+            else if (c === '\r') { /* skip */ }
+            else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+            else { field += c; }
+        }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.length > 1 || r[0] !== '');
+}
+
+async function loadEvents() {
+    const loadNote = document.getElementById('loadNote');
+    const loadStatus = document.getElementById('loadStatus');
+    try {
+        const res = await fetch(ACTIVITY_SHEET_URL);
+        const text = await res.text();
+        const rows = parseCSV(text);
+        const headers = rows[0].map(h => h.trim());
+        const idx = (label) => headers.indexOf(label);
+
+        EVENTS = rows.slice(1).map(r => ({
+            month: (r[idx('Month')] || '').trim(),
+            date: (r[idx('Date')] || '').trim(),
+            activity: (r[idx('Activity')] || '').trim(),
+            waysToHelp: (r[idx('Ways to Help')] || '').trim(),
+            leader: (r[idx('Leader')] || '').trim(),
+        })).filter(e => e.activity);
+
+        MONTH_ORDER = [...new Set(EVENTS.map(e => e.month))];
+
+        loadNote.textContent = `Connected \u2014 ${EVENTS.length} events loaded from the council calendar.`;
+        loadStatus.remove();
+        buildMonthCheckboxes();
+        renderEvents();
+    } catch (e) {
+        loadNote.textContent = 'Could not reach the calendar sheet \u2014 check sharing settings on the published sheet.';
+        loadStatus.textContent = 'Could not load events right now.';
+    }
+}
+
+function buildMonthCheckboxes() {
+    const grid = document.getElementById('monthCheckboxGrid');
+    grid.innerHTML = MONTH_ORDER.map(m =>
+        `<label><input type="checkbox" value="${m}" onchange="applyFilters()"> ${m}</label>`
+    ).join('');
+}
+
+function toggleMonthDropdown() {
+    document.getElementById('monthDropdownPanel').classList.toggle('open');
+}
+
+function setAllMonths(checked) {
+    document.querySelectorAll('#monthCheckboxGrid input[type="checkbox"]').forEach(cb => cb.checked = checked);
+    applyFilters();
+}
+
+function selectedMonths() {
+    return Array.from(document.querySelectorAll('#monthCheckboxGrid input[type="checkbox"]:checked')).map(cb => cb.value);
+}
+
+function updateMonthDropdownLabel(months) {
+    const label = document.getElementById('monthDropdownLabel');
+    if (months.length === 0) label.textContent = 'All Months';
+    else if (months.length === 1) label.textContent = months[0];
+    else if (months.length <= 3) label.textContent = months.map(m => m.slice(0,3)).join(', ');
+    else label.textContent = months.length + ' months selected';
+}
+
+function renderEvents(monthsFilter) {
+    const months = monthsFilter || [];
+    const container = document.getElementById('eventsContainer');
+    const monthsToShow = months.length ? months : MONTH_ORDER;
+
+    let html = '';
+    let anyVisible = false;
+    monthsToShow.forEach(month => {
+        const monthEvents = EVENTS.filter(e => e.month === month);
+        if (!monthEvents.length) return;
+        anyVisible = true;
+        html += `<div class="month-group"><div class="month-label">${month}</div>`;
+        monthEvents.forEach(e => {
+            html += `<div class="event-row">
+                <div class="event-top">${e.date ? `<span class="event-date">${e.date}</span>` : ''}</div>
+                <div class="event-title">${e.activity}</div>
+                ${e.waysToHelp ? `<div class="event-responsibility"><strong>Volunteers needed:</strong> ${e.waysToHelp}</div>` : ''}
+                ${e.leader ? `<div class="event-leader">Contact: ${e.leader}</div>` : ''}
+            </div>`;
+        });
+        html += `</div>`;
+    });
+
+    container.innerHTML = html;
+    document.getElementById('noResults').classList.toggle('show', !anyVisible);
+}
+
+function applyFilters() {
+    const months = selectedMonths();
+    updateMonthDropdownLabel(months);
+    document.getElementById('filterHint').textContent = months.length
+        ? ('Showing ' + (months.length === 1 ? months[0] : months.length + ' selected months'))
+        : 'Showing all months';
+    renderEvents(months);
+}
+
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('monthDropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+        document.getElementById('monthDropdownPanel').classList.remove('open');
+    }
+});
+
+window.addEventListener('DOMContentLoaded', loadEvents);
+
+/* Carry the logged-in member across pages via preserve-member links */
+(function () {
+    const memberParam = new URLSearchParams(window.location.search).get("member");
+    if (!memberParam) return;
+    document.querySelectorAll("a.preserve-member").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.href);
+        url.searchParams.set("member", memberParam);
+        a.setAttribute("href", url.pathname + url.search);
+    });
+})();
+</script>
+
+</body>
+</html>
