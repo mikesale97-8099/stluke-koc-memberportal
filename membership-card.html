@@ -101,7 +101,7 @@ nav a.signout:hover { color:var(--accent); }
 .btn-outline:disabled:hover { background:transparent; color:var(--primary); }
 .wallet-note { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); margin-top:1.5rem; }
 
-.back-link { display:inline-block; margin-top:2rem; font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--primary); text-decoration:underline; }
+.actions { max-width:700px; margin:2rem auto 0; padding:0 2rem; display:flex; gap:0.9rem; justify-content:center; flex-wrap:wrap; }
 
 @media (max-width:640px){
     nav .container { flex-wrap:wrap; }
@@ -207,7 +207,9 @@ nav a.signout:hover { color:var(--accent); }
 
 
 
-    <a href="home.html" class="back-link preserve-member">&larr; Back to My Profile</a>
+    <div class="actions">
+        <a href="home.html" class="btn btn-outline preserve-member">Back to My Profile</a>
+    </div>
 </div>
 
 <script>

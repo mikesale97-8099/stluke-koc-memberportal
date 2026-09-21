@@ -64,6 +64,11 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
 
 .empty-state { padding:2rem; text-align:center; font-family:'Lato',sans-serif; color:var(--text-medium); }
 
+.actions { max-width:700px; margin:2rem auto 0; padding:0 2rem; display:flex; gap:0.9rem; justify-content:center; flex-wrap:wrap; }
+.btn { font-family:'Lato', sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer; border-radius:50px; padding:0.7rem 1.5rem; border:2px solid transparent; text-decoration:none; display:inline-block; }
+.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
+.btn-outline:hover { background:var(--primary); color:white; }
+
 @media (max-width:640px){
     nav ul { flex-wrap:nowrap; width:100%; justify-content:flex-start; order:3; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
     nav ul::-webkit-scrollbar { display:none; }
@@ -129,6 +134,9 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
         </div>
     </div>
 
+    <div class="actions">
+        <a href="home.html" class="btn btn-outline preserve-member">Back to My Profile</a>
+    </div>
 </div>
 
 <script>
