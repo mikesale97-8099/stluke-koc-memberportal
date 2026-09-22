@@ -599,6 +599,24 @@ async function requestContact() {
     }
 }
 
+function mailtoFallback(action) {
+    if (!CURRENT_MEMBER) return 'mailto:council14895@gmail.com';
+    const subject = encodeURIComponent('Portal issue \u2014 ' + fullName(CURRENT_MEMBER) + ' #' + CURRENT_MEMBER.memberNumber);
+    const body = encodeURIComponent(
+        'Action that failed: ' + action + '\n' +
+        'Member: ' + fullName(CURRENT_MEMBER) + ' (#' + CURRENT_MEMBER.memberNumber + ')\n' +
+        'Time: ' + new Date().toString() + '\n' +
+        'Device: ' + navigator.userAgent
+    );
+    return 'mailto:council14895@gmail.com?subject=' + subject + '&body=' + body;
+}
+
+function showUnreachableError(statusEl, action) {
+    statusEl.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it, not a problem with your info. ' +
+        '<a href="' + mailtoFallback(action) + '" style="color:inherit;text-decoration:underline;">Email a data administrator</a> and we\u2019ll sort it out directly.';
+    statusEl.style.color = 'var(--accent)';
+}
+
 async function saveContactChanges() {
     if (!CURRENT_MEMBER) return;
     const btn = document.getElementById('saveContactBtn');
@@ -647,9 +665,29 @@ async function saveContactChanges() {
             status.style.color = 'var(--accent)';
         }
     } catch (e) {
+        // A timeout/network hiccup here doesn't mean the write failed — Apps Script
+        // keeps running server-side even after the browser gives up waiting. Re-check
+        // the live record before assuming anything went wrong.
+        status.textContent = 'Slow connection \u2014 checking whether that went through\u2026';
+        status.style.color = '';
+        try {
+            const live = await fetchLiveMember(CURRENT_MEMBER.memberNumber);
+            const fieldsMatch = live && Object.keys(newFields).every(key =>
+                String(newFields[key] || '').trim().toLowerCase() === String(live[key] || '').trim().toLowerCase()
+            );
+            if (fieldsMatch) {
+                Object.assign(CURRENT_MEMBER, newFields);
+                CURRENT_MEMBER.lastVerified = live.lastVerified || CURRENT_MEMBER.lastVerified;
+                status.textContent = 'Saved \u2014 the connection was just slow, but your changes went through.';
+                status.style.color = 'var(--green)';
+                applyMember(CURRENT_MEMBER);
+            } else {
+                showUnreachableError(status, 'Contact Profile save');
+            }
+        } catch (e2) {
+            showUnreachableError(status, 'Contact Profile save');
+        }
         btn.disabled = false;
-        status.textContent = 'Could not reach the save endpoint \u2014 try again.';
-        status.style.color = 'var(--accent)';
     }
 }
 function goToPayDues() {
@@ -997,9 +1035,27 @@ async function confirmInfo() {
             btn.disabled = false;
         }
     } catch (e) {
-        status.textContent = 'Could not reach the verification endpoint.';
-        status.className = 'confirm-status err';
-        btn.disabled = false;
+        status.textContent = 'Slow connection \u2014 checking whether that went through\u2026';
+        status.className = 'confirm-status';
+        try {
+            const live = await fetchLiveMember(CURRENT_MEMBER.memberNumber);
+            const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+            if (live && live.lastVerified === today) {
+                document.getElementById('verifiedText').textContent = 'Last verified ' + today;
+                document.getElementById('verifyBoxStatus').textContent = 'Confirmed as of ' + today + '.';
+                status.textContent = 'Saved \u2014 the connection was just slow, but it went through.';
+                status.className = 'confirm-status ok';
+                btn.textContent = '\u2713 Confirmed';
+            } else {
+                status.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it. <a href="' + mailtoFallback('Confirm my data looks good') + '" style="color:inherit;text-decoration:underline;">Email a data administrator</a> and we\u2019ll sort it out directly.';
+                status.className = 'confirm-status err';
+                btn.disabled = false;
+            }
+        } catch (e2) {
+            status.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it. <a href="' + mailtoFallback('Confirm my data looks good') + '" style="color:inherit;text-decoration:underline;">Email a data administrator</a> and we\u2019ll sort it out directly.';
+            status.className = 'confirm-status err';
+            btn.disabled = false;
+        }
     }
 }
 
