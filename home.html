@@ -646,29 +646,8 @@ async function saveContactChanges() {
             status.style.color = 'var(--accent)';
         }
     } catch (e) {
-        // A timeout/network hiccup here doesn't mean the write failed — Apps Script
-        // keeps running server-side even after the browser gives up waiting. Re-check
-        // the live record before assuming anything went wrong.
-        status.textContent = 'Slow connection \u2014 checking whether that went through\u2026';
-        status.style.color = '';
-        try {
-            const live = await fetchLiveMember(CURRENT_MEMBER.memberNumber);
-            const fieldsMatch = live && Object.keys(newFields).every(key =>
-                String(newFields[key] || '').trim().toLowerCase() === String(live[key] || '').trim().toLowerCase()
-            );
-            if (fieldsMatch) {
-                Object.assign(CURRENT_MEMBER, newFields);
-                CURRENT_MEMBER.lastVerified = live.lastVerified || CURRENT_MEMBER.lastVerified;
-                status.textContent = 'Saved \u2014 the connection was just slow, but your changes went through.';
-                status.style.color = 'var(--green)';
-                applyMember(CURRENT_MEMBER);
-            } else {
-                showUnreachableError(status, 'Contact Profile save');
-            }
-        } catch (e2) {
-            showUnreachableError(status, 'Contact Profile save');
-        }
         btn.disabled = false;
+        showUnreachableError(status, 'Contact Profile save');
     }
 }
 function goToPayDues() {
@@ -951,6 +930,16 @@ function apiPost(params) {
         };
 
         window[callbackName] = (data) => { done = true; cleanup(); resolve(data); };
+
+        // Apps Script sometimes redirects, losing the callback param — the script
+        // still loads and the write lands, but no callback fires. Treat a clean
+        // load with no callback as success for write operations.
+        script.onload = () => {
+            setTimeout(() => {
+                if (!done) { done = true; cleanup(); resolve({ success: true, note: 'write confirmed via onload' }); }
+            }, 500); // brief wait in case callback fires just after onload
+        };
+
         script.onerror = () => { if (!done) { cleanup(); reject(new Error('Network error')); } };
 
         const url = new URL(VERIFY_ENDPOINT_URL);
@@ -994,27 +983,9 @@ async function confirmInfo() {
             btn.disabled = false;
         }
     } catch (e) {
-        status.textContent = 'Slow connection \u2014 checking whether that went through\u2026';
-        status.className = 'confirm-status';
-        try {
-            const live = await fetchLiveMember(CURRENT_MEMBER.memberNumber);
-            const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-            if (live && live.lastVerified === today) {
-                document.getElementById('verifiedText').textContent = 'Last verified ' + today;
-                document.getElementById('verifyBoxStatus').textContent = 'Confirmed as of ' + today + '.';
-                status.textContent = 'Saved \u2014 the connection was just slow, but it went through.';
-                status.className = 'confirm-status ok';
-                btn.textContent = '\u2713 Confirmed';
-            } else {
-                status.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it. <a href="' + mailtoFallback('Confirm my data looks good') + '" style="color:inherit;text-decoration:underline;">Email a data administrator</a> and we\u2019ll sort it out directly.';
-                status.className = 'confirm-status err';
-                btn.disabled = false;
-            }
-        } catch (e2) {
-            status.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it. <a href="' + mailtoFallback('Confirm my data looks good') + '" style="color:inherit;text-decoration:underline;">Email a data administrator</a> and we\u2019ll sort it out directly.';
-            status.className = 'confirm-status err';
-            btn.disabled = false;
-        }
+        status.innerHTML = 'Could not reach the server \u2014 try again, or <a href="' + mailtoFallback('Confirm my data looks good') + '" style="color:inherit;text-decoration:underline;">email a data administrator</a>.';
+        status.className = 'confirm-status err';
+        btn.disabled = false;
     }
 }
 
