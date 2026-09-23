@@ -9,6 +9,15 @@
  * VERIFY_ENDPOINT_URL near the top of home.html's <script> block.
  */
 
+/**
+ * Handles CORS preflight OPTIONS requests from browsers (Safari, Chrome, etc.).
+ * Without this, cross-origin POST requests are blocked before they even start.
+ */
+function doOptions(e) {
+  return ContentService.createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
 function doGet(e) {
   const action = (e.parameter && e.parameter.action) || 'verify';
   let result;
@@ -237,3 +246,10 @@ function jsonResponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+/* NOTE on CORS: Apps Script Web Apps automatically include
+ * Access-Control-Allow-Origin: * on responses when deployed as
+ * "Anyone" access. The doOptions() above handles the preflight.
+ * If writes are still blocked after redeployment, verify the
+ * deployment is set to "Anyone" (not "Anyone with Google account").
+ */

@@ -370,14 +370,16 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 <script>
 /* Full original tone messages — restored, this is what got lost in the first restructure pass */
 const states = {
-    "Core Member, Current": { friendlyLabel:"Core Member", tone:"tone-good", msg:"You're all set. Thank you for staying active in council life." },
-    "Core Member, Payment Due": { friendlyLabel:"Payment Due", tone:"tone-warm", msg:"Your dues are due for this cycle. Pay anytime below — thanks for being part of the council." },
-    "Contributing Member, Payment Overdue": { friendlyLabel:"Contributing Member", tone:"tone-warm", msg:"You're a bit behind on dues — thanks for staying involved. Pay anytime below." },
-    "Long-time Member, Payment Overdue": { friendlyLabel:"Long-time Member", tone:"tone-good", msg:"You've been part of this council a long time. Please reach out for assistance if dues are a barrier." },
-    "Member, Inactive": { friendlyLabel:"Inactive", tone:"tone-neutral", msg:"We don't show any dues activity yet. If you're still interested in the council, we'd love to hear from you." },
+    "Core Member, Current": { friendlyLabel:"Member In Good Standing", tone:"tone-good", msg:"You're all set. Thank you for staying active in council life." },
+    "Core Member, Payment Due": { friendlyLabel:"Active, Payment Due", tone:"tone-warm", msg:"Your dues are due for this cycle. Pay anytime below — thanks for being part of the council." },
+    "Contributing Member, Payment Past Due": { friendlyLabel:"Active, Payment Past Due", tone:"tone-warm", msg:"You're a bit behind on dues — thanks for staying involved. Pay anytime below." },
+    "Contributing Member, Payment Overdue": { friendlyLabel:"Active, Payment Overdue", tone:"tone-warm", msg:"You're a bit behind on dues — thanks for staying involved. Pay anytime below." },
+    "Member, Active/Severely Overdue": { friendlyLabel:"Member, Severly Overdue", tone:"tone-warm", msg:"You're a bit behind on dues, but we see you around — thanks for staying involved. Pay anytime below." },
+    "Long-time Member, Inactive/Severely Overdue": { friendlyLabel:"Long-time Member, Severly Overdue", tone:"tone-good", msg:"You've been part of this council a long time. Please reach out for assistance if dues are a barrier." },
+    "Member, Inactive and Severely Overdue": { friendlyLabel:"Associate, Inactive", tone:"tone-neutral", msg:"We don't show any dues activity yet. If you're still interested in the council, we'd love to hear from you." },
     "Member, No record of dues payments": { friendlyLabel:"Status Unknown", tone:"tone-neutral", msg:"We haven't seen recent activity or payment from you. If you'd like to stay a member, we're here — reach out anytime." },
-    "Clergy": { friendlyLabel:"Clergy", tone:"tone-exempt", msg:"Thank you for your continued guidance to our council." },
-    "Member, No dues data": { friendlyLabel:"Records Incomplete", tone:"tone-neutral", msg:"We don't have complete records on file for you yet. Flag this below so a data administrator can take a look — nothing is being held against you." }
+    "Member, No dues data": { friendlyLabel:"Records Incomplete", tone:"tone-neutral", msg:"We don't have complete records on file for you yet. Flag this below so a data administrator can take a look — nothing is being held against you." },
+    "Clergy": { friendlyLabel:"Clergy", tone:"tone-exempt", msg:"Thank you for your continued guidance to our council." }
 };
 const DEFAULT_TIER = "Member, No dues data";
 
@@ -464,7 +466,7 @@ function applyMember(indexOrMember) {
             duesEl.classList.add('dues-owed');
             payBtn.textContent = 'Pay $' + owed.toFixed(2) + ' Now';
             payPrompt.style.display = 'block';
-        } else if (m.state === 'Member, Inactive' || m.state === 'Member, No dues data') {
+        } else if (m.state === 'Member, Inactive and Severely Overdue' || m.state === 'Member, No dues data') {
             duesEl.textContent = 'No payment on record';
             duesEl.classList.add('dues-owed');
             payBtn.textContent = 'Pay Dues';
@@ -536,16 +538,8 @@ async function submitFlag() {
     status.style.color = '';
 
     try {
-        const url = new URL(VERIFY_ENDPOINT_URL);
-        url.searchParams.set('action', 'logChange');
-        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
-        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
-        url.searchParams.set('type', 'Flag');
-        url.searchParams.set('category', category);
-        url.searchParams.set('field', 'General');
-        url.searchParams.set('newValue', text);
-
-        const data = await jsonp(url.toString());
+        const params = { action: 'logChange', memberNumber: CURRENT_MEMBER.memberNumber, memberName: fullName(CURRENT_MEMBER), type: 'Flag', category: category, field: 'General', newValue: text };
+        const data = await apiPost(params);
         btn.disabled = false;
         if (data.success) {
             document.getElementById('flagForm').classList.remove('open');
@@ -573,16 +567,8 @@ async function requestContact() {
     status.style.color = '';
 
     try {
-        const url = new URL(VERIFY_ENDPOINT_URL);
-        url.searchParams.set('action', 'logChange');
-        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
-        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
-        url.searchParams.set('type', 'Contact Request');
-        url.searchParams.set('category', 'Membership');
-        url.searchParams.set('field', 'General');
-        url.searchParams.set('newValue', 'Member has requested contact to discuss their membership.');
-
-        const data = await jsonp(url.toString());
+        const params = { action: 'logChange', memberNumber: CURRENT_MEMBER.memberNumber, memberName: fullName(CURRENT_MEMBER), type: 'Contact Request', category: 'Membership', field: 'General', newValue: 'Member has requested contact to discuss their membership.' };
+        const data = await apiPost(params);
         if (data.success) {
             btn.textContent = '\u2713 Request sent';
             status.textContent = 'The data administrator will forward your request and someone will be reaching out soon.';
@@ -638,13 +624,8 @@ async function saveContactChanges() {
     status.style.color = '';
 
     try {
-        const url = new URL(VERIFY_ENDPOINT_URL);
-        url.searchParams.set('action', 'saveContact');
-        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
-        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
-        url.searchParams.set('fields', JSON.stringify(newFields));
-
-        const data = await jsonp(url.toString());
+        const params = { action: 'saveContact', memberNumber: CURRENT_MEMBER.memberNumber, memberName: fullName(CURRENT_MEMBER), fields: JSON.stringify(newFields) };
+        const data = await apiPost(params);
         btn.disabled = false;
 
         if (data.success) {
@@ -718,18 +699,8 @@ async function submitStatusRequest(kind) {
     status.style.color = '';
 
     try {
-        const url = new URL(VERIFY_ENDPOINT_URL);
-        url.searchParams.set('action', 'logChange');
-        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
-        url.searchParams.set('memberName', fullName(CURRENT_MEMBER));
-        url.searchParams.set('type', 'Status Request');
-        url.searchParams.set('category', 'Membership');
-        url.searchParams.set('field', kind === 'Inactive' ? 'Request Inactive Status' : 'Request Removal');
-        url.searchParams.set('newValue', kind === 'Inactive'
-            ? 'Member has requested to be moved to Inactive status.'
-            : 'Member has requested removal from the council (for Supreme).');
-
-        const data = await jsonp(url.toString());
+        const params = { action: 'logChange', memberNumber: CURRENT_MEMBER.memberNumber, memberName: fullName(CURRENT_MEMBER), type: 'Status Request', category: 'Membership', field: kind === 'Inactive' ? 'Request Inactive Status' : 'Request Removal', newValue: kind === 'Inactive' ? 'Member has requested to be moved to Inactive status.' : 'Member has requested removal from the council (for Supreme).' };
+        const data = await apiPost(params);
         if (data.success) {
             btn.textContent = '\u2713 Sent';
             status.textContent = 'Thanks \u2014 a data administrator will reach out to confirm.';
@@ -832,7 +803,7 @@ async function loadTierMessages() {
 
         let changed = false;
         json.table.rows.forEach(row => {
-            const tier = (cell(row, 'Tier') || '').toString().trim();
+            const tier = (cell(row, 'Membership Tier') || '').toString().trim();
             const msg = (cell(row, 'Home Page Message') || '').toString().trim();
             const friendly = (cell(row, 'Friendly Label') || '').toString().trim();
             if (tier && states[tier]) {
@@ -964,41 +935,18 @@ function recordLoginOncePerSession(memberNumber) {
     if (sessionStorage.getItem(flagKey)) return;
     sessionStorage.setItem(flagKey, '1');
 
-    const url = new URL(VERIFY_ENDPOINT_URL);
-    url.searchParams.set('action', 'recordLogin');
-    url.searchParams.set('memberNumber', memberNumber);
-    jsonp(url.toString()).catch(() => {}); // silent — non-critical
+    const params = { 'action': 'recordLogin', 'memberNumber': memberNumber };
+    apiPost(params).catch(() => {}); // silent — non-critical
 }
 
-function jsonp(url) {
-    return new Promise((resolve, reject) => {
-        const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-        const script = document.createElement('script');
-        let done = false;
-
-        const cleanup = () => {
-            delete window[callbackName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-        };
-
-        window[callbackName] = (data) => {
-            done = true;
-            cleanup();
-            resolve(data);
-        };
-
-        script.onerror = () => {
-            if (!done) { cleanup(); reject(new Error('JSONP request failed')); }
-        };
-
-        const sep = url.includes('?') ? '&' : '?';
-        script.src = url + sep + 'callback=' + callbackName;
-        document.body.appendChild(script);
-
-        setTimeout(() => {
-            if (!done) { cleanup(); reject(new Error('JSONP request timed out')); }
-        }, 20000);
+async function apiPost(params) {
+    const res = await fetch(VERIFY_ENDPOINT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
 }
 
 async function confirmInfo() {
@@ -1017,11 +965,8 @@ async function confirmInfo() {
     status.className = 'confirm-status';
 
     try {
-        const url = new URL(VERIFY_ENDPOINT_URL);
-        url.searchParams.set('memberNumber', CURRENT_MEMBER.memberNumber);
-        url.searchParams.set('confirmerName', fullName(CURRENT_MEMBER));
-
-        const data = await jsonp(url.toString());
+        const params = { memberNumber: CURRENT_MEMBER.memberNumber, confirmerName: fullName(CURRENT_MEMBER) };
+        const data = await apiPost(params);
         if (data.success) {
             const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
             document.getElementById('verifiedText').textContent = 'Last verified ' + today;

@@ -216,12 +216,14 @@ nav a.signout:hover { color:var(--accent); }
 const states = {
     "Core Member, Current": { ribbon:"Active", card:"current", tone:"tone-good", msg:"You're all set. Thank you for staying active in council life." },
     "Core Member, Payment Due": { ribbon:"Active", card:"current", tone:"tone-warm", msg:"Your dues are due for this cycle. Pay anytime — thanks for being part of the council." },
+    "Contributing Member, Payment Past Due": { ribbon:"Active", card:"lapsed", tone:"tone-warm", msg:"You're a bit behind on dues — thanks for staying involved." },
     "Contributing Member, Payment Overdue": { ribbon:"Active", card:"lapsed", tone:"tone-warm", msg:"You're a bit behind on dues — thanks for staying involved." },
-    "Long-time Member, Payment Overdue": { ribbon:"Active", card:"current", tone:"tone-good", msg:"You've been part of this council a long time. Please reach out for assistance if dues are a barrier." },
-    "Member, Inactive": { ribbon:"Active", card:"lapsed", tone:"tone-neutral", msg:"We don't show any dues activity yet. If you're still interested in the council, we'd love to hear from you." },
+    "Member, Active/Severely Overdue": { ribbon:"Active", card:"lapsed", tone:"tone-warm", msg:"You're a bit behind on dues, but we see you around — thanks for staying involved." },
+    "Long-time Member, Inactive/Severely Overdue": { ribbon:"Active", card:"current", tone:"tone-good", msg:"You've been part of this council a long time. Please reach out for assistance if dues are a barrier." },
+    "Member, Inactive and Severely Overdue": { ribbon:"Active", card:"lapsed", tone:"tone-neutral", msg:"We don't show any dues activity yet. If you're still interested in the council, we'd love to hear from you." },
     "Member, No record of dues payments": { ribbon:"Active", card:"lapsed", tone:"tone-neutral", msg:"We haven't seen recent activity or payment from you. If you'd like to stay a member, we're here — reach out anytime." },
-    "Clergy": { ribbon:"Clergy", card:"exempt", tone:"tone-exempt", msg:"Thank you for your continued guidance to our council." },
-    "Member, No dues data": { ribbon:"Verify Needed", card:"unknown", tone:"tone-neutral", msg:"We don't have complete records on file for you yet. Flag this on your profile so a data administrator can take a look." }
+    "Member, No dues data": { ribbon:"Verify Needed", card:"unknown", tone:"tone-neutral", msg:"We don't have complete records on file for you yet. Flag this on your profile so a data administrator can take a look." },
+    "Clergy": { ribbon:"Clergy", card:"exempt", tone:"tone-exempt", msg:"Thank you for your continued guidance to our council." }
 };
 const DEFAULT_TIER = "Member, No dues data";
 
@@ -233,7 +235,7 @@ function fullName(m) {
 
 function expText(m) {
     if (m.state === 'Member, No dues data') return 'No dues record on file';
-    if (m.state === 'Member, Inactive') return 'No dues ever recorded';
+    if (m.state === 'Member, Inactive and Severely Overdue') return 'No dues ever recorded';
     if (typeof m.lastYrPaid === 'number') return 'Behind since ' + (m.lastYrPaid + 1);
     return 'Dues not current';
 }
