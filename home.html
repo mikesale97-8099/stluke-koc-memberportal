@@ -942,7 +942,8 @@ function recordLoginOncePerSession(memberNumber) {
 async function apiPost(params) {
     const res = await fetch(VERIFY_ENDPOINT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' }, // text/plain avoids CORS preflight on Apps Script
         body: JSON.stringify(params)
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
