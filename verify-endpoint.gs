@@ -24,6 +24,7 @@ function doGet(e) {
   if (action === 'logChange') result = handleLogChange(e.parameter);
   else if (action === 'saveContact') result = handleSaveContact(e.parameter);
   else if (action === 'recordLogin') result = handleRecordLogin(e.parameter);
+  else if (action === 'completeWizard') result = handleCompleteWizard(e.parameter);
   else result = handleVerify(e.parameter);
 
   const callback = e.parameter && e.parameter.callback;
@@ -46,6 +47,7 @@ function doPost(e) {
   if (action === 'logChange') result = handleLogChange(params);
   else if (action === 'saveContact') result = handleSaveContact(params);
   else if (action === 'recordLogin') result = handleRecordLogin(params);
+  else if (action === 'completeWizard') result = handleCompleteWizard(params);
   else result = handleVerify(params);
   return jsonResponse(result);
 }
@@ -253,3 +255,46 @@ function jsonResponse(obj) {
  * If writes are still blocked after redeployment, verify the
  * deployment is set to "Anyone" (not "Anyone with Google account").
  */
+
+/**
+ * Stamps Wizard Completed date and Wizard Outcome on the member's row,
+ * then logs a summary entry to the Change Log.
+ * outcome: 'Confirmed' | 'Flagged' | 'Status Request'
+ * notes: optional detail (dispute text, inactive/leave request, etc.)
+ */
+function handleCompleteWizard(params) {
+  const SHEET_NAME = 'St Luke KOC Membership DB';
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+
+  const memberNumberCol = headers.indexOf('Member Number');
+  const wizardCompletedCol = headers.indexOf('Wizard Completed');
+  const wizardOutcomeCol = headers.indexOf('Wizard Outcome');
+
+  if (memberNumberCol === -1) return { success: false, error: 'Member Number column not found' };
+
+  const memberNumber = String(params.memberNumber || '').replace(/^0+/, '').trim();
+  const memberName = String(params.memberName || '').trim();
+  const outcome = String(params.outcome || 'Confirmed').trim();
+  const notes = String(params.notes || '').trim();
+
+  if (!memberNumber) return { success: false, error: 'Missing memberNumber' };
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][memberNumberCol]).replace(/^0+/, '').trim() === memberNumber) {
+      const rowNum = i + 1;
+      const today = new Date();
+
+      if (wizardCompletedCol !== -1) sheet.getRange(rowNum, wizardCompletedCol + 1).setValue(today);
+      if (wizardOutcomeCol !== -1) sheet.getRange(rowNum, wizardOutcomeCol + 1).setValue(outcome);
+
+      // Log to Change Log
+      const logNote = notes ? outcome + ': ' + notes : outcome;
+      logSheet().appendRow([today, memberNumber, memberName, 'Wizard', 'Verification', 'Wizard Completed', '', logNote, '', '']);
+
+      return { success: true, completedDate: today.toISOString() };
+    }
+  }
+  return { success: false, error: 'Member not found' };
+}
