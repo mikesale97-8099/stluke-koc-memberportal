@@ -929,26 +929,37 @@ function apiPost(params) {
             if (script.parentNode) script.parentNode.removeChild(script);
         };
 
-        window[callbackName] = (data) => { done = true; cleanup(); resolve(data); };
-
-        // Apps Script sometimes redirects, losing the callback param — the script
-        // still loads and the write lands, but no callback fires. Treat a clean
-        // load with no callback as success for write operations.
-        script.onload = () => {
-            setTimeout(() => {
-                if (!done) { done = true; cleanup(); resolve({ success: true, note: 'write confirmed via onload' }); }
-            }, 500); // brief wait in case callback fires just after onload
+        window[callbackName] = (data) => {
+            console.log('[apiPost] callback fired:', JSON.stringify(data));
+            done = true; cleanup(); resolve(data);
         };
 
-        script.onerror = () => { if (!done) { cleanup(); reject(new Error('Network error')); } };
+        script.onload = () => {
+            console.log('[apiPost] script onload fired, done=' + done);
+            setTimeout(() => {
+                if (!done) {
+                    console.log('[apiPost] onload but no callback — treating as success');
+                    done = true; cleanup(); resolve({ success: true, note: 'write confirmed via onload' });
+                }
+            }, 500);
+        };
+
+        script.onerror = (e) => {
+            console.log('[apiPost] script onerror fired');
+            if (!done) { cleanup(); reject(new Error('Network error')); }
+        };
 
         const url = new URL(VERIFY_ENDPOINT_URL);
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
         url.searchParams.set('callback', callbackName);
+        console.log('[apiPost] loading script:', url.toString().substring(0, 120));
         script.src = url.toString();
         document.body.appendChild(script);
 
-        setTimeout(() => { if (!done) { cleanup(); reject(new Error('Timed out')); } }, 20000);
+        setTimeout(() => {
+            console.log('[apiPost] timeout fired, done=' + done);
+            if (!done) { cleanup(); reject(new Error('Timed out')); }
+        }, 20000);
     });
 }
 
