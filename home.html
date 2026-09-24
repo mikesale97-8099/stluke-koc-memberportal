@@ -764,7 +764,7 @@ async function tryLiveLogin() {
     try {
         const live = await fetchLiveMember(memberNumber);
         if (live) {
-            applyMember(live);
+            try { applyMember(live); } catch(applyErr) { console.error('applyMember error:', applyErr); }
             showMainContent();
             if (note) note.textContent = 'Logged in live \u2014 record #' + memberNumber + ' pulled straight from the sheet just now.';
             recordLoginOncePerSession(memberNumber);
