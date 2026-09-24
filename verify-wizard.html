@@ -305,7 +305,7 @@ const MEMBER_NUMBER = new URLSearchParams(window.location.search).get('member') 
 let CURRENT_MEMBER = null;
 
 // Wizard state
-let currentMember = MEMBERS[0];
+let currentMember = null;
 let memberStatus = 'stay'; // stay / inactive / leave
 let duesDisputed = false;
 
