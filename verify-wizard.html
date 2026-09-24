@@ -609,13 +609,15 @@ async function init() {
         return;
     }
 
-    // Show loading state
     document.getElementById('panel-welcome').querySelector('h1').textContent = 'Loading your profile\u2026';
 
     try {
+        console.log('[wizard] fetching member:', MEMBER_NUMBER);
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
+        console.log('[wizard] result:', CURRENT_MEMBER ? 'found' : 'null');
         loadMember(CURRENT_MEMBER);
     } catch (e) {
+        console.error('[wizard] error:', e.message);
         document.getElementById('panel-welcome').querySelector('h1').textContent = 'Could not load your profile';
         document.getElementById('panel-welcome').querySelector('.sub').textContent = 'Please try refreshing the page. If the problem persists, contact a data administrator.';
     }
