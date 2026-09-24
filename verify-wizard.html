@@ -265,7 +265,7 @@ async function fetchLiveMember(memberNumber) {
     const memberNum = String(memberNumber).replace(/^0+/, '');
     for (const row of json.table.rows) {
         if (String(cell(row, 'Member Number')).replace(/^0+/, '') === memberNum) {
-            const lastDues = cell(row, 'Last Dues Year');
+            const lastDues = cell(row, 'Last Yr Paid');
             const currentYear = new Date().getFullYear();
             const duesYear = lastDues ? parseInt(String(lastDues).match(/\d{4}/)?.[0] || 0) : 0;
             const owed = duesYear < currentYear - 1;
