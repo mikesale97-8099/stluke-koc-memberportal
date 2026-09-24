@@ -604,8 +604,13 @@ function showResult(paidNow) {
 }
 
 async function init() {
+    if (!MEMBER_NUMBER) {
+        window.location.href = 'landing.html';
+        return;
+    }
+
     // Show loading state
-    document.getElementById('panel-welcome').querySelector('h1').textContent = 'Loading your profile…';
+    document.getElementById('panel-welcome').querySelector('h1').textContent = 'Loading your profile\u2026';
 
     try {
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
