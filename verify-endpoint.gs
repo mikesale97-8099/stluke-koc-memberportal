@@ -107,7 +107,7 @@ function handleSaveContact(params) {
 
   Object.keys(fields).forEach(key => {
     const mapping = FIELD_MAP[key];
-    if (!mapping) return;
+    if (!mapping) { skipped.push('Unknown field: ' + key); return; }
     const [colName, label] = mapping;
     const colIdx = headers.indexOf(colName);
     if (colIdx === -1) { skipped.push(label); return; }

@@ -61,9 +61,9 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
 
 .wizard-panel h1 { font-family:'Crimson Pro', serif; font-size:1.7rem; color:var(--primary); font-weight:700; text-align:center; }
-.wizard-panel .sub { font-family:'Lato',serif; font-size:0.9rem; color:var(--text-medium); text-align:center; margin-top:0.6rem; line-height:1.5; }
+.wizard-panel .sub { font-family:'Lato',serif; font-size:1rem; color:#4B5563; text-align:center; margin-top:0.6rem; line-height:1.5; }
 .wizard-panel h2 { font-family:'Crimson Pro', serif; font-size:1.3rem; color:var(--primary); font-weight:700; margin-bottom:0.25rem; }
-.step-sub { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); margin-bottom:1.25rem; }
+.step-sub { font-family:'Lato',sans-serif; font-size:1rem; line-height:1.6; color:#4B5563; margin-bottom:1.1rem; }
 
 .welcome-icon { text-align:center; font-size:2.4rem; margin-bottom:1rem; }
 
@@ -73,14 +73,14 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .status-option:hover { border-color:var(--secondary); }
 .status-option.selected { border-color:var(--secondary); background:#FFFBEB; }
 .status-option input[type="radio"] { margin-top:0.25rem; accent-color:var(--primary); flex-shrink:0; }
-.opt-title { font-family:'Lato',sans-serif; font-weight:700; font-size:0.92rem; color:var(--text-dark); }
-.opt-desc { font-family:'Lato',sans-serif; font-size:0.82rem; color:var(--text-medium); margin-top:0.15rem; }
+.opt-title { font-family:'Lato',sans-serif; font-weight:700; font-size:1rem; color:var(--text-dark); }
+.opt-desc { font-family:'Lato',sans-serif; font-size:0.92rem; color:#4B5563; margin-top:0.15rem; }
 
 /* Contact fields */
 .field-row { display:grid; grid-template-columns:100px 1fr; gap:0.6rem; padding:0.5rem 0; align-items:center; border-bottom:1px solid #F3F4F6; }
 .field-row:last-of-type { border-bottom:none; }
-.field-row label { font-family:'Lato',sans-serif; font-size:0.8rem; color:var(--text-medium); }
-.field-row input { font-family:'Lora',serif; font-size:0.92rem; padding:0.5rem 0.65rem; border:1.5px solid #E5E7EB; border-radius:8px; width:100%; }
+.field-row label { font-family:'Lato',sans-serif; font-size:0.9rem; color:#4B5563; }
+.field-row input { font-family:'Lora',serif; font-size:1rem; padding:0.6rem 0.7rem; border:1.5px solid #E5E7EB; border-radius:8px; width:100%; }
 .field-row input:focus { outline:none; border-color:var(--primary); }
 
 /* Dues */
@@ -90,7 +90,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .dues-row .val { font-weight:700; }
 .dues-row .val.owed { color:var(--accent); }
 .pay-btn { display:block; width:100%; text-align:center; background:var(--secondary); color:white; font-family:'Lato',sans-serif; font-weight:700; font-size:0.95rem; padding:0.75rem; border-radius:10px; text-decoration:none; margin-bottom:1rem; }
-.dispute-link { background:none; border:none; font-family:'Lato',sans-serif; font-size:0.85rem; font-weight:600; color:var(--accent); text-decoration:underline; cursor:pointer; padding:0; display:block; margin-bottom:0.5rem; }
+.dispute-link { background:none; border:none; font-family:'Lato',sans-serif; font-size:0.95rem; font-weight:600; color:var(--accent); text-decoration:underline; cursor:pointer; padding:0; display:block; margin-bottom:0.5rem; }
 .dispute-box { display:none; margin-top:0.75rem; }
 .dispute-box.open { display:block; }
 .dispute-box textarea { width:100%; min-height:72px; font-family:'Lora',serif; font-size:0.9rem; padding:0.65rem; border:1.5px solid #D1D5DB; border-radius:8px; resize:vertical; }
@@ -165,10 +165,10 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
     <!-- Step 1b: Dues purpose — shown to everyone -->
     <div class="wizard-panel" id="panel-purpose">
-        <h2>Thank you for the time and money you give to make our mission possible.</h2>
+        <h2>A quick refresher before we begin</h2>
         <p class="step-sub" style="margin-top:0.75rem;">Dues aren't a membership fee in the ordinary sense — they're the mechanism that turns individual membership into collective charity. That's true whether you're able to attend every event or just able to contribute in the form of dues and donations.</p>
         <p class="step-sub">The vast majority of your dues are used to fund the charitable work we do in our parish and community and to meet the unexpected needs of our brothers and their families. The balance covers the everyday costs of running the council and our per-capita contribution to the State and Supreme Councils that keep us connected to the broader Knights of Columbus family.</p>
-        <p class="step-sub">We hope you see — and are proud of — the positive impact we make on our parish and fellow knights. Thank you again!</p>
+        <p class="step-sub" style="font-weight:700; color:var(--text-dark);">We hope you see — and are proud of — the positive impact we make on our parish and fellow knights. Thank you again!</p>
         <div class="wizard-actions single" style="margin-top:1.5rem;">
             <button class="btn btn-primary" onclick="goTo('contact')">Continue</button>
         </div>
@@ -202,9 +202,9 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
     <!-- Step 3: Contact Info (only if staying) -->
     <div class="wizard-panel" id="panel-contact">
-        <h2>Contact Info</h2>
-        <p class="step-sub">Review your information below. If you spot anything missing or out of date, correct it and we'll save your changes.</p>
-        <div class="field-row"><label>Preferred Name</label><input type="text" id="wPreferred" placeholder="What you go by" oninput="contactChanged()"></div>
+        <h2>Verify your Contact Info</h2>
+        <p class="step-sub">Review your information below. If you spot anything missing or out of date, correct it and we'll save your changes. Type in your preferred name if it's blank (e.g., Bob).</p>
+        <div class="field-row"><label>Preferred Name</label><input type="text" id="wPreferred" placeholder="e.g., Bob" oninput="contactChanged()"></div>
         <div class="field-row"><label>Address</label><input type="text" id="wAddress" oninput="contactChanged()"></div>
         <div class="field-row"><label>City</label><input type="text" id="wCity" oninput="contactChanged()"></div>
         <div class="field-row"><label>State</label><input type="text" id="wState" maxlength="2" style="text-transform:uppercase;width:60px;" oninput="contactChanged()"></div>
@@ -219,7 +219,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
     <!-- Step 4: Directory Opt-In -->
     <div class="wizard-panel" id="panel-directory">
-        <h2>Member Directory</h2>
+        <h2>Member Directory Option</h2>
         <p class="step-sub">Under <strong>Groups</strong> in this Member Center, there's a directory listing names, phone numbers, and emails of council members who've chosen to appear there. It's only accessible from within this application and is never shared externally.</p>
         <p class="step-sub" style="margin-bottom:1.25rem;">Would you like to appear in the member directory?</p>
         <div class="status-choice">
@@ -246,8 +246,8 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
     <!-- Step 5: Dues Check (only if staying) -->
     <div class="wizard-panel" id="panel-dues">
-        <h2>Dues Check</h2>
-        <p class="step-sub">Review your dues below. If the amount is correct you can pay now or continue — flag it if something looks wrong.</p>
+        <h2>Verify your Dues Balance</h2>
+        <p class="step-sub">If the balance shown is correct, click <strong>Data is Correct</strong>. You can also make a payment now, or let us know if something looks wrong.</p>
         <div class="dues-box">
             <div class="dues-row"><span>Status</span><span class="val" id="wDuesStatus">—</span></div>
             <div class="dues-row"><span>Paid Through</span><span class="val" id="wPaidThrough">—</span></div>
@@ -260,7 +260,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         </div>
         <div class="wizard-actions">
             <button class="btn btn-ghost" onclick="goTo('contact')">Back</button>
-            <button class="btn btn-primary" id="duesContinueBtn" onclick="continueFromDues()">Continue</button>
+            <button class="btn btn-primary" id="duesContinueBtn" onclick="continueFromDues()">Data is Correct</button>
         </div>
     </div>
 
@@ -425,7 +425,7 @@ function loadMember(m) {
     const disputeBox = document.getElementById('disputeBox'); if (disputeBox) disputeBox.classList.remove('open');
     const disputeNote = document.getElementById('disputeNote'); if (disputeNote) disputeNote.value = '';
     const disputeToggle = document.getElementById('disputeToggle'); if (disputeToggle) disputeToggle.textContent = 'Something looks wrong with my dues \u2192';
-    const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
+    const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Data is Correct';
     const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
 
     goTo('welcome');
@@ -565,7 +565,7 @@ function toggleDispute() {
 function updateDuesBtn() {
     const open = document.getElementById('disputeBox').classList.contains('open');
     const hasText = document.getElementById('disputeNote').value.trim().length > 0;
-    document.getElementById('duesContinueBtn').textContent = (open && hasText) ? 'Submit & Continue' : 'Continue';
+    document.getElementById('duesContinueBtn').textContent = (open && hasText) ? 'Submit & Continue' : 'Data is Correct';
 }
 
 function continueFromDues() {
