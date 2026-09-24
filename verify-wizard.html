@@ -295,9 +295,9 @@ async function fetchLiveMember(memberNumber) {
     for (const row of json.table.rows) {
         if (String(cell(row, 'Member Number')).replace(/^0+/, '') === memberNum) {
             const lastDues = cell(row, 'Last Yr Paid');
-            const currentYear = new Date().getFullYear();
+            const outstandingDues = parseFloat(String(cell(row, 'Outstanding Dues') || '0').replace(/[^0-9.]/g, '')) || 0;
             const duesYear = lastDues ? parseInt(String(lastDues).match(/\d{4}/)?.[0] || 0) : 0;
-            const owed = duesYear < currentYear - 1;
+            const owed = outstandingDues > 0;
             return {
                 memberNumber: String(cell(row, 'Member Number')),
                 firstName:    String(cell(row, 'First Name') || '').trim(),
@@ -309,7 +309,7 @@ async function fetchLiveMember(memberNumber) {
                 zip:          String(cell(row, 'Postal Code') || '').trim(),
                 phone:        String(cell(row, 'phone') || '').trim(),
                 email:        String(cell(row, 'email') || '').trim(),
-                duesStatus:   owed ? 'Payment Due' : 'Current',
+                duesStatus:   owed ? '$' + outstandingDues.toFixed(2) + ' outstanding' : 'Current',
                 paidThrough:  duesYear || 'Unknown',
                 owed:         owed ? 1 : 0,
                 tier:         String(cell(row, 'Membership Tier') || '').trim(),
