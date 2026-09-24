@@ -347,7 +347,10 @@ function loadMember(m) {
     currentMember = m;
     try {
         const welcomeName = document.getElementById('welcomeName');
-        if (welcomeName) welcomeName.textContent = (currentMember.nickname || currentMember.firstName) + ' ' + currentMember.lastName;
+        if (welcomeName) {
+            console.log('[wizard] name fields:', currentMember.nickname, currentMember.firstName, currentMember.lastName);
+            welcomeName.textContent = (currentMember.nickname || currentMember.firstName || '') + ' ' + (currentMember.lastName || '');
+        }
         const wPreferred = document.getElementById('wPreferred'); if (wPreferred) wPreferred.value = currentMember.nickname || '';
         const wAddress = document.getElementById('wAddress'); if (wAddress) wAddress.value = currentMember.address1;
         const wCity = document.getElementById('wCity'); if (wCity) wCity.value = currentMember.city;
@@ -402,9 +405,7 @@ function loadMember(m) {
     const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
     const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
 
-    const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
-
-    } catch(loadErr) { console.error('loadMember error:', loadErr.message, loadErr.stack); }
+    } catch(loadErr) { console.error('loadMember error:', loadErr); }
     goTo('welcome');
 }
 
