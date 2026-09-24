@@ -477,7 +477,7 @@ async function continueFromDirectory() {
             action: 'saveContact',
             memberNumber: currentMember.memberNumber,
             memberName: currentMember.firstName + ' ' + currentMember.lastName,
-            fields: JSON.stringify({ 'Directory Opt-In': directoryOptIn ? 'Yes' : 'No' })
+            fields: JSON.stringify({ directoryOptIn: directoryOptIn ? 'Yes' : 'No' })
         });
     } catch(e) {
         console.warn('Directory opt-in save failed:', e.message);
