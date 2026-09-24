@@ -438,10 +438,9 @@ function applyMember(indexOrMember) {
     document.getElementById('flagForm').classList.remove('open');
     document.getElementById('flagConfirm').classList.remove('open');
     const cb = document.getElementById('confirmBtn'); if (cb) { cb.disabled = false; cb.textContent = '\u2713 My data looks good'; }
-    
     const confirmStatusEl = document.getElementById('confirmStatus');
     if (confirmStatusEl) { confirmStatusEl.textContent = ''; confirmStatusEl.className = 'confirm-status'; }
-    
+
     updatePositionsLine(m.memberNumber);
 }
 
@@ -690,43 +689,7 @@ function formatGvizDate(v) {
     }
     return s;
 }
-async function tryLiveLogin() {
-    const memberNumber = new URLSearchParams(window.location.search).get('member');
-    const note = document.getElementById('memberNote');
-    const owner = isOwnerMode();
 
-    console.log('[login] memberNumber:', memberNumber, 'owner:', owner);
-
-    if (!memberNumber) {
-        if (!owner) showNotLoggedIn();
-        return;
-    }
-
-    if (note) note.textContent = 'Loading your live record\u2026';
-    try {
-        console.log('[login] calling fetchLiveMember...');
-        const live = await fetchLiveMember(memberNumber);
-        console.log('[login] result:', live ? 'found' : 'null');
-        if (live) {
-            try { applyMember(live); } catch(applyErr) { console.error('[login] applyMember error:', applyErr); }
-            showMainContent();
-            if (note) note.textContent = 'Logged in live \u2014 record #' + memberNumber + ' pulled straight from the sheet just now.';
-            recordLoginOncePerSession(memberNumber);
-        } else if (owner) {
-            if (note) note.textContent = 'Could not find member #' + memberNumber;
-        } else {
-            console.log('[login] not found, showing login screen');
-            showNotLoggedIn();
-        }
-    } catch (e) {
-        console.error('[login] error:', e.message);
-        if (owner) {
-            if (note) note.textContent = 'Could not reach the live sheet.';
-        } else {
-            showNotLoggedIn();
-        }
-    }
-}
 async function fetchLiveMember(memberNumber) {
     const res = await fetch(GVIZ_URL);
     const text = await res.text();
@@ -791,8 +754,9 @@ async function tryLiveLogin() {
     const note = document.getElementById('memberNote');
     const owner = isOwnerMode();
 
+
     if (!memberNumber) {
-        if (!owner) showNotLoggedIn(); // no login, not the owner — nothing to show
+        if (!owner) showNotLoggedIn();
         return;
     }
 
