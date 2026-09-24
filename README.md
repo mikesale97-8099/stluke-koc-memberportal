@@ -5,7 +5,7 @@
 
 ## Overview
 
-A lightweight member self-service portal hosted on GitHub Pages. Members log in with their email address, view and correct their profile, check dues status, and complete an annual data-verification wizard. All data lives in a Google Sheet; writes go through a Cloudflare Worker relay to work around browser CORS restrictions on Apps Script.
+A   lightweight member self-service portal hosted on GitHub Pages. Members log in with their email address, view and correct their profile, check dues status, and complete an annual data-verification wizard. All data lives in a Google Sheet; writes go through a Cloudflare Worker relay to work around browser CORS restrictions on Apps Script.
 
 ---
 
