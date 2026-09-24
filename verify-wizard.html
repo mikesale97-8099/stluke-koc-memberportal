@@ -404,9 +404,12 @@ function loadMember(m) {
     const disputeToggle = document.getElementById('disputeToggle'); if (disputeToggle) disputeToggle.textContent = 'Something looks wrong with my dues \u2192';
     const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
     const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
-
-    } catch(loadErr) { console.error('loadMember error:', loadErr); }
     goTo('welcome');
+
+    } catch(loadErr) {
+        console.error('loadMember error:', loadErr.message, loadErr.stack);
+        document.getElementById('panel-welcome').querySelector('h1').textContent = 'Error: ' + loadErr.message;
+    }
 }
 
 // Track original contact values to detect changes
