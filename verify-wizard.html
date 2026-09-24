@@ -345,43 +345,39 @@ function updateProgress(activePanelId) {
 
 function loadMember(m) {
     currentMember = m;
-    try {
-        const welcomeName = document.getElementById('welcomeName');
-        if (welcomeName) {
-            console.log('[wizard] name fields:', currentMember.nickname, currentMember.firstName, currentMember.lastName);
-            welcomeName.textContent = (currentMember.nickname || currentMember.firstName || '') + ' ' + (currentMember.lastName || '');
-        }
-        const wPreferred = document.getElementById('wPreferred'); if (wPreferred) wPreferred.value = currentMember.nickname || '';
-        const wAddress = document.getElementById('wAddress'); if (wAddress) wAddress.value = currentMember.address1;
-        const wCity = document.getElementById('wCity'); if (wCity) wCity.value = currentMember.city;
-        const wState = document.getElementById('wState'); if (wState) wState.value = currentMember.stateAbbr;
-        const wZip = document.getElementById('wZip'); if (wZip) wZip.value = currentMember.zip;
-        const wPhone = document.getElementById('wPhone'); if (wPhone) wPhone.value = currentMember.phone;
-        const wEmail = document.getElementById('wEmail'); if (wEmail) wEmail.value = currentMember.email;
+    console.log('[loadMember] starting, member:', m.firstName, m.lastName);
+    const welcomeName = document.getElementById('welcomeName');
+    console.log('[loadMember] name fields:', m.nickname, m.firstName, m.lastName);
+    if (welcomeName) welcomeName.textContent = (m.nickname || m.firstName || '') + ' ' + (m.lastName || '');
+    const wPreferred = document.getElementById('wPreferred'); if (wPreferred) wPreferred.value = m.nickname || '';
+    const wAddress = document.getElementById('wAddress'); if (wAddress) wAddress.value = m.address1;
+    const wCity = document.getElementById('wCity'); if (wCity) wCity.value = m.city;
+    const wState = document.getElementById('wState'); if (wState) wState.value = m.stateAbbr;
+    const wZip = document.getElementById('wZip'); if (wZip) wZip.value = m.zip;
+    const wPhone = document.getElementById('wPhone'); if (wPhone) wPhone.value = m.phone;
+    const wEmail = document.getElementById('wEmail'); if (wEmail) wEmail.value = m.email;
 
-    // Capture originals so we can detect changes
     originalContact = {
-        preferred: currentMember.nickname || '',
-        address: currentMember.address1,
-        city: currentMember.city,
-        state: currentMember.stateAbbr,
-        zip: currentMember.zip,
-        phone: currentMember.phone,
-        email: currentMember.email,
+        preferred: m.nickname || '',
+        address: m.address1,
+        city: m.city,
+        state: m.stateAbbr,
+        zip: m.zip,
+        phone: m.phone,
+        email: m.email,
     };
 
-    // Reset contact button
     const btn = document.getElementById('contactContinueBtn');
     if (btn) btn.textContent = 'Data is Correct';
     const wDuesStatus = document.getElementById('wDuesStatus');
-    if (wDuesStatus) { wDuesStatus.textContent = currentMember.duesStatus; wDuesStatus.style.color = currentMember.owed > 0 ? 'var(--accent)' : 'var(--text-dark)'; }
+    if (wDuesStatus) { wDuesStatus.textContent = m.duesStatus; wDuesStatus.style.color = m.owed > 0 ? 'var(--accent)' : 'var(--text-dark)'; }
     const wPaidThrough = document.getElementById('wPaidThrough');
-    if (wPaidThrough) wPaidThrough.textContent = currentMember.paidThrough;
+    if (wPaidThrough) wPaidThrough.textContent = m.paidThrough;
 
     const payBtn = document.getElementById('payNowBtn');
     const payNote = document.getElementById('payNote');
     if (payBtn && payNote) {
-        if (currentMember.owed > 0) {
+        if (m.owed > 0) {
             payBtn.style.display = 'block';
             payBtn.textContent = 'Thanks for Paying Now \u2192';
             payNote.style.display = 'block';
@@ -391,7 +387,6 @@ function loadMember(m) {
         }
     }
 
-    // Reset state
     memberStatus = 'stay';
     duesDisputed = false;
     document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
@@ -404,12 +399,10 @@ function loadMember(m) {
     const disputeToggle = document.getElementById('disputeToggle'); if (disputeToggle) disputeToggle.textContent = 'Something looks wrong with my dues \u2192';
     const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
     const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
-    goTo('welcome');
 
-    } catch(loadErr) {
-        console.error('loadMember error:', loadErr.message, loadErr.stack);
-        document.getElementById('panel-welcome').querySelector('h1').textContent = 'Error: ' + loadErr.message;
-    }
+    console.log('[loadMember] calling goTo welcome');
+    goTo('welcome');
+    console.log('[loadMember] done');
 }
 
 // Track original contact values to detect changes
