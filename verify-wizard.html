@@ -540,15 +540,17 @@ function handlePayNow(e) {
     }, 800);
 }
 
-// On load: if returning from payment, skip straight to result
-(function checkPayReturn() {
-    if (sessionStorage.getItem('wizardPayReturn')) {
-        sessionStorage.removeItem('wizardPayReturn');
-        memberStatus = 'stay';
-        duesDisputed = false;
-        setTimeout(() => showResult(true), 300); // true = came from payment
-    }
-})();
+// Returning from pay-dues.html? (URL flag from the Return button, or session flag set on the way out)
+function consumePayReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const fromPay = params.get('paid') === '1' || sessionStorage.getItem('wizardPayReturn') === '1';
+    if (!fromPay) return false;
+    sessionStorage.removeItem('wizardPayReturn');
+    // Drop ?paid=1 from the address bar so a refresh doesn't replay the result
+    params.delete('paid');
+    history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+    return true;
+}
 
 function toggleDispute() {
     const box = document.getElementById('disputeBox');
@@ -670,6 +672,12 @@ async function init() {
     try {
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
         loadMember(CURRENT_MEMBER);
+        if (consumePayReturn()) {
+            // Contact + directory were completed before they left to pay — finish with dues confirmed
+            memberStatus = 'stay';
+            duesDisputed = false;
+            showResult(true); // true = came from payment
+        }
     } catch (e) {
         document.getElementById('panel-welcome').querySelector('h1').textContent = 'Could not load your profile';
         document.getElementById('panel-welcome').querySelector('.sub').textContent = 'Please try refreshing the page. If the problem persists, contact a data administrator.';
