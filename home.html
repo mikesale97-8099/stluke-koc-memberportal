@@ -239,7 +239,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <div class="field-row"><span class="field-label">Dues Status</span><span class="field-value" id="duesValue">Current</span></div>
             <div class="field-row"><span class="field-label">Paid Through</span><span class="field-value" id="paidThroughValue">2026</span></div>
             <div class="pay-prompt" id="payPrompt" style="display:none;">
-                <button class="btn btn-primary btn-pay" id="payDuesBtn" onclick="goToPayDues()">Pay Dues</button>
+                <button class="btn btn-primary btn-pay" id="payDuesBtn" onclick="goToPayDues()">Thanks for Paying Now &rarr;</button>
             </div>
             <div style="margin-top:0.75rem;">
                 <button class="btn-text" style="font-family:'Lato',sans-serif; font-size:0.82rem; color:var(--accent); text-decoration:underline; background:none; border:none; cursor:pointer;" onclick="toggleFlag()">My dues/membership data doesn't look right</button>
@@ -418,12 +418,12 @@ function applyMember(indexOrMember) {
         if (!isNaN(owed) && owed > 0) {
             duesEl.textContent = '$' + owed.toFixed(2) + ' owed';
             duesEl.classList.add('dues-owed');
-            payBtn.textContent = 'Pay $' + owed.toFixed(2) + ' Now';
+            payBtn.textContent = 'Thanks for Paying Now →';
             payPrompt.style.display = 'block';
         } else if (m.state === 'Member, Inactive and Severely Overdue' || m.state === 'Member, No dues data') {
             duesEl.textContent = 'No payment on record';
             duesEl.classList.add('dues-owed');
-            payBtn.textContent = 'Pay Dues';
+            payBtn.textContent = 'Thanks for Paying Now →';
             payPrompt.style.display = 'block';
         } else {
             duesEl.textContent = 'Current';

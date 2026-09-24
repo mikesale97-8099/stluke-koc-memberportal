@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pay Dues Mockup — St. Luke Knights of Columbus Member Portal</title>
+<title>Pay Dues Mockup — St. Luke Knights of Columbus Member Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -60,7 +60,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 .amount-card .owed .value { font-family:'Crimson Pro',serif; font-size:1.8rem; font-weight:700; color:var(--accent); }
 .amount-card .owed .value.current { color:var(--green); }
 
-.options { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:1.5rem; }
+.options { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.5rem; margin-top:1.5rem; }
 @media (max-width:640px){ .options { grid-template-columns:1fr; } }
 .option-card { background:white; border-radius:16px; box-shadow:0 4px 15px var(--shadow); padding:1.75rem; display:flex; flex-direction:column; }
 .option-card h2 { font-family:'Crimson Pro', serif; font-size:1.2rem; color:var(--primary); font-weight:700; margin-bottom:0.6rem; }
@@ -115,7 +115,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <div class="logo-section">
             <a href="home.html" class="logo preserve-member">
                 <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
-                <span class="logo-sub">Member Portal · Council 14895</span>
+                <span class="logo-sub">Member Center · Council 14895</span>
             </a>
         </div>
         <ul>
@@ -139,7 +139,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
 <div class="stage" id="mainContent" style="display:none;">
     <h1>Pay Your Dues</h1>
-    <p class="sub">Pay online through Square, or mail a check — whichever's easier.</p>
+    <p class="sub">Pay online through Square, send with Venmo, or mail a check — whichever's easier.</p>
 
     <div class="amount-card">
         <div class="who">
@@ -158,6 +158,14 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             <h2>Pay Online</h2>
             <p>Fast and secure through Square. You'll be taken to the council's Square page to complete payment — your dues status updates once it's processed.</p>
             <a class="btn btn-primary" href="https://knights-of-columbus-14895.square.site/" target="_blank" rel="noopener">Pay with Square &rarr;</a>
+        </div>
+
+        <div class="option-card" id="venmoCard" style="display:none;">
+            <h2>Pay with Venmo</h2>
+            <p>Send your payment to the council's Financial Secretary on Venmo:</p>
+            <p class="payable-to">Venmo: <strong id="venmoHandle">Loading&hellip;</strong></p>
+            <p class="mail-note">Please include your member number (<strong id="venmoMemberId">#0142</strong>) in the Venmo note so it's applied to the right account.</p>
+            <a class="btn btn-primary" id="venmoLink" href="#" target="_blank" rel="noopener">Open Venmo &rarr;</a>
         </div>
 
         <div class="option-card">
@@ -193,6 +201,8 @@ function applyMember(idxOrMember) {
     document.getElementById('memberName').textContent = fullName(m);
     document.getElementById('memberId').textContent = m.memberNumber;
     document.getElementById('mailMemberId').textContent = '#' + m.memberNumber;
+    const venmoMemberEl = document.getElementById('venmoMemberId');
+    if (venmoMemberEl) venmoMemberEl.textContent = '#' + m.memberNumber;
 
     const owedRaw = (m.outstandingDues === null || m.outstandingDues === undefined) ? '' : String(m.outstandingDues);
     const owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
@@ -285,6 +295,24 @@ async function fetchPayableTo() {
     return fetchAssumptionsRow('dues check payable to');
 }
 
+async function fetchVenmoHandle() {
+    return fetchAssumptionsRow('financial secretary venmo');
+}
+
+async function loadVenmo() {
+    const card = document.getElementById('venmoCard');
+    try {
+        const raw = await fetchVenmoHandle();
+        const handle = String(raw || '').trim().replace(/^@/, '');
+        if (!handle) return; // no handle on file — keep the card hidden
+        document.getElementById('venmoHandle').textContent = '@' + handle;
+        document.getElementById('venmoLink').href = 'https://venmo.com/u/' + encodeURIComponent(handle);
+        card.style.display = 'flex';
+    } catch (e) {
+        // quiet fail — Square and check remain available
+    }
+}
+
 const ADMIN_KEY = 'stluke14895';
 function isOwnerMode() {
     return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY;
@@ -364,6 +392,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     tryLiveLogin();
     loadMailAddress();
+    loadVenmo();
 });
 
 /* Carry the logged-in member across pages via preserve-member links */
