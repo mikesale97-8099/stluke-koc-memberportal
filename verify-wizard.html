@@ -296,7 +296,11 @@ async function fetchLiveMember(memberNumber) {
     for (const row of json.table.rows) {
         if (String(cell(row, 'Member Number')).replace(/^0+/, '') === memberNum) {
             const lastDues = cell(row, 'Last Yr Paid');
-            const outstandingDues = parseFloat(String(cell(row, 'Outstanding Dues') || '0').replace(/[^0-9.]/g, '')) || 0;
+            const duesRaw = cell(row, 'Outstanding Dues');
+            const duesStr = String(duesRaw === null || duesRaw === undefined ? '' : duesRaw).trim();
+            const duesNum = parseFloat(duesStr.replace(/[^0-9.]/g, '')) || 0;
+            const outstandingDues = (typeof duesRaw === 'number') ? duesRaw
+                : ((/^\(.*\)$/.test(duesStr) || duesStr.startsWith('-')) ? -duesNum : duesNum); // credits are negative
             const duesYear = lastDues ? parseInt(String(lastDues).match(/\d{4}/)?.[0] || 0) : 0;
             const owed = outstandingDues > 0;
             return {

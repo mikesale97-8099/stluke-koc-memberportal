@@ -415,7 +415,8 @@ function applyMember(indexOrMember) {
         duesEl.classList.add('dues-current');
     } else {
         const owedRaw = (m.outstandingDues === null || m.outstandingDues === undefined) ? '' : String(m.outstandingDues);
-        const owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
+        let owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
+        if (/^\s*\(.*\)\s*$/.test(owedRaw)) owed = -Math.abs(owed); // ($28.55) is a credit, not money owed
         if (!isNaN(owed) && owed > 0) {
             duesEl.textContent = '$' + owed.toFixed(2) + ' owed';
             duesEl.classList.add('dues-owed');
