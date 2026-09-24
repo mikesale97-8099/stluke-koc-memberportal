@@ -363,7 +363,7 @@ function applyMember(indexOrMember) {
     document.getElementById('statusMessage').textContent = cfg.msg;
 
     document.getElementById('verifiedText').textContent = m.lastVerified ? ('Last verified ' + m.lastVerified) : 'Not yet verified';
-    document.getElementById('verifyBoxStatus').textContent = m.lastVerified ? ('Confirmed as of ' + m.lastVerified + '.') : 'Not yet verified.';
+    const vbs = document.getElementById('verifyBoxStatus'); if (vbs) vbs.textContent = m.lastVerified ? ('Confirmed as of ' + m.lastVerified + '.') : 'Not yet verified.';
 
     const nickEl = document.getElementById('profileNickname');
     const a1 = document.getElementById('profileAddress1');
@@ -437,8 +437,7 @@ function applyMember(indexOrMember) {
     document.getElementById('editToggleBtn').style.display = 'inline-block';
     document.getElementById('flagForm').classList.remove('open');
     document.getElementById('flagConfirm').classList.remove('open');
-    document.getElementById('confirmBtn').disabled = false;
-    document.getElementById('confirmBtn').textContent = '\u2713 My data looks good';
+    const cb = document.getElementById('confirmBtn'); if (cb) { cb.disabled = false; cb.textContent = '\u2713 My data looks good'; }
     const confirmStatusEl = document.getElementById('confirmStatus');
     confirmStatusEl.textContent = '';
     confirmStatusEl.className = 'confirm-status';
@@ -809,7 +808,7 @@ async function apiPost(params) {
 }
 
 async function confirmInfo() {
-    const btn = document.getElementById('confirmBtn');
+    const btn = document.getElementById('confirmBtn'); if (!btn) return;
     const status = document.getElementById('confirmStatus');
     if (!CURRENT_MEMBER) return;
 
@@ -829,7 +828,7 @@ async function confirmInfo() {
         if (data.success) {
             const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
             document.getElementById('verifiedText').textContent = 'Last verified ' + today;
-            document.getElementById('verifyBoxStatus').textContent = 'Confirmed as of ' + today + '.';
+            const vbs2 = document.getElementById('verifyBoxStatus'); if (vbs2) vbs2.textContent = 'Confirmed as of ' + today + '.';
             status.textContent = 'Thanks \u2014 saved to your record.';
             status.className = 'confirm-status ok';
             btn.textContent = '\u2713 Confirmed';
