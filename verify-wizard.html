@@ -345,14 +345,16 @@ function updateProgress(activePanelId) {
 
 function loadMember(m) {
     currentMember = m;
-    document.getElementById('welcomeName').textContent = (currentMember.nickname || currentMember.firstName) + ' ' + currentMember.lastName;
-    document.getElementById('wPreferred').value = currentMember.nickname || '';
-    document.getElementById('wAddress').value = currentMember.address1;
-    document.getElementById('wCity').value = currentMember.city;
-    document.getElementById('wState').value = currentMember.stateAbbr;
-    document.getElementById('wZip').value = currentMember.zip;
-    document.getElementById('wPhone').value = currentMember.phone;
-    document.getElementById('wEmail').value = currentMember.email;
+    try {
+        const welcomeName = document.getElementById('welcomeName');
+        if (welcomeName) welcomeName.textContent = (currentMember.nickname || currentMember.firstName) + ' ' + currentMember.lastName;
+        const wPreferred = document.getElementById('wPreferred'); if (wPreferred) wPreferred.value = currentMember.nickname || '';
+        const wAddress = document.getElementById('wAddress'); if (wAddress) wAddress.value = currentMember.address1;
+        const wCity = document.getElementById('wCity'); if (wCity) wCity.value = currentMember.city;
+        const wState = document.getElementById('wState'); if (wState) wState.value = currentMember.stateAbbr;
+        const wZip = document.getElementById('wZip'); if (wZip) wZip.value = currentMember.zip;
+        const wPhone = document.getElementById('wPhone'); if (wPhone) wPhone.value = currentMember.phone;
+        const wEmail = document.getElementById('wEmail'); if (wEmail) wEmail.value = currentMember.email;
 
     // Capture originals so we can detect changes
     originalContact = {
@@ -368,19 +370,22 @@ function loadMember(m) {
     // Reset contact button
     const btn = document.getElementById('contactContinueBtn');
     if (btn) btn.textContent = 'Data is Correct';
-    document.getElementById('wDuesStatus').textContent = currentMember.duesStatus;
-    document.getElementById('wDuesStatus').style.color = currentMember.owed > 0 ? 'var(--accent)' : 'var(--text-dark)';
-    document.getElementById('wPaidThrough').textContent = currentMember.paidThrough;
+    const wDuesStatus = document.getElementById('wDuesStatus');
+    if (wDuesStatus) { wDuesStatus.textContent = currentMember.duesStatus; wDuesStatus.style.color = currentMember.owed > 0 ? 'var(--accent)' : 'var(--text-dark)'; }
+    const wPaidThrough = document.getElementById('wPaidThrough');
+    if (wPaidThrough) wPaidThrough.textContent = currentMember.paidThrough;
 
     const payBtn = document.getElementById('payNowBtn');
     const payNote = document.getElementById('payNote');
-    if (currentMember.owed > 0) {
-        payBtn.style.display = 'block';
-        payBtn.textContent = 'Thanks for Paying Now \u2192';
-        payNote.style.display = 'block';
-    } else {
-        payBtn.style.display = 'none';
-        payNote.style.display = 'none';
+    if (payBtn && payNote) {
+        if (currentMember.owed > 0) {
+            payBtn.style.display = 'block';
+            payBtn.textContent = 'Thanks for Paying Now \u2192';
+            payNote.style.display = 'block';
+        } else {
+            payBtn.style.display = 'none';
+            payNote.style.display = 'none';
+        }
     }
 
     // Reset state
@@ -391,12 +396,13 @@ function loadMember(m) {
     if (firstOpt) { firstOpt.classList.add('selected'); }
     const inactiveRadio = document.querySelector('input[value="inactive"]');
     if (inactiveRadio) inactiveRadio.checked = true;
-    document.getElementById('disputeBox').classList.remove('open');
-    document.getElementById('disputeNote').value = '';
-    document.getElementById('disputeToggle').textContent = 'Something looks wrong with my dues \u2192';
-    document.getElementById('duesContinueBtn').textContent = 'Continue';
+    const disputeBox = document.getElementById('disputeBox'); if (disputeBox) disputeBox.classList.remove('open');
+    const disputeNote = document.getElementById('disputeNote'); if (disputeNote) disputeNote.value = '';
+    const disputeToggle = document.getElementById('disputeToggle'); if (disputeToggle) disputeToggle.textContent = 'Something looks wrong with my dues \u2192';
+    const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
+    const resultNav = document.getElementById('resultNav'); if (resultNav) resultNav.style.display = 'none';
 
-    document.getElementById('resultNav').style.display = 'none';
+    } catch(loadErr) { console.error('loadMember error:', loadErr); }
     goTo('welcome');
 }
 
@@ -609,15 +615,13 @@ async function init() {
         return;
     }
 
+    // Show loading state
     document.getElementById('panel-welcome').querySelector('h1').textContent = 'Loading your profile\u2026';
 
     try {
-        console.log('[wizard] fetching member:', MEMBER_NUMBER);
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
-        console.log('[wizard] result:', CURRENT_MEMBER ? 'found' : 'null');
         loadMember(CURRENT_MEMBER);
     } catch (e) {
-        console.error('[wizard] error:', e.message);
         document.getElementById('panel-welcome').querySelector('h1').textContent = 'Could not load your profile';
         document.getElementById('panel-welcome').querySelector('.sub').textContent = 'Please try refreshing the page. If the problem persists, contact a data administrator.';
     }
