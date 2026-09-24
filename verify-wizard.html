@@ -536,8 +536,7 @@ function handlePayNow(e) {
     payNote.textContent = 'You\u2019ll be returned here automatically after paying.';
 
     setTimeout(() => {
-        // In live build: window.location.href = 'pay-dues.html?member=' + currentMember.memberNumber + '&from=wizard';
-        // navigation to pay-dues handled above
+        window.location.href = 'pay-dues.html?member=' + currentMember.memberNumber + '&from=wizard';
     }, 800);
 }
 
