@@ -402,7 +402,9 @@ function loadMember(m) {
     const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
     const resultNav = document.getElementById('resultNav'); if (resultNav) resultNav.style.display = 'none';
 
-    } catch(loadErr) { console.error('loadMember error:', loadErr); }
+    const resultNav = document.getElementById('resultNav'); if (resultNav) resultNav.style.display = 'none';
+
+    } catch(loadErr) { console.error('loadMember error:', loadErr.message, loadErr.stack); }
     goTo('welcome');
 }
 
