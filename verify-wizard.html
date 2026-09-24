@@ -400,9 +400,9 @@ function loadMember(m) {
     const disputeNote = document.getElementById('disputeNote'); if (disputeNote) disputeNote.value = '';
     const disputeToggle = document.getElementById('disputeToggle'); if (disputeToggle) disputeToggle.textContent = 'Something looks wrong with my dues \u2192';
     const duesContinueBtn = document.getElementById('duesContinueBtn'); if (duesContinueBtn) duesContinueBtn.textContent = 'Continue';
-    const resultNav = document.getElementById('resultNav'); if (resultNav) resultNav.style.display = 'none';
+    const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
 
-    const resultNav = document.getElementById('resultNav'); if (resultNav) resultNav.style.display = 'none';
+    const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
 
     } catch(loadErr) { console.error('loadMember error:', loadErr.message, loadErr.stack); }
     goTo('welcome');
