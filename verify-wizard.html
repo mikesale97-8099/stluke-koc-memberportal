@@ -121,6 +121,13 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
     nav ul { width:100%; order:3; border-top:1px solid #F0F1F3; }
     nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; }
 }
+
+/* Changed-circumstances screens */
+.btn:disabled { opacity:0.45; cursor:default; }
+.status-option input[type="checkbox"] { margin-top:0.25rem; accent-color:var(--primary); flex-shrink:0; width:18px; height:18px; }
+.wizard-textarea { width:100%; min-height:90px; font-family:'Lora',serif; font-size:1rem; padding:0.7rem; border:1.5px solid #D1D5DB; border-radius:8px; resize:vertical; }
+.circ-error { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--accent); margin-top:0.9rem; min-height:0; }
+.circ-error:empty { display:none; }
 </style>
 <script src="nav-toggle.js"></script>
 </head>
@@ -175,29 +182,123 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         </div>
     </div>
 
-    <!-- Step 2: Changed circumstances -->
+    <!-- Changed circumstances: What's changed? -->
     <div class="wizard-panel" id="panel-changed">
-        <h2>What would you like to do?</h2>
-        <p class="step-sub">Someone will reach out to confirm before anything changes.</p>
-        <div class="status-choice">
-            <label class="status-option selected" onclick="selectStatus('inactive')">
-                <input type="radio" name="status" value="inactive" checked>
+        <h2>What's changed?</h2>
+        <p class="step-sub">Choose the one that fits best.</p>
+        <div class="status-choice" id="changedChoices">
+            <label class="status-option" onclick="selectCircumstance('moved', this)">
+                <input type="radio" name="circumstance">
                 <div>
-                    <div class="opt-title">Pause my membership (Inactive)</div>
-                    <div class="opt-desc">You remain a council member — just stepped back, not removed.</div>
+                    <div class="opt-title">I've moved</div>
+                    <div class="opt-desc">Update your address, and let us know if you'd like to join a council near your new home.</div>
                 </div>
             </label>
-            <label class="status-option" onclick="selectStatus('leave')">
-                <input type="radio" name="status" value="leave">
+            <label class="status-option" onclick="selectCircumstance('stepback', this)">
+                <input type="radio" name="circumstance">
                 <div>
-                    <div class="opt-title">Leave the council</div>
-                    <div class="opt-desc">Your name is passed along to Supreme for removal.</div>
+                    <div class="opt-title">I need to step back for a while</div>
+                    <div class="opt-desc">You stay a member. Let us know what's going on and we'll stay in touch.</div>
+                </div>
+            </label>
+            <label class="status-option" onclick="selectCircumstance('withdraw', this)">
+                <input type="radio" name="circumstance">
+                <div>
+                    <div class="opt-title">I want to withdraw from the Knights</div>
+                    <div class="opt-desc">Supreme requires a signed request. We'll show you how.</div>
+                </div>
+            </label>
+            <label class="status-option" onclick="selectCircumstance('other', this)">
+                <input type="radio" name="circumstance">
+                <div>
+                    <div class="opt-title">Something else</div>
+                    <div class="opt-desc">Tell us in your own words and someone will follow up.</div>
                 </div>
             </label>
         </div>
         <div class="wizard-actions" style="margin-top:1.5rem;">
             <button class="btn btn-ghost" onclick="backFromChanged()">Back</button>
-            <button class="btn btn-danger" id="statusContinueBtn" onclick="submitStatusAndFinish()">Submit Request</button>
+            <button class="btn btn-primary" id="changedContinueBtn" onclick="continueFromChanged()" disabled>Continue</button>
+        </div>
+    </div>
+
+    <!-- I've moved -->
+    <div class="wizard-panel" id="panel-moved">
+        <h2>You've moved</h2>
+        <p class="step-sub">Enter your new address so council mail reaches you. Leave it blank if you don't have it yet.</p>
+        <p class="step-sub" style="font-size:0.92rem;">Currently on file: <strong id="movedCurrentAddr"></strong></p>
+        <div class="field-row"><label for="mAddress">New Address</label><input type="text" id="mAddress"></div>
+        <div class="field-row"><label for="mCity">City</label><input type="text" id="mCity"></div>
+        <div class="field-row"><label for="mState">State</label><input type="text" id="mState" maxlength="2" style="text-transform:uppercase;width:70px;"></div>
+        <div class="field-row"><label for="mZip">Zip</label><input type="text" id="mZip"></div>
+
+        <p class="step-sub" style="margin-top:1.4rem; color:var(--text-dark);"><strong>Would you like to join a Knights of Columbus council near your new home?</strong></p>
+        <div class="status-choice" id="transferChoices">
+            <label class="status-option" onclick="selectTransfer('Yes', this)"><input type="radio" name="transfer"><div><div class="opt-title">Yes</div></div></label>
+            <label class="status-option" onclick="selectTransfer('No', this)"><input type="radio" name="transfer"><div><div class="opt-title">No</div></div></label>
+            <label class="status-option" onclick="selectTransfer('Not sure yet', this)"><input type="radio" name="transfer"><div><div class="opt-title">Not sure yet</div></div></label>
+        </div>
+        <div id="transferWhereBox" style="display:none; margin-top:1rem;">
+            <div class="field-row"><label for="mWhere">Where are you moving?</label><input type="text" id="mWhere" placeholder="City, or parish if you know it"></div>
+            <p class="step-sub" style="font-size:0.92rem; margin-top:0.6rem;">The council you join starts the transfer. We'll note your interest and can help you find one.</p>
+        </div>
+        <p class="circ-error" id="err-moved"></p>
+        <div class="wizard-actions">
+            <button class="btn btn-ghost" onclick="goTo('changed')">Back</button>
+            <button class="btn btn-primary" id="btn-moved" onclick="submitMoved()">Submit</button>
+        </div>
+    </div>
+
+    <!-- Stepping back -->
+    <div class="wizard-panel" id="panel-stepback">
+        <h2>Stepping back</h2>
+        <p class="step-sub">Thanks for letting us know. Stepping back doesn't change your membership. You're still a Knight, and you're welcome back at any meeting or event. Annual dues still apply.</p>
+        <p class="step-sub" style="color:var(--text-dark);"><strong>What's going on? Choose any that apply.</strong></p>
+        <div class="status-choice" id="stepbackReasons">
+            <label class="status-option"><input type="checkbox" value="Family or work" onchange="updateReasons()"><div><div class="opt-title">Family or work</div></div></label>
+            <label class="status-option"><input type="checkbox" value="Health" onchange="updateReasons()"><div><div class="opt-title">Health</div></div></label>
+            <label class="status-option"><input type="checkbox" value="Dues or cost" onchange="updateReasons()"><div><div class="opt-title">Dues or cost</div><div class="opt-desc">We'd like to talk about it. Please don't let dues keep you away.</div></div></label>
+            <label class="status-option"><input type="checkbox" value="Other" onchange="updateReasons()"><div><div class="opt-title">Other</div></div></label>
+        </div>
+        <label class="step-sub" for="stepbackNote" style="display:block; margin:1.1rem 0 0.4rem;">Anything else you'd like us to know? (optional)</label>
+        <textarea id="stepbackNote" class="wizard-textarea"></textarea>
+        <p class="step-sub" style="margin-top:1rem;">Our <strong>Retention Chair</strong> will give you a call in the next few weeks.</p>
+        <p class="circ-error" id="err-stepback"></p>
+        <div class="wizard-actions">
+            <button class="btn btn-ghost" onclick="goTo('changed')">Back</button>
+            <button class="btn btn-primary" id="btn-stepback" onclick="submitStepBack()">Submit</button>
+        </div>
+    </div>
+
+    <!-- Withdraw -->
+    <div class="wizard-panel" id="panel-withdraw">
+        <h2>Withdrawing from the Knights</h2>
+        <p class="step-sub">We're sorry to see you go, and grateful for your service.</p>
+        <p class="step-sub">Supreme requires a <strong>personal, signed request</strong> to withdraw. Clicking here can't count as your signature. Choose one or both ways to take care of it:</p>
+        <div class="status-choice">
+            <label class="status-option" id="wdLetterOpt"><input type="checkbox" id="wdLetter" onchange="updateWithdraw()">
+                <div><div class="opt-title">Print a letter I can sign</div><div class="opt-desc">We'll fill in your name and member number. Sign it and return it to the council.</div></div>
+            </label>
+            <label class="status-option" id="wdContactOpt"><input type="checkbox" id="wdContact" onchange="updateWithdraw()">
+                <div><div class="opt-title">Have someone from the council contact me</div><div class="opt-desc">We'll reach out and help with the signed request.</div></div>
+            </label>
+        </div>
+        <p class="circ-error" id="err-withdraw"></p>
+        <div class="wizard-actions" style="margin-top:1.5rem;">
+            <button class="btn btn-ghost" onclick="goTo('changed')">Back</button>
+            <button class="btn btn-danger" id="btn-withdraw" onclick="submitWithdraw()" disabled>Submit Request</button>
+        </div>
+    </div>
+
+    <!-- Something else -->
+    <div class="wizard-panel" id="panel-other">
+        <h2>Tell us what's changed</h2>
+        <p class="step-sub">Describe your situation in your own words. Someone from the council will follow up with you.</p>
+        <textarea id="otherNote" class="wizard-textarea" oninput="document.getElementById('btn-other').disabled = !this.value.trim()"></textarea>
+        <p class="circ-error" id="err-other"></p>
+        <div class="wizard-actions">
+            <button class="btn btn-ghost" onclick="goTo('changed')">Back</button>
+            <button class="btn btn-primary" id="btn-other" onclick="submitOther()" disabled>Submit</button>
         </div>
     </div>
 
@@ -340,16 +441,17 @@ let CURRENT_MEMBER = null;
 
 // Wizard state
 let currentMember = null;
-let memberStatus = 'stay'; // stay / inactive / leave
+let memberStatus = 'stay'; // 'stay' (normal wizard) or 'changed' (circumstances path)
+let circumstance = null;    // moved / stepback / withdraw / other
+let transferChoice = null;
 let duesDisputed = false;
 
 // Progress configuration per panel
 const PANELS_FULL = ['welcome', 'purpose', 'contact', 'directory', 'dues', 'result'];
 const PANELS_CURRENT = ['welcome', 'purpose', 'contact', 'directory', 'result']; // skip dues if no balance
-const PANELS_SHORT = ['welcome', 'changed', 'result']; // changed circumstances path
 
 function currentFlow() {
-    if (memberStatus !== 'stay') return PANELS_SHORT;
+    if (memberStatus === 'changed') return ['welcome', 'changed', circumstance || 'moved', 'result'];
     return currentMember.owed === 0 ? PANELS_CURRENT : PANELS_FULL;
 }
 
@@ -422,11 +524,7 @@ function loadMember(m) {
     memberStatus = 'stay';
     duesDisputed = false;
     directoryOptIn = true;
-    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
-    const firstOpt = document.querySelector('#panel-changed .status-option:first-child');
-    if (firstOpt) { firstOpt.classList.add('selected'); }
-    const inactiveRadio = document.querySelector('input[value="inactive"]');
-    if (inactiveRadio) inactiveRadio.checked = true;
+    resetCircumstances();
     const disputeBox = document.getElementById('disputeBox'); if (disputeBox) disputeBox.classList.remove('open');
     const disputeNote = document.getElementById('disputeNote'); if (disputeNote) disputeNote.value = '';
     const disputeToggle = document.getElementById('disputeToggle'); if (disputeToggle) disputeToggle.textContent = 'Something looks wrong with my dues \u2192';
@@ -456,14 +554,26 @@ function contactChanged() {
 
 let enteredFromProfile = false; // true when opened from the Profile page's "My circumstances have changed" link
 
-// Enter the changed-circumstances screen with the pre-selected option actually registered
+const CIRC_PANELS = ['#panel-changed', '#panel-moved', '#panel-stepback', '#panel-withdraw', '#panel-other'];
+
+// Clear every choice on the circumstances screens
+function resetCircumstances() {
+    circumstance = null;
+    transferChoice = null;
+    CIRC_PANELS.forEach(sel => {
+        document.querySelectorAll(sel + ' .status-option').forEach(o => o.classList.remove('selected'));
+        document.querySelectorAll(sel + ' input[type=radio], ' + sel + ' input[type=checkbox]').forEach(i => i.checked = false);
+        document.querySelectorAll(sel + ' input[type=text], ' + sel + ' textarea').forEach(i => i.value = '');
+        document.querySelectorAll(sel + ' .circ-error').forEach(e => e.textContent = '');
+    });
+    const where = document.getElementById('transferWhereBox'); if (where) where.style.display = 'none';
+    ['changedContinueBtn', 'btn-withdraw', 'btn-other'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = true; });
+}
+
+// Enter "What's changed?" with nothing pre-selected — he has to choose
 function openChanged() {
-    memberStatus = 'inactive';
-    document.querySelectorAll('#panel-changed .status-option').forEach(o => o.classList.remove('selected'));
-    const r = document.querySelector('#panel-changed input[value="inactive"]');
-    if (r) { r.checked = true; r.closest('.status-option').classList.add('selected'); }
-    const btn = document.getElementById('statusContinueBtn');
-    if (btn) { btn.textContent = 'Submit Request'; btn.disabled = false; btn.className = 'btn btn-primary'; }
+    memberStatus = 'changed';
+    resetCircumstances();
     goTo('changed');
 }
 
@@ -476,15 +586,41 @@ function backFromChanged() {
     goTo('welcome');
 }
 
-function selectStatus(val) {
-    memberStatus = val;
-    document.querySelectorAll('#panel-changed .status-option').forEach(o => o.classList.remove('selected'));
-    const radio = document.querySelector(`#panel-changed input[value="${val}"]`);
-    if (radio) { radio.checked = true; radio.closest('.status-option').classList.add('selected'); }
+function selectCircumstance(val, el) {
+    circumstance = val;
+    document.querySelectorAll('#changedChoices .status-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('changedContinueBtn').disabled = false;
+}
 
-    const btn = document.getElementById('statusContinueBtn');
-    btn.textContent = 'Submit Request';
-    btn.className = val === 'leave' ? 'btn btn-danger' : 'btn btn-primary';
+function continueFromChanged() {
+    if (!circumstance) return;
+    if (circumstance === 'moved') {
+        const m = currentMember || {};
+        const parts = [m.address1, m.city, [m.stateAbbr, m.zip].filter(Boolean).join(' ')].filter(Boolean);
+        document.getElementById('movedCurrentAddr').textContent = parts.length ? parts.join(', ') : 'No address on file';
+    }
+    goTo(circumstance);
+}
+
+function selectTransfer(val, el) {
+    transferChoice = val;
+    document.querySelectorAll('#transferChoices .status-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('transferWhereBox').style.display = val === 'Yes' ? 'block' : 'none';
+}
+
+function updateReasons() {
+    document.querySelectorAll('#stepbackReasons .status-option').forEach(o =>
+        o.classList.toggle('selected', o.querySelector('input').checked));
+}
+
+function updateWithdraw() {
+    const letter = document.getElementById('wdLetter').checked;
+    const contact = document.getElementById('wdContact').checked;
+    document.getElementById('wdLetterOpt').classList.toggle('selected', letter);
+    document.getElementById('wdContactOpt').classList.toggle('selected', contact);
+    document.getElementById('btn-withdraw').disabled = !(letter || contact);
 }
 
 
@@ -602,26 +738,182 @@ function continueFromDues() {
     showResult();
 }
 
-async function submitStatusAndFinish() {
-    const btn = document.getElementById('statusContinueBtn');
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
+function titleCase(s) {
+    return String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
+}
+function properName(m) {
+    return [titleCase(m.firstName), titleCase(m.lastName)].filter(Boolean).join(' ');
+}
+function escHtml(s) {
+    return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// Council mailing address for the withdrawal letter, from the Assumptions tab
+let RETURN_ADDRESS = '';
+async function loadReturnAddress() {
     try {
-        await apiPost({
-            action: 'logChange',
-            memberNumber: currentMember.memberNumber,
-            memberName: currentMember.firstName + ' ' + currentMember.lastName,
-            type: 'Status Request',
-            category: 'Membership',
-            field: memberStatus === 'leave' ? 'Request Removal' : 'Request Inactive Status',
-            newValue: memberStatus === 'leave'
-                ? 'Member requested removal from the council (for Supreme).'
-                : 'Member requested to be moved to Inactive status.'
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=753284304`;
+        const text = await (await fetch(url)).text();
+        const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
+        const row = json.table.rows.find(r => {
+            const c = r.c[0]; const label = c && (c.v || c.f);
+            return label && String(label).trim().toLowerCase().startsWith('dues check mail to');
         });
+        const cell = row && row.c[1];
+        RETURN_ADDRESS = cell ? String(cell.v != null ? cell.v : (cell.f || '')).trim() : '';
+    } catch (e) { RETURN_ADDRESS = ''; }
+}
+
+// One call: the Apps Script logs it, updates the sheet, and emails the right officers
+async function reportCircumstance(type, details, fields) {
+    const data = await apiPost({
+        action: 'reportCircumstance',
+        memberNumber: currentMember.memberNumber,
+        memberName: properName(currentMember),
+        type: type,
+        details: JSON.stringify(details),
+        fields: fields ? JSON.stringify(fields) : ''
+    });
+    if (!data || !data.success) throw new Error((data && data.error) || 'Could not send');
+    return data;
+}
+
+async function runSubmit(type, work) {
+    const btn = document.getElementById('btn-' + type);
+    const err = document.getElementById('err-' + type);
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+    err.textContent = '';
+    try {
+        await work();
     } catch (e) {
-        console.warn('Status request log failed:', e.message);
+        btn.disabled = false;
+        btn.textContent = label;
+        err.innerHTML = 'That didn\u2019t go through. Please try again, or email <a href="mailto:council14895@gmail.com" style="color:inherit;">council14895@gmail.com</a>.';
     }
-    showResult();
+}
+
+const PROFILE_BTN = () => '<a href="home.html?member=' + encodeURIComponent(currentMember.memberNumber) + '" class="btn btn-primary">Continue to My Profile</a>';
+
+function circumstanceResult({ icon, title, sub, boxClass, box, actions }) {
+    document.getElementById('resultIcon').textContent = icon;
+    document.getElementById('resultTitle').textContent = title;
+    document.getElementById('resultSub').textContent = sub;
+    const b = document.getElementById('resultBox');
+    b.className = 'result-box ' + boxClass;
+    b.innerHTML = box;
+    document.getElementById('resultActions').innerHTML = actions;
+    const rn = document.getElementById('resultNav'); if (rn) rn.style.display = 'none';
+    goTo('result');
+}
+
+function submitMoved() {
+    runSubmit('moved', async () => {
+        const v = id => document.getElementById(id).value.trim();
+        const addr = { address1: v('mAddress'), city: v('mCity'), stateAbbr: v('mState').toUpperCase(), zip: v('mZip') };
+        const hasAddr = Object.values(addr).some(Boolean);
+        const newAddress = hasAddr
+            ? [addr.address1, addr.city, [addr.stateAbbr, addr.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ')
+            : '';
+        const fields = {};
+        Object.keys(addr).forEach(k => { if (addr[k]) fields[k] = addr[k]; });
+        const transfer = transferChoice || 'Not answered';
+        await reportCircumstance('moved', { newAddress, transfer, where: v('mWhere') }, hasAddr ? fields : null);
+        circumstanceResult({
+            icon: '\u{1F3E0}',
+            title: 'Thanks \u2014 we\u2019ve got it',
+            sub: hasAddr ? 'Your new address is saved.' : 'Thanks for letting us know. You can add your new address anytime on your Profile.',
+            boxClass: 'confirmed',
+            box: transfer === 'Yes'
+                ? 'We\u2019ve noted that you\u2019d like to join a council near your new home. Someone from the council will be in touch to help.'
+                : 'Your record has been updated. You\u2019re still a member of Council 14895.',
+            actions: PROFILE_BTN()
+        });
+    });
+}
+
+function submitStepBack() {
+    runSubmit('stepback', async () => {
+        const reasons = [...document.querySelectorAll('#stepbackReasons input:checked')].map(i => i.value);
+        const note = document.getElementById('stepbackNote').value.trim();
+        await reportCircumstance('stepback', { reasons, note });
+        circumstanceResult({
+            icon: '\u{1F91D}',
+            title: 'Thanks for letting us know',
+            sub: 'You\u2019re still a member, and you\u2019re welcome back anytime.',
+            boxClass: 'confirmed',
+            box: 'Our Retention Chair will give you a call in the next few weeks.' +
+                 (reasons.includes('Dues or cost') ? ' We\u2019ll talk about dues then, too.' : ''),
+            actions: PROFILE_BTN()
+        });
+    });
+}
+
+function submitWithdraw() {
+    const letter = document.getElementById('wdLetter').checked;
+    const contact = document.getElementById('wdContact').checked;
+    if (letter) openLetter(); // open before any waiting, so the browser doesn't block the window
+    runSubmit('withdraw', async () => {
+        await reportCircumstance('withdraw', { letter, contact });
+        const parts = [];
+        if (letter) parts.push('Please sign the letter and hand it to the Grand Knight or any council officer' +
+            (RETURN_ADDRESS ? ', or mail it to:<br><span style="white-space:pre-line;">' + escHtml(RETURN_ADDRESS) + '</span>' : '.') +
+            '<br><button class="btn btn-ghost" style="margin-top:0.75rem;" onclick="openLetter()">Print the letter again</button>');
+        if (contact) parts.push('Someone from the council will contact you to help with the signed request.');
+        circumstanceResult({
+            icon: '\u{1F4EC}',
+            title: 'Request received',
+            sub: 'Your membership doesn\u2019t change until Supreme receives your signed request.',
+            boxClass: 'leaving',
+            box: parts.join('<hr style="border:none;border-top:1px solid rgba(0,0,0,0.1);margin:0.9rem 0;">'),
+            actions: '<a href="landing.html" class="btn btn-ghost">Sign Out</a>'
+        });
+    });
+}
+
+function submitOther() {
+    runSubmit('other', async () => {
+        await reportCircumstance('other', { note: document.getElementById('otherNote').value.trim() });
+        circumstanceResult({
+            icon: '\u{1F4EC}',
+            title: 'Thanks \u2014 we\u2019ve got it from here',
+            sub: 'Someone from the council will follow up with you.',
+            boxClass: 'flagged',
+            box: 'Your note has been passed along.',
+            actions: PROFILE_BTN()
+        });
+    });
+}
+
+function openLetter() {
+    const name = escHtml(properName(currentMember));
+    const num = escHtml(currentMember.memberNumber);
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const returnTo = 'Please hand this signed letter to the Grand Knight or any council officer' +
+        (RETURN_ADDRESS ? ', or mail it to:\n' + escHtml(RETURN_ADDRESS) : '.');
+    const doc = `<!DOCTYPE html><html><head><title>Withdrawal Request \u2014 ${name}</title><style>
+        body { font-family: Georgia, 'Times New Roman', serif; max-width: 640px; margin: 48px auto; padding: 0 24px; line-height: 1.7; color: #111; font-size: 17px; }
+        .sig { margin-top: 52px; } .line { border-bottom: 1px solid #000; width: 340px; max-width: 100%; height: 30px; }
+        .label { font-size: 14px; color: #444; }
+        .note { margin-top: 48px; padding-top: 12px; border-top: 1px solid #bbb; font-size: 14px; color: #333; white-space: pre-line; }
+        .printbtn { font-size: 16px; padding: 10px 22px; margin-bottom: 28px; cursor: pointer; }
+        @media print { .noprint { display: none; } }
+    </style></head><body>
+        <div class="noprint"><button class="printbtn" onclick="window.print()">Print this letter</button></div>
+        <p>${today}</p>
+        <p>Grand Knight<br>St. Luke Knights of Columbus, Council #14895</p>
+        <p>I, ${name}, member number ${num}, request to withdraw my membership in the Knights of Columbus.</p>
+        <div class="sig"><div class="line"></div><div class="label">Signature</div></div>
+        <div class="sig"><div class="line"></div><div class="label">Date</div></div>
+        <p style="margin-top:28px;">Printed name: ${name}<br>Member number: ${num}</p>
+        <p style="margin-top:28px;">cc: Retention Chair, Council #14895</p>
+        <div class="note">${returnTo}</div>
+    </body></html>`;
+    const win = window.open('', '_blank');
+    if (!win) return; // blocked — the result screen offers "Print the letter again"
+    win.document.write(doc);
+    win.document.close();
 }
 
 async function completeWizard(outcome, notes) {
@@ -644,22 +936,7 @@ function showResult(paidNow) {
     const sub = document.getElementById('resultSub');
     const box = document.getElementById('resultBox');
 
-    if (memberStatus === 'leave') {
-        icon.textContent = '\u{1F4EC}';
-        title.textContent = "Request received";
-        sub.textContent = "Someone from the council will be in touch to confirm before anything changes.";
-        box.className = 'result-box leaving';
-        box.textContent = 'Your request to leave the council has been noted. Someone from the council will be in touch.';
-        completeWizard('Status Request', 'Member requested: Leave council');
-        document.getElementById('resultActions').innerHTML = '<a href="landing.html" class="btn btn-ghost">Sign Out</a>';
-    } else if (memberStatus === 'inactive') {
-        icon.textContent = '\u{1F4EC}';
-        title.textContent = "Request received";
-        sub.textContent = "Someone from the council will be in touch to confirm before anything changes.";
-        box.className = 'result-box flagged';
-        box.textContent = 'Your request to go Inactive has been noted. Someone from the council will be in touch.';
-        document.getElementById('resultActions').innerHTML = '<a href="landing.html" class="btn btn-ghost">Sign Out</a>';
-    } else if (duesDisputed) {
+    if (duesDisputed) {
         icon.textContent = '\u{1F4EC}';
         title.textContent = "Thanks \u2014 we've got it from here";
         sub.textContent = "Your contact info has been updated. Someone from the council will follow up on your dues question.";
@@ -697,6 +974,7 @@ async function init() {
     if (welcomeSpan) welcomeSpan.textContent = '\u2026';
 
     try {
+        loadReturnAddress();
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
         loadMember(CURRENT_MEMBER);
         const cameFromProfile = new URLSearchParams(window.location.search).get('path') === 'changed';

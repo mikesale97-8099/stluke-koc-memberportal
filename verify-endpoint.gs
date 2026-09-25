@@ -25,6 +25,7 @@ function doGet(e) {
   else if (action === 'saveContact') result = handleSaveContact(e.parameter);
   else if (action === 'recordLogin') result = handleRecordLogin(e.parameter);
   else if (action === 'completeWizard') result = handleCompleteWizard(e.parameter);
+  else if (action === 'reportCircumstance') result = handleReportCircumstance(e.parameter);
   else result = handleVerify(e.parameter);
 
   const callback = e.parameter && e.parameter.callback;
@@ -48,6 +49,7 @@ function doPost(e) {
   else if (action === 'saveContact') result = handleSaveContact(params);
   else if (action === 'recordLogin') result = handleRecordLogin(params);
   else if (action === 'completeWizard') result = handleCompleteWizard(params);
+  else if (action === 'reportCircumstance') result = handleReportCircumstance(params);
   else result = handleVerify(params);
   return jsonResponse(result);
 }
@@ -297,4 +299,227 @@ function handleCompleteWizard(params) {
     }
   }
   return { success: false, error: 'Member not found' };
+}
+
+
+/* ================================================================
+ * "My circumstances have changed" — member-reported changes
+ * ================================================================
+ * One call does everything for a report:
+ *   1. Address update (moved only), reusing handleSaveContact
+ *   2. Council Member Status (withdrawal only)
+ *   3. Circumstance column, if the sheet ever gets one
+ *   4. Change Log entry (Notes column records who was emailed)
+ *   5. Wizard stamp (withdrawal only, so he isn't asked to verify again)
+ *   6. Notification email to the right officers
+ *
+ * Email addresses come from the Assumptions tab, so they follow whoever
+ * holds each role with no code changes.
+ */
+
+const WITHDRAWAL_PENDING_STATUS = 'Withdrawal Pending';
+
+const CIRCUMSTANCE_TYPES = {
+  moved:    { label: 'Moved',                 circumstance: 'Moved',         logType: 'Circumstance',   status: null,                      roles: ['retention', 'financialSecretary'], stampWizard: false },
+  stepback: { label: 'Stepping back',         circumstance: 'Stepping Back', logType: 'Circumstance',   status: null,                      roles: ['retention'],                       stampWizard: false },
+  withdraw: { label: 'Withdrawal requested',  circumstance: null,            logType: 'Status Request', status: WITHDRAWAL_PENDING_STATUS, roles: ['grandKnight', 'retention'],         stampWizard: true  },
+  other:    { label: 'Circumstances changed', circumstance: null,            logType: 'Circumstance',   status: null,                      roles: ['retention', 'dataAdmin'],          stampWizard: false },
+};
+
+const EMAIL_ROLES = {
+  grandKnight:        { label: 'Grand Knight',        labels: ['grand knight email'] },
+  retention:          { label: 'Retention Chair',     labels: ['retention committee email', 'retention chair email'] },
+  financialSecretary: { label: 'Financial Secretary', labels: ['financial secretary email'], fallback: 'dataAdmin' },
+  dataAdmin:          { label: 'Data Administrator',  labels: ['data administrator email'] },
+};
+
+/** Value (column B) of the Assumptions row whose label (column A) starts with any of `labels`. */
+function readAssumption(labels) {
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Assumptions');
+  if (!sh) return '';
+  const rows = sh.getDataRange().getValues();
+  for (let i = 0; i < rows.length; i++) {
+    const label = String(rows[i][0] || '').trim().toLowerCase().replace(/:$/, '');
+    if (labels.some(l => label.indexOf(l) === 0)) return String(rows[i][1] || '').trim();
+  }
+  return '';
+}
+
+/** Email address for a role, following its fallback if the role has no address on file. */
+function roleEmail(roleKey) {
+  const role = EMAIL_ROLES[roleKey];
+  const addr = readAssumption(role.labels);
+  if (addr) return { address: addr, label: role.label };
+  if (role.fallback) {
+    const fb = roleEmail(role.fallback);
+    if (fb) return { address: fb.address, label: fb.label + ' (no ' + role.label + ' email on file)' };
+  }
+  return null;
+}
+
+function handleReportCircumstance(params) {
+  const type = String(params.type || '').trim();
+  const cfg = CIRCUMSTANCE_TYPES[type];
+  if (!cfg) return { success: false, error: 'Unknown circumstance type' };
+
+  const memberNumber = String(params.memberNumber || '').replace(/^0+/, '').trim();
+  if (!memberNumber) return { success: false, error: 'Missing memberNumber' };
+  let d = {};
+  try { d = JSON.parse(params.details || '{}'); } catch (err) { d = {}; }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('St Luke KOC Membership DB');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0].map(h => String(h).trim());
+  const col = name => headers.indexOf(name);
+  let rowIdx = -1;
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][col('Member Number')]).replace(/^0+/, '') === memberNumber) { rowIdx = i; break; }
+  }
+  if (rowIdx === -1) return { success: false, error: 'Member not found' };
+  const rowNum = rowIdx + 1;
+  const get = name => col(name) === -1 ? '' : String(data[rowIdx][col(name)] || '').trim();
+  const memberName = String(params.memberName || '').trim() || (get('First Name') + ' ' + get('Last Name')).trim();
+
+  // 1. Address update (moved)
+  let addressChanged = [];
+  if (type === 'moved' && params.fields) {
+    let fields = {};
+    try { fields = JSON.parse(params.fields); } catch (err) { fields = {}; }
+    if (Object.keys(fields).some(k => String(fields[k] || '').trim())) {
+      const r = handleSaveContact({ memberNumber: memberNumber, memberName: memberName, fields: JSON.stringify(fields) });
+      addressChanged = (r && r.changed) || [];
+    }
+  }
+
+  // 2. Council Member Status (withdrawal)
+  if (cfg.status && col('Council Member Status') !== -1) {
+    const oldStatus = get('Council Member Status');
+    if (oldStatus !== cfg.status) {
+      sheet.getRange(rowNum, col('Council Member Status') + 1).setValue(cfg.status);
+      logSheet().appendRow([new Date(), memberNumber, memberName, 'Status Request', 'Membership', 'Council Member Status', oldStatus, cfg.status, '', '']);
+    }
+  }
+
+  // 3. Circumstance column, only if the sheet has one
+  if (cfg.circumstance && col('Circumstance') !== -1) {
+    sheet.getRange(rowNum, col('Circumstance') + 1).setValue(cfg.circumstance);
+  }
+
+  // 4. Notification email (before the log entry, so the log can record the result)
+  const summary = circumstanceSummary(type, d);
+  const recipients = [];
+  const seen = {};
+  cfg.roles.forEach(k => {
+    const r = roleEmail(k);
+    if (!r) return;
+    recipients.push(r.label);
+    r.address.split(/[,;]/).map(a => a.trim()).filter(Boolean).forEach(a => { seen[a.toLowerCase()] = a; });
+  });
+  const addresses = Object.keys(seen).map(k => seen[k]);
+  let emailNote;
+  if (!addresses.length) {
+    emailNote = 'No email sent: no officer email on the Assumptions tab';
+  } else {
+    try {
+      MailApp.sendEmail({
+        to: addresses.join(','),
+        subject: '[Member Center] ' + cfg.label + ': ' + memberName + ' (#' + String(params.memberNumber || memberNumber) + ')',
+        body: circumstanceEmailBody(type, d, memberName, get('phone'), get('email')),
+        name: 'St. Luke Member Center'
+      });
+      emailNote = 'Emailed ' + recipients.join(', ');
+    } catch (err) {
+      emailNote = 'Email FAILED: ' + err.message;
+    }
+  }
+
+  // 5. Change Log entry
+  logSheet().appendRow([new Date(), memberNumber, memberName, cfg.logType, 'Membership', cfg.label, '', summary, emailNote, '']);
+
+  // 6. Wizard stamp (withdrawal)
+  if (cfg.stampWizard) {
+    if (col('Wizard Completed') !== -1) sheet.getRange(rowNum, col('Wizard Completed') + 1).setValue(new Date());
+    if (col('Wizard Outcome') !== -1) sheet.getRange(rowNum, col('Wizard Outcome') + 1).setValue(WITHDRAWAL_PENDING_STATUS);
+  }
+
+  return { success: true, emailed: emailNote, addressChanged: addressChanged };
+}
+
+/** One-line summary for the Change Log. */
+function circumstanceSummary(type, d) {
+  if (type === 'moved') {
+    let s = 'New address: ' + (d.newAddress || '(not provided yet)') + '. Wants to join a council near new home: ' + (d.transfer || 'Not answered');
+    if (d.transfer === 'Yes' && d.where) s += ' (' + d.where + ')';
+    return s + '.';
+  }
+  if (type === 'stepback') {
+    const reasons = (d.reasons || []).join(', ') || 'none given';
+    let s = 'Reasons: ' + reasons;
+    if ((d.reasons || []).indexOf('Dues or cost') !== -1) s += ' · DUES BARRIER';
+    if (d.note) s += ' · Note: ' + d.note;
+    return s + ' · Follow-up: Retention Chair call';
+  }
+  if (type === 'withdraw') {
+    const chose = [d.letter ? 'printed letter to sign and return' : '', d.contact ? 'council to contact him' : ''].filter(Boolean).join(' and ');
+    return 'Signature pending. Member chose: ' + (chose || 'no option') + '.';
+  }
+  return d.note || '(no note)';
+}
+
+/** Plain-text email body for the officers. */
+function circumstanceEmailBody(type, d, name, phone, email) {
+  let lines;
+  if (type === 'moved') {
+    const transfer = d.transfer || 'Not answered';
+    lines = [
+      name + ' reports he has moved.',
+      'New address: ' + (d.newAddress || '(not provided yet)'),
+      'Wants to join a council near his new home: ' + transfer + (transfer === 'Yes' && d.where ? ' (' + d.where + ')' : ''),
+      '',
+      'Financial Secretary: please update his address in Member Management.',
+      transfer === 'Yes'
+        ? 'Retention Chair: he may want help finding a council. The receiving council initiates the transfer.'
+        : 'Retention Chair: for your awareness.'
+    ];
+  } else if (type === 'stepback') {
+    const reasons = d.reasons || [];
+    lines = [name + ' told us he needs to step back for a while.', 'Reasons: ' + (reasons.join(', ') || 'none given')];
+    if (reasons.indexOf('Dues or cost') !== -1) lines.push('** He indicated dues or cost is a barrier. **');
+    if (d.note) lines.push('His note: ' + d.note);
+    lines.push('', 'He was told the Retention Chair will call in the next few weeks.');
+  } else if (type === 'withdraw') {
+    lines = [
+      name + ' has asked to withdraw from the Knights of Columbus.',
+      'Supreme requires his personal, signed request. His Council Member Status is now ' + WITHDRAWAL_PENDING_STATUS + '.',
+      '',
+      d.letter ? 'He printed the pre-filled withdrawal letter to sign and return.' : 'He did not print the letter.',
+      d.contact ? 'He asked for someone from the council to contact him about the signed request.' : 'He did not ask to be contacted.'
+    ];
+  } else {
+    lines = [name + ' says his circumstances have changed:', '', '"' + (d.note || '') + '"', '', 'He was told someone from the council will follow up.'];
+  }
+  lines.push('', 'Phone: ' + (phone || 'not on file'), 'Email: ' + (email || 'not on file'), '',
+             'Logged in the Change Log. Sent automatically by the St. Luke Member Center.');
+  return lines.join('\n');
+}
+
+/**
+ * Run this ONCE from the Apps Script editor (select it in the function
+ * dropdown, click Run). It grants the script permission to send email and
+ * sends a test message listing the officer addresses it found.
+ */
+function testMemberCenterEmail() {
+  const lines = Object.keys(EMAIL_ROLES).map(k => {
+    const r = roleEmail(k);
+    return EMAIL_ROLES[k].label + ': ' + (r ? r.address + (r.label !== EMAIL_ROLES[k].label ? '  [' + r.label + ']' : '') : '(no address on file)');
+  });
+  const da = roleEmail('dataAdmin');
+  const to = da ? da.address : Session.getEffectiveUser().getEmail();
+  MailApp.sendEmail({
+    to: to,
+    subject: '[Member Center] Test email: setup check',
+    body: 'Member Center email notifications are working.\n\nAddresses found on the Assumptions tab:\n' + lines.join('\n'),
+    name: 'St. Luke Member Center'
+  });
+  Logger.log('Sent test email to ' + to + '\n' + lines.join('\n'));
 }
