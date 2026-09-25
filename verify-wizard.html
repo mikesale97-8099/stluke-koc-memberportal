@@ -159,7 +159,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
         <p class="sub">Thank you for your service as a Knight. We're taking a minute to make sure our records are accurate for every member.</p>
         <p class="sub" style="margin-top:0.75rem; font-size:0.82rem;">If this isn't you, sign out and log in with your own email before continuing.</p>
         <div class="wizard-actions" style="margin-top:1.75rem;">
-            <button class="btn btn-ghost" onclick="goTo('changed')">My circumstances<br>have changed</button>
+            <button class="btn btn-ghost" onclick="openChanged()">My circumstances<br>have changed</button>
             <button class="btn btn-primary" onclick="goTo('purpose')">Get Started</button>
         </div>
     </div>
@@ -196,7 +196,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
             </label>
         </div>
         <div class="wizard-actions" style="margin-top:1.5rem;">
-            <button class="btn btn-ghost" onclick="goTo('welcome')">Back</button>
+            <button class="btn btn-ghost" onclick="backFromChanged()">Back</button>
             <button class="btn btn-danger" id="statusContinueBtn" onclick="submitStatusAndFinish()">Submit Request</button>
         </div>
     </div>
@@ -454,14 +454,36 @@ function contactChanged() {
     if (btn) btn.textContent = changed ? 'Save & Continue' : 'Data is Correct';
 }
 
+let enteredFromProfile = false; // true when opened from the Profile page's "My circumstances have changed" link
+
+// Enter the changed-circumstances screen with the pre-selected option actually registered
+function openChanged() {
+    memberStatus = 'inactive';
+    document.querySelectorAll('#panel-changed .status-option').forEach(o => o.classList.remove('selected'));
+    const r = document.querySelector('#panel-changed input[value="inactive"]');
+    if (r) { r.checked = true; r.closest('.status-option').classList.add('selected'); }
+    const btn = document.getElementById('statusContinueBtn');
+    if (btn) { btn.textContent = 'Submit Request'; btn.disabled = false; btn.className = 'btn btn-primary'; }
+    goTo('changed');
+}
+
+function backFromChanged() {
+    memberStatus = 'stay';
+    if (enteredFromProfile) {
+        window.location.href = 'home.html?member=' + encodeURIComponent(MEMBER_NUMBER);
+        return;
+    }
+    goTo('welcome');
+}
+
 function selectStatus(val) {
     memberStatus = val;
-    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('selected'));
-    document.querySelector(`input[value="${val}"]`).checked = true;
-    document.querySelector(`input[value="${val}"]`).closest('.status-option').classList.add('selected');
+    document.querySelectorAll('#panel-changed .status-option').forEach(o => o.classList.remove('selected'));
+    const radio = document.querySelector(`#panel-changed input[value="${val}"]`);
+    if (radio) { radio.checked = true; radio.closest('.status-option').classList.add('selected'); }
 
     const btn = document.getElementById('statusContinueBtn');
-    btn.textContent = val === 'stay' ? 'Continue' : 'Submit & Finish';
+    btn.textContent = 'Submit Request';
     btn.className = val === 'leave' ? 'btn btn-danger' : 'btn btn-primary';
 }
 
@@ -677,7 +699,11 @@ async function init() {
     try {
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
         loadMember(CURRENT_MEMBER);
-        if (consumePayReturn()) {
+        const cameFromProfile = new URLSearchParams(window.location.search).get('path') === 'changed';
+        if (cameFromProfile && !new URLSearchParams(window.location.search).get('paid')) {
+            enteredFromProfile = true;
+            openChanged();
+        } else if (consumePayReturn()) {
             // Contact + directory were completed before they left to pay — finish with dues confirmed
             memberStatus = 'stay';
             duesDisputed = false;
