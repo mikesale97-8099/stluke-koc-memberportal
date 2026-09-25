@@ -26,7 +26,8 @@ function doGet(e) {
   else if (action === 'recordLogin') result = handleRecordLogin(e.parameter);
   else if (action === 'completeWizard') result = handleCompleteWizard(e.parameter);
   else if (action === 'reportCircumstance') result = handleReportCircumstance(e.parameter);
-  else result = handleVerify(e.parameter);
+  else if (action === 'verify') result = handleVerify(e.parameter);
+  else result = { success: false, error: 'Unknown action: ' + action };
 
   const callback = e.parameter && e.parameter.callback;
   if (callback) {
@@ -50,7 +51,8 @@ function doPost(e) {
   else if (action === 'recordLogin') result = handleRecordLogin(params);
   else if (action === 'completeWizard') result = handleCompleteWizard(params);
   else if (action === 'reportCircumstance') result = handleReportCircumstance(params);
-  else result = handleVerify(params);
+  else if (action === 'verify') result = handleVerify(params);
+  else result = { success: false, error: 'Unknown action: ' + action };
   return jsonResponse(result);
 }
 
@@ -320,7 +322,7 @@ function handleCompleteWizard(params) {
 const WITHDRAWAL_PENDING_STATUS = 'Withdrawal Pending';
 
 const CIRCUMSTANCE_TYPES = {
-  moved:    { label: 'Moved',                 circumstance: 'Moved',         logType: 'Circumstance',   status: null,                      roles: ['retention', 'financialSecretary'], stampWizard: false },
+  moved:    { label: 'Moved out of area',     circumstance: 'Moved Away',         logType: 'Circumstance',   status: null,                      roles: ['retention', 'financialSecretary'], stampWizard: false },
   stepback: { label: 'Stepping back',         circumstance: 'Stepping Back', logType: 'Circumstance',   status: null,                      roles: ['retention'],                       stampWizard: false },
   withdraw: { label: 'Withdrawal requested',  circumstance: null,            logType: 'Status Request', status: WITHDRAWAL_PENDING_STATUS, roles: ['grandKnight', 'retention'],         stampWizard: true  },
   other:    { label: 'Circumstances changed', circumstance: null,            logType: 'Circumstance',   status: null,                      roles: ['retention', 'dataAdmin'],          stampWizard: false },
@@ -352,7 +354,7 @@ function roleEmail(roleKey) {
   if (addr) return { address: addr, label: role.label };
   if (role.fallback) {
     const fb = roleEmail(role.fallback);
-    if (fb) return { address: fb.address, label: fb.label + ' (no ' + role.label + ' email on file)' };
+    if (fb) return { address: fb.address, label: fb.label + ' standing in for ' + role.label };
   }
   return null;
 }
@@ -472,7 +474,7 @@ function circumstanceEmailBody(type, d, name, phone, email) {
   if (type === 'moved') {
     const transfer = d.transfer || 'Not answered';
     lines = [
-      name + ' reports he has moved.',
+      name + ' reports he has moved out of the St. Luke area.',
       'New address: ' + (d.newAddress || '(not provided yet)'),
       'Wants to join a council near his new home: ' + transfer + (transfer === 'Yes' && d.where ? ' (' + d.where + ')' : ''),
       '',
