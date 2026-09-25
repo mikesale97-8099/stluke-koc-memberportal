@@ -320,9 +320,10 @@ function handleCompleteWizard(params) {
  */
 
 const WITHDRAWAL_PENDING_STATUS = 'Withdrawal Pending';
+const MOVE_ALERT_STATUS = 'Move Alert';
 
 const CIRCUMSTANCE_TYPES = {
-  moved:    { label: 'Moved out of area',     circumstance: 'Moved Away',         logType: 'Circumstance',   status: null,                      roles: ['retention', 'financialSecretary'], stampWizard: false },
+  moved:    { label: 'Moved out of area',     circumstance: 'Moved Away',         logType: 'Circumstance',   status: MOVE_ALERT_STATUS, onlyOverBlank: true, roles: ['retention', 'financialSecretary'], stampWizard: false },
   stepback: { label: 'Stepping back',         circumstance: 'Stepping Back', logType: 'Circumstance',   status: null,                      roles: ['retention'],                       stampWizard: false },
   withdraw: { label: 'Withdrawal requested',  circumstance: null,            logType: 'Status Request', status: WITHDRAWAL_PENDING_STATUS, roles: ['grandKnight', 'retention'],         stampWizard: true  },
   other:    { label: 'Circumstances changed', circumstance: null,            logType: 'Circumstance',   status: null,                      roles: ['retention', 'dataAdmin'],          stampWizard: false },
@@ -393,12 +394,16 @@ function handleReportCircumstance(params) {
     }
   }
 
-  // 2. Council Member Status (withdrawal)
+  // 2. Council Member Status (withdrawal: always; move: only over a blank or Active status,
+  //    so it never overwrites something further along like Transfer Pending)
+  let statusSet = '';
   if (cfg.status && col('Council Member Status') !== -1) {
     const oldStatus = get('Council Member Status');
-    if (oldStatus !== cfg.status) {
+    const replaceable = !cfg.onlyOverBlank || ['', 'active', 'current'].indexOf(oldStatus.toLowerCase()) !== -1;
+    if (oldStatus !== cfg.status && replaceable) {
       sheet.getRange(rowNum, col('Council Member Status') + 1).setValue(cfg.status);
       logSheet().appendRow([new Date(), memberNumber, memberName, 'Status Request', 'Membership', 'Council Member Status', oldStatus, cfg.status, '', '']);
+      statusSet = cfg.status;
     }
   }
 
@@ -426,7 +431,7 @@ function handleReportCircumstance(params) {
       MailApp.sendEmail({
         to: addresses.join(','),
         subject: '[Member Center] ' + cfg.label + ': ' + memberName + ' (#' + String(params.memberNumber || memberNumber) + ')',
-        body: circumstanceEmailBody(type, d, memberName, get('phone'), get('email')),
+        body: circumstanceEmailBody(type, d, memberName, get('phone'), get('email'), statusSet),
         name: 'St. Luke Member Center'
       });
       emailNote = 'Emailed ' + recipients.join(', ');
@@ -469,7 +474,7 @@ function circumstanceSummary(type, d) {
 }
 
 /** Plain-text email body for the officers. */
-function circumstanceEmailBody(type, d, name, phone, email) {
+function circumstanceEmailBody(type, d, name, phone, email, statusSet) {
   let lines;
   if (type === 'moved') {
     const transfer = d.transfer || 'Not answered';
@@ -479,10 +484,11 @@ function circumstanceEmailBody(type, d, name, phone, email) {
       'Wants to join a council near his new home: ' + transfer + (transfer === 'Yes' && d.where ? ' (' + d.where + ')' : ''),
       '',
       'Financial Secretary: please update his address in Member Management.',
+      statusSet ? 'His Council Member Status is now ' + statusSet + '. Change it to Transfer Pending, or back to Active, once his plans are clear.' : null,
       transfer === 'Yes'
         ? 'Retention Chair: he may want help finding a council. The receiving council initiates the transfer.'
         : 'Retention Chair: for your awareness.'
-    ];
+    ].filter(line => line !== null);
   } else if (type === 'stepback') {
     const reasons = d.reasons || [];
     lines = [name + ' told us he needs to step back for a while.', 'Reasons: ' + (reasons.join(', ') || 'none given')];
