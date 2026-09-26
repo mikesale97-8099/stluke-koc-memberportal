@@ -121,6 +121,8 @@ nav a.signout:hover { color:var(--accent); }
     .card-meta { gap:1.25rem; }
 }
 .site-header { position:sticky; top:0; z-index:1000; }
+.cert-emblem { display:block; width:64px; height:64px; margin:0 auto 0.5rem; }
+@media (max-width:640px){ .cert-emblem { width:52px; height:52px; } }
 </style>
 <script src="nav-toggle.js"></script>
 </head>
@@ -173,6 +175,7 @@ nav a.signout:hover { color:var(--accent); }
         <div class="ribbon" id="cardRibbon">Active</div>
 
         <div class="cert-header">
+            <img class="cert-emblem" src="council-logo.png" alt="Knights of Columbus emblem" onerror="this.style.display='none'">
             <div class="cert-title">Knights of Columbus</div>
             <div class="cert-subtitle">This is to certify that</div>
         </div>

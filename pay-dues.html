@@ -94,6 +94,7 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
     .option-card { padding:1.25rem; }
 }
 .site-header { position:sticky; top:0; z-index:1000; }
+.venmo-alt a { color:var(--primary); font-weight:600; text-decoration:underline; }
 </style>
 <script src="nav-toggle.js"></script>
 </head>
@@ -163,9 +164,10 @@ nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--te
 
         <div class="option-card" id="venmoCard" style="display:none;">
             <h2>Pay with Venmo</h2>
-            <p>Send your payment to the council's Financial Secretary on Venmo:</p>
+            <p>For members who already use Venmo. Send your payment to the council's Financial Secretary:</p>
             <p class="payable-to">Venmo: <strong id="venmoHandle">Loading&hellip;</strong></p>
             <p class="mail-note">Please include your member number (<strong id="venmoMemberId">#0142</strong>) in the Venmo note so it's applied to the right account.</p>
+            <p class="mail-note venmo-alt"><strong>No Venmo?</strong> <a href="https://knights-of-columbus-14895.square.site/" target="_blank" rel="noopener">Use Square</a> to pay by card, no account needed.</p>
             <a class="btn btn-primary" id="venmoLink" href="#" target="_blank" rel="noopener">Open Venmo &rarr;</a>
         </div>
 
