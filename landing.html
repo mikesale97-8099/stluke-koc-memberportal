@@ -88,6 +88,8 @@ a { color:inherit; }
 .status-checking { background:#F3F4F6; color:var(--text-medium); }
 .status-found { background:var(--green-bg); color:#166534; }
 .status-notfound { background:var(--red-bg); color:#991B1B; }
+.status-notyet { background:#EFF6FF; color:#1E3A8A; line-height:1.5; }
+.status-notyet a { color:inherit; font-weight:600; }
 
 .fallback {
     margin-top:1.75rem; padding-top:1.5rem; border-top:1px dashed #E5E7EB; text-align:center;
@@ -165,6 +167,10 @@ a { color:inherit; }
             </div>
             <div class="help-confirm" id="helpConfirm">Thanks — a data administrator will follow up and help get your email added.</div>
         </div>
+        <div class="status-msg status-notyet" id="msg-notyet">
+            Thanks<span id="notyetName"></span>! We're opening the Member Center in stages so we can make sure everything works well. You'll get an email when it's your turn.
+            <div style="margin-top:0.6rem;">Questions? Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a>.</div>
+        </div>
         <div class="status-msg status-notfound" id="msg-error">
             Couldn't reach the membership sheet right now. If this keeps happening, a data administrator may need to check the sheet's sharing settings.
         </div>
@@ -182,37 +188,17 @@ a { color:inherit; }
 const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
 const SHEET_GID = '1292747386'; // St Luke KOC Membership DB tab
 const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-const VERIFY_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbw-wxkf1XzXM-tvhj-tsmDVdHdgI5YcWI63yj7W3RQyee7mrWmi2h88bvIykQq0Jb50FQ/exec';
+const VERIFY_ENDPOINT_URL = 'https://stluke-koc14895-relay.mike-sale97.workers.dev';
+const ASSUMPTIONS_GID = '753284304'; // Assumptions tab
 
-function jsonp(url) {
-    return new Promise((resolve, reject) => {
-        const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-        const script = document.createElement('script');
-        let done = false;
-
-        const cleanup = () => {
-            delete window[callbackName];
-            if (script.parentNode) script.parentNode.removeChild(script);
-        };
-
-        window[callbackName] = (data) => {
-            done = true;
-            cleanup();
-            resolve(data);
-        };
-
-        script.onerror = () => {
-            if (!done) { cleanup(); reject(new Error('JSONP request failed')); }
-        };
-
-        const sep = url.includes('?') ? '&' : '?';
-        script.src = url + sep + 'callback=' + callbackName;
-        document.body.appendChild(script);
-
-        setTimeout(() => {
-            if (!done) { cleanup(); reject(new Error('JSONP request timed out')); }
-        }, 20000);
+async function apiPost(params) {
+    const res = await fetch(VERIFY_ENDPOINT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
 }
 
 let SHEET_ROWS = null; // cached after first successful fetch
@@ -236,15 +222,45 @@ async function fetchSheet() {
             email: cell('email'),
             firstName: cell('First Name'),
             lastName: cell('Last Name'),
+            wave: cell('Rollout Wave'),
         };
     });
     return rows;
 }
 
+/* Staged rollout. "Open rollout waves through" on the Assumptions tab:
+   a number N lets in members whose Rollout Wave is 1..N (blank = not invited yet).
+   "All", blank, or no such row = everyone with an email on file gets in. */
+let OPEN_WAVES = undefined; // undefined = not loaded yet; null = rollout gating off; number = open through N
+
+async function fetchOpenWaves() {
+    try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${ASSUMPTIONS_GID}`;
+        const text = await (await fetch(url)).text();
+        const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
+        const row = json.table.rows.find(r => {
+            const c = r.c[0]; const label = c && (c.v || c.f);
+            return label && String(label).trim().toLowerCase().startsWith('open rollout waves through');
+        });
+        const cell = row && row.c[1];
+        const n = parseInt(cell ? String(cell.v != null ? cell.v : (cell.f || '')).trim() : '', 10);
+        return isNaN(n) ? null : n;
+    } catch (e) {
+        console.warn('Could not read the rollout setting; letting members in:', e.message);
+        return null; // fail open: the wave check is a courtesy, not security
+    }
+}
+
+function isInvited(member) {
+    if (isOwnerMode() || OPEN_WAVES === null) return true;
+    const wave = parseInt(member.wave, 10);
+    return !isNaN(wave) && wave <= OPEN_WAVES;
+}
+
 async function initConnection() {
     const status = document.getElementById('wireStatus');
     try {
-        SHEET_ROWS = await fetchSheet();
+        [SHEET_ROWS, OPEN_WAVES] = await Promise.all([fetchSheet(), fetchOpenWaves()]);
         status.textContent = `Connected — ${SHEET_ROWS.length} records loaded from the live sheet.`;
     } catch (e) {
         status.textContent = 'Could not connect to the membership sheet — check sharing settings (Anyone with the link — Viewer).';
@@ -258,7 +274,7 @@ function titleCase(s) {
 async function handleLogin() {
     const emailInput = document.getElementById('emailField').value.trim().toLowerCase();
     const btn = document.getElementById('submitBtn');
-    ['checking','found','notfound','error'].forEach(s => document.getElementById('msg-' + s)?.classList.remove('show'));
+    ['checking','found','notfound','notyet','error'].forEach(s => document.getElementById('msg-' + s)?.classList.remove('show'));
     document.getElementById('helpForm').classList.remove('hidden');
     document.getElementById('helpConfirm').classList.remove('open');
     document.getElementById('helpStatus').textContent = '';
@@ -271,11 +287,16 @@ async function handleLogin() {
 
     try {
         if (!SHEET_ROWS) SHEET_ROWS = await fetchSheet();
+        if (OPEN_WAVES === undefined) OPEN_WAVES = await fetchOpenWaves();
         const match = SHEET_ROWS.find(r => (r.email || '').toString().trim().toLowerCase() === emailInput);
 
         document.getElementById('msg-checking').classList.remove('show');
 
-        if (match) {
+        if (match && !isInvited(match)) {
+            document.getElementById('notyetName').textContent = match.firstName ? ', ' + titleCase(match.firstName) : '';
+            document.getElementById('msg-notyet').classList.add('show');
+            btn.disabled = false;
+        } else if (match) {
             document.getElementById('foundName').textContent = ', ' + titleCase(match.firstName);
             document.getElementById('msg-found').classList.add('show');
             setTimeout(() => {
@@ -317,17 +338,16 @@ async function submitHelpRequest() {
     if (note) newValue += ' | Note: ' + note;
 
     try {
-        const url = new URL(VERIFY_ENDPOINT_URL);
-        url.searchParams.set('action', 'logChange');
-        url.searchParams.set('memberNumber', ''); // unknown — this member couldn't be matched
-        url.searchParams.set('memberName', name);
-        url.searchParams.set('type', 'Contact Request');
-        url.searchParams.set('category', 'Contact');
-        url.searchParams.set('field', 'Add Email');
-        url.searchParams.set('oldValue', '(none on file)');
-        url.searchParams.set('newValue', newValue);
-
-        const data = await jsonp(url.toString());
+        const data = await apiPost({
+            action: 'logChange',
+            memberNumber: '', // unknown — this member couldn't be matched
+            memberName: name,
+            type: 'Contact Request',
+            category: 'Contact',
+            field: 'Add Email',
+            oldValue: '(none on file)',
+            newValue: newValue
+        });
         if (data.success) {
             document.getElementById('helpForm').classList.add('hidden');
             document.getElementById('helpConfirm').classList.add('open');
