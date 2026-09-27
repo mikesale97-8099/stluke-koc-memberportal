@@ -123,6 +123,16 @@ nav a.signout:hover { color:var(--accent); }
 .site-header { position:sticky; top:0; z-index:1000; }
 .cert-emblem { display:block; width:64px; height:64px; margin:0 auto 0.5rem; }
 @media (max-width:640px){ .cert-emblem { width:52px; height:52px; } }
+
+/* Menu: never break a label across two lines; below 1180px the menu gets its own row */
+nav a.navlink, nav a.signout { white-space:nowrap; }
+@media (max-width:1180px) {
+    nav .container { flex-wrap:wrap; }
+    .logo-section { flex:1; min-width:200px; }
+    nav ul { width:100%; order:3; justify-content:flex-start; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+}
 </style>
 <script src="nav-toggle.js"></script>
 </head>
@@ -151,6 +161,7 @@ nav a.signout:hover { color:var(--accent); }
         <ul>
             <li><a href="home.html" class="navlink preserve-member">Profile</a></li>
             <li><a href="calendar.html" class="navlink preserve-member">Calendar</a></li>
+            <li><a href="rosary.html" class="navlink preserve-member">Rosary</a></li>
             <li><a href="membership-card.html" class="navlink active">Membership Card</a></li>
             <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
             <li class="nav-whydues"><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>

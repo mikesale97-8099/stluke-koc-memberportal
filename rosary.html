@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Holy Rosary — St. Luke Knights of Columbus Member Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Lora:wght@400;500;600&family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #1E3A8A;
+    --primary-light: #2563EB;
+    --secondary: #C5A572;
+    --secondary-light: #D4B583;
+    --accent: #B91C1C;
+    --light-bg: #F9FAFB;
+    --text-dark: #1F2937;
+    --text-medium: #6B7280;
+    --line: #E5E0D6;
+    --shadow: rgba(30, 58, 138, 0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Lora', serif; color:var(--text-dark); background:var(--light-bg); line-height:1.6; padding-bottom:4rem; }
+a { color:inherit; }
+:focus-visible { outline:3px solid var(--primary-light); outline-offset:2px; }
+/* Navigation (shared with the other Member Center pages) */
+nav { background:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); border-bottom:3px solid var(--primary); }
+nav .container { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:stretch; }
+.logo-section { padding:0.7rem 1.5rem; display:flex; align-items:center; }
+.logo { font-family:'Crimson Pro', serif; color:var(--primary); line-height:1.15; text-decoration:none; }
+.logo-main { display:block; font-size:1.05rem; font-weight:700; letter-spacing:0.2px; }
+.logo-sub { display:block; font-size:0.72rem; font-weight:400; color:var(--text-medium); font-family:'Lato',sans-serif; }
+nav ul { list-style:none; display:flex; margin:0; }
+nav ul li { display:flex; align-items:center; }
+nav a.navlink {
+    font-family:'Lato', sans-serif; font-size:0.92rem; font-weight:500; color:var(--text-medium);
+    text-decoration:none; padding:1.1rem 1.15rem; border-bottom:3px solid transparent; transition:all .2s;
+}
+nav a.navlink:hover { color:var(--primary); background:rgba(30,58,138,0.05); }
+nav a.navlink.active { color:var(--primary); font-weight:700; border-bottom-color:var(--secondary); }
+nav a.signout { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); padding:1.1rem 1.5rem; text-decoration:none; }
+nav a.signout:hover { color:var(--accent); }
+.site-header { position:sticky; top:0; z-index:1000; }
+
+/* Page: one continuous sheet, following the original mock's order */
+.page { max-width:900px; margin:0 auto; padding:2rem 1.5rem 0; }
+.sheet { background:white; border-radius:16px; box-shadow:0 4px 15px var(--shadow); padding:2.2rem 2.6rem 1.8rem; }
+
+.sheet-head { text-align:center; border-bottom:2px solid var(--secondary); padding-bottom:1.1rem; margin-bottom:1.5rem; }
+.sheet-emblem { display:block; width:64px; height:64px; margin:0 auto 0.4rem; }
+.sheet-head h1 { font-family:'Crimson Pro', serif; font-size:2.2rem; color:var(--primary); font-weight:700; letter-spacing:0.01em; }
+.subtitle { font-family:'Lato', sans-serif; font-size:1rem; color:var(--text-medium); margin-top:0.2rem; }
+
+.intro { background:#FBF7EE; border-left:4px solid var(--secondary); border-radius:6px; padding:0.9rem 1.1rem; margin:0 0 1.6rem; }
+.intro summary { list-style:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:1rem;
+                 font-family:'Lato', sans-serif; font-weight:700; font-size:1rem; color:var(--primary); }
+.intro summary::-webkit-details-marker { display:none; }
+.intro summary::after { content:'\25BE'; font-size:1.1rem; transition:transform .2s; }
+.intro[open] summary::after { transform:rotate(180deg); }
+.intro summary:hover { color:var(--primary-light); }
+.intro p { font-size:1.02rem; margin-top:0.5rem; }
+
+h2 { font-family:'Crimson Pro', serif; font-size:1.5rem; color:var(--primary); font-weight:700;
+     margin:1.8rem 0 0.8rem; padding-bottom:0.3rem; border-bottom:1px solid var(--line); }
+
+.prayer { margin:0.9rem 0 1.1rem; }
+.prayer strong { display:block; font-family:'Lato', sans-serif; font-size:1rem; color:var(--primary); margin-bottom:0.15rem; }
+.prayer p { font-size:1.02rem; }
+.optional { font-family:'Lato', sans-serif; font-size:0.82rem; font-weight:400; color:var(--text-medium); }
+
+.readings-note { font-family:'Lato', sans-serif; font-size:0.9rem; color:var(--text-medium); margin:-0.2rem 0 0.9rem; }
+.mysteries { display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem; }
+.mystery-group { border:1px solid var(--line); border-radius:10px; padding:0.95rem 1.1rem; background:white; position:relative; }
+.mystery-group h3 { font-family:'Crimson Pro', serif; font-size:1.2rem; color:var(--primary); margin-bottom:0.3rem; }
+.mystery-group ol { margin-left:1.3rem; }
+.mystery-group li { margin:0.2rem 0; }
+.mystery-group .days { font-family:'Lato', sans-serif; font-size:0.88rem; font-style:italic; color:var(--text-medium); margin-top:0.5rem; }
+.mystery-group.is-today { border-color:var(--secondary); background:#FFFBEB; }
+.today-tag { display:none; position:absolute; top:0.75rem; right:0.85rem; font-family:'Lato',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; background:var(--secondary); color:white; padding:0.2rem 0.55rem; border-radius:50px; }
+.mystery-group.is-today .today-tag { display:inline-block; }
+.reading { font-family:'Lato', sans-serif; font-size:0.88rem; font-weight:600; color:var(--primary); text-decoration:underline; text-underline-offset:2px; white-space:nowrap; }
+.reading:hover { color:var(--primary-light); }
+.reading-sep { color:var(--text-medium); margin:0 0.3rem; }
+.note { font-family:'Lato', sans-serif; font-size:0.85rem; color:var(--text-medium); margin-top:0.7rem; }
+
+
+.sheet-foot { margin-top:2rem; padding-top:0.9rem; border-top:1px solid var(--line); text-align:center;
+              font-family:'Lato', sans-serif; font-size:0.88rem; color:var(--text-medium); }
+.sheet-foot em { font-family:'Crimson Pro', serif; font-size:1.1rem; color:var(--primary); }
+
+.actions { display:flex; justify-content:center; margin-top:1.75rem; }
+.btn { font-family:'Lato', sans-serif; font-weight:600; font-size:0.9rem; cursor:pointer; border-radius:50px; padding:0.7rem 1.5rem; border:2px solid transparent; text-decoration:none; display:inline-block; }
+.btn-outline { background:transparent; color:var(--primary); border-color:var(--primary); }
+.btn-outline:hover { background:var(--primary); color:white; }
+
+@media (max-width:720px){
+    nav .container { flex-wrap:wrap; }
+    .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
+    nav ul { flex-wrap:nowrap; width:100%; justify-content:flex-start; order:3; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+    nav a.navlink { padding:0.65rem 0.7rem; font-size:0.82rem; white-space:nowrap; }
+    .page { padding:1.25rem 0.75rem 0; }
+    .sheet { padding:1.5rem 1.2rem 1.4rem; }
+    .sheet-head h1 { font-size:1.9rem; }
+    .mysteries { grid-template-columns:1fr; }
+}
+
+/* Printing (from the browser menu): just the sheet */
+@media print {
+    body { background:white; padding:0; }
+    .site-header, .actions { display:none !important; }
+    .page { max-width:none; padding:0; }
+    .sheet { box-shadow:none; border-radius:0; padding:0; }
+    .mystery-group.is-today { background:white; border-color:var(--line); }
+    .mystery-group.is-today .today-tag { display:none; }
+    .mystery-group, .prayer { break-inside:avoid; }
+    h2 { break-after:avoid; }
+}
+/* Menu: never break a label across two lines; below 1180px the menu gets its own row */
+nav a.navlink, nav a.signout { white-space:nowrap; }
+@media (max-width:1180px) {
+    nav .container { flex-wrap:wrap; }
+    .logo-section { flex:1; min-width:200px; }
+    nav ul { width:100%; order:3; justify-content:flex-start; border-top:1px solid #F0F1F3; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    nav ul::-webkit-scrollbar { display:none; }
+    nav ul li { flex-shrink:0; }
+}
+</style>
+<script src="nav-toggle.js"></script>
+</head>
+<body>
+
+<header class="site-header">
+<nav>
+    <div class="container">
+        <div class="logo-section">
+            <a href="home.html" class="logo preserve-member">
+                <span class="logo-main">ST. LUKE KNIGHTS OF COLUMBUS</span>
+                <span class="logo-sub">Member Center · Council 14895</span>
+            </a>
+        </div>
+        <ul>
+            <li><a href="home.html" class="navlink preserve-member">Profile</a></li>
+            <li><a href="calendar.html" class="navlink preserve-member">Calendar</a></li>
+            <li><a href="#" class="navlink active">Rosary</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
+            <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
+            <li class="nav-whydues"><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
+            <li><a href="verify-wizard.html" class="navlink preserve-member">Verify Data</a></li>
+        </ul>
+        <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
+    </div>
+</nav>
+</header>
+
+<main class="page">
+    <div class="sheet">
+        <header class="sheet-head">
+            <img class="sheet-emblem" src="council-logo.png" alt="Knights of Columbus emblem" onerror="this.style.display='none'">
+            <h1>The Holy Rosary</h1>
+            <p class="subtitle">A simple guide for prayer</p>
+        </header>
+
+        <details class="intro">
+            <summary>How to pray the Rosary</summary>
+            <p>Begin with the Sign of the Cross. Pray the opening prayers: the Apostles' Creed, one Our Father, three Hail Marys (for an increase in faith, hope, and charity), and one Glory Be. Announce the mystery for each decade, then pray one Our Father, ten Hail Marys, and one Glory Be. Continue through the five decades and conclude with the Hail, Holy Queen and the closing prayer.</p>
+        </details>
+
+        <h2>Opening Prayers</h2>
+        <section class="prayer">
+            <strong>Sign of the Cross</strong>
+            <p>In the name of the Father, and of the Son, and of the Holy Spirit. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Apostles' Creed</strong>
+            <p>I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; he descended into hell; on the third day he rose again from the dead; he ascended into heaven, and is seated at the right hand of God the Father almighty; from there he will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Our Father</strong>
+            <p>Our Father, who art in heaven, hallowed be thy name; thy kingdom come, thy will be done on earth as it is in heaven. Give us this day our daily bread; and forgive us our trespasses, as we forgive those who trespass against us; and lead us not into temptation, but deliver us from evil. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Hail Mary</strong>
+            <p>Hail, Mary, full of grace, the Lord is with thee; blessed art thou among women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Glory Be</strong>
+            <p>Glory be to the Father, and to the Son, and to the Holy Spirit; as it was in the beginning, is now, and ever shall be, world without end. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Fatima Prayer <span class="optional">(customary, after each Glory Be)</span></strong>
+            <p>O my Jesus, forgive us our sins, save us from the fires of hell; lead all souls to heaven, especially those in most need of thy mercy.</p>
+        </section>
+
+        <h2>The Mysteries of the Rosary</h2>
+        <p class="readings-note">Tap a Scripture reference to read that passage in the USCCB Bible.</p>
+        <div class="mysteries">
+            <div class="mystery-group" data-set="joyful">
+                <span class="today-tag">Today</span>
+                <h3>Joyful Mysteries</h3>
+                <ol>
+                    <li>The Annunciation</li>
+                    <li>The Visitation</li>
+                    <li>The Nativity</li>
+                    <li>The Presentation</li>
+                    <li>The Finding in the Temple</li>
+                </ol>
+                <p class="days">Prayed on Monday and Saturday.</p>
+            </div>
+            <div class="mystery-group" data-set="sorrowful">
+                <span class="today-tag">Today</span>
+                <h3>Sorrowful Mysteries</h3>
+                <ol>
+                    <li>The Agony in the Garden</li>
+                    <li>The Scourging at the Pillar</li>
+                    <li>The Crowning with Thorns</li>
+                    <li>The Carrying of the Cross</li>
+                    <li>The Crucifixion</li>
+                </ol>
+                <p class="days">Prayed on Tuesday and Friday.</p>
+            </div>
+            <div class="mystery-group" data-set="glorious">
+                <span class="today-tag">Today</span>
+                <h3>Glorious Mysteries</h3>
+                <ol>
+                    <li>The Resurrection</li>
+                    <li>The Ascension</li>
+                    <li>The Descent of the Holy Spirit</li>
+                    <li>The Assumption</li>
+                    <li>The Coronation of Mary</li>
+                </ol>
+                <p class="days">Prayed on Wednesday and Sunday.</p>
+            </div>
+            <div class="mystery-group" data-set="luminous">
+                <span class="today-tag">Today</span>
+                <h3>Luminous Mysteries</h3>
+                <ol>
+                    <li>The Baptism of Jesus</li>
+                    <li>The Wedding at Cana</li>
+                    <li>The Proclamation of the Kingdom</li>
+                    <li>The Transfiguration</li>
+                    <li>The Institution of the Eucharist</li>
+                </ol>
+                <p class="days">Prayed on Thursday.</p>
+            </div>
+        </div>
+        <p class="note">The Assumption and the Coronation come from Church tradition rather than a Gospel account; the readings shown are the customary passages for reflection.</p>
+        <p class="note">By custom, the Joyful Mysteries are often prayed on Sundays of Advent and Christmas, and the Sorrowful Mysteries on Sundays of Lent.</p>
+
+        <h2>Concluding Prayers</h2>
+        <section class="prayer">
+            <strong>Hail, Holy Queen</strong>
+            <p>Hail, holy Queen, mother of mercy, our life, our sweetness, and our hope. To thee do we cry, poor banished children of Eve; to thee do we send up our sighs, mourning and weeping in this valley of tears. Turn then, most gracious advocate, thine eyes of mercy toward us; and after this our exile show unto us the blessed fruit of thy womb, Jesus. O clement, O loving, O sweet Virgin Mary. Pray for us, O holy Mother of God, that we may be made worthy of the promises of Christ. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Closing Prayer</strong>
+            <p>O God, whose Only Begotten Son, by his life, Death and Resurrection, has purchased for us the rewards of eternal life, grant, we beseech thee, that meditating upon these mysteries of the most holy Rosary of the Blessed Virgin Mary, we may imitate what they contain and obtain what they promise, through the same Christ our Lord. Amen.</p>
+        </section>
+        <section class="prayer">
+            <strong>Sign of the Cross</strong>
+            <p>In the name of the Father, and of the Son, and of the Holy Spirit. Amen.</p>
+        </section>
+
+        <footer class="sheet-foot">
+            Knights of Columbus &bull; Member Center<br>
+            <em>May the Rosary bring us closer to Christ through Mary.</em>
+        </footer>
+    </div>
+
+    <div class="actions">
+        <a href="home.html" class="btn btn-outline preserve-member">Back to My Profile</a>
+    </div>
+</main>
+
+<script>
+/* Scripture for each mystery, in order. [book, chapter, first verse, last verse] */
+const READINGS = {
+    joyful:    [['Luke', 1, 26, 38], ['Luke', 1, 39, 56], ['Luke', 2, 1, 20], ['Luke', 2, 22, 38], ['Luke', 2, 41, 52]],
+    sorrowful: [['Matthew', 26, 36, 46], ['Matthew', 27, 15, 26], ['Matthew', 27, 27, 31], ['Luke', 23, 26, 32], ['Luke', 23, 33, 46]],
+    glorious:  [['Matthew', 28, 1, 10], ['Acts', 1, 6, 11], ['Acts', 2, 1, 13], ['Luke', 1, 46, 55], ['Revelation', 12, 1, 6]],
+    luminous:  [['Matthew', 3, 13, 17], ['John', 2, 1, 12], ['Mark', 1, 14, 15], ['Matthew', 17, 1, 8], ['Matthew', 26, 26, 29]],
+};
+/* USCCB Bible addresses: bible.usccb.org/bible/<book>/<chapter>?<verse>#<book code><chapter><verse> */
+const USCCB_BOOKS = { Matthew: ['matthew', '48'], Mark: ['mark', '49'], Luke: ['luke', '50'], John: ['john', '51'], Acts: ['acts', '52'], Revelation: ['revelation', '74'] };
+const pad3 = n => String(n).padStart(3, '0');
+
+(function addReadings() {
+    Object.keys(READINGS).forEach(set => {
+        const items = document.querySelectorAll(`.mystery-group[data-set="${set}"] li`);
+        READINGS[set].forEach(([book, ch, v1, v2], i) => {
+            const li = items[i];
+            if (!li) return;
+            const [slug, code] = USCCB_BOOKS[book];
+            const url = `https://bible.usccb.org/bible/${slug}/${ch}?${v1}#${code}${pad3(ch)}${pad3(v1)}`;
+            const ref = `${book} ${ch}:${v1}\u2013${v2}`;
+            li.insertAdjacentHTML('beforeend',
+                `<span class="reading-sep">\u00b7</span><a class="reading" href="${url}" target="_blank" rel="noopener" ` +
+                `aria-label="Read ${ref} in the USCCB Bible (opens in a new tab)">${ref}</a>`);
+        });
+    });
+})();
+
+/* When printing, open the collapsed explanation so it's on paper */
+window.addEventListener('beforeprint', () => document.querySelectorAll('details').forEach(d => d.open = true));
+
+/* Mark today's set: traditional weekday assignment (Sunday = 0) */
+(function markToday() {
+    const SET_FOR_DAY = ['glorious', 'joyful', 'sorrowful', 'glorious', 'luminous', 'sorrowful', 'joyful'];
+    const g = document.querySelector(`.mystery-group[data-set="${SET_FOR_DAY[new Date().getDay()]}"]`);
+    if (g) g.classList.add('is-today');
+})();
+
+/* Carry the logged-in member across pages via preserve-member links */
+(function () {
+    const memberParam = new URLSearchParams(window.location.search).get("member");
+    if (!memberParam) return;
+    document.querySelectorAll("a.preserve-member").forEach(a => {
+        const url = new URL(a.getAttribute("href"), window.location.href);
+        url.searchParams.set("member", memberParam);
+        a.setAttribute("href", url.pathname + url.search);
+    });
+})();
+</script>
+
+</body>
+</html>
