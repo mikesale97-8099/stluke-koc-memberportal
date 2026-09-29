@@ -142,6 +142,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 }
 .dispute-link:hover { color:var(--primary); }
 </style>
+<script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
 <body>
@@ -340,21 +341,21 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
     <!-- Step 4: Directory Opt-In -->
     <div class="wizard-panel" id="panel-directory">
         <h2>Member Directory Option</h2>
-        <p class="step-sub">Under <strong>Groups</strong> in this Member Center, there's a directory listing names, phone numbers, and emails of council members who've chosen to appear there. It's only accessible from within this application and is never shared externally.</p>
+        <p class="step-sub">Under <strong>Groups</strong>, the Member Center has a directory with the names, phone numbers, and email addresses of members who choose to be included. Only members signed in to the Member Center can see the directory, and the council doesn't share it outside the council.</p>
         <p class="step-sub" style="margin-bottom:1.25rem;">Would you like to appear in the member directory?</p>
         <div class="status-choice">
             <label class="status-option selected" onclick="selectDirectory(true)">
                 <input type="radio" name="directory" value="yes" checked>
                 <div>
                     <div class="opt-title">Yes — include me in the directory</div>
-                    <div class="opt-desc">Your name, phone, and email will be visible to other council members in this app.</div>
+                    <div class="opt-desc">Other members signed in to the Member Center will see your name, phone, and email in the directory.</div>
                 </div>
             </label>
             <label class="status-option" onclick="selectDirectory(false)">
                 <input type="radio" name="directory" value="no">
                 <div>
                     <div class="opt-title">No — keep me out of the directory</div>
-                    <div class="opt-desc">Your contact info will remain private.</div>
+                    <div class="opt-desc">You won't appear in the directory. Council officers can still reach you through your membership record.</div>
                 </div>
             </label>
         </div>
@@ -447,14 +448,14 @@ async function apiPost(params) {
     const res = await fetch(VERIFY_ENDPOINT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
+        body: JSON.stringify(Object.assign({ token: Session.token() }, params))
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
 }
 
 /* ── Member from URL param ── */
-const MEMBER_NUMBER = new URLSearchParams(window.location.search).get('member') || '';
+const MEMBER_NUMBER = Session.pageMember() || '';
 let CURRENT_MEMBER = null;
 
 // Wizard state
@@ -987,6 +988,7 @@ function showResult(paidNow) {
 }
 
 async function init() {
+    Session.renew();
     if (!MEMBER_NUMBER) {
         window.location.href = 'landing.html';
         return;

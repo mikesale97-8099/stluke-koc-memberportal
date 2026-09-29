@@ -106,6 +106,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
     nav ul li { flex-shrink:0; }
 }
 </style>
+<script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
 <body>
@@ -145,9 +146,9 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </header>
 
 <div class="not-logged-in" id="notLoggedIn" style="display:none;">
-    <h1>Please log in</h1>
-    <p>You need to log in through the member portal to view this page.</p>
-    <a href="landing.html" class="btn btn-primary">Go to login</a>
+    <h1>Please sign in</h1>
+    <p>Sign in to the Member Center to view this page.</p>
+    <a href="landing.html" class="btn btn-primary">Sign in</a>
 </div>
 
 <div class="stage" id="mainContent" style="display:none;">
@@ -354,9 +355,8 @@ async function loadVenmo() {
     }
 }
 
-const ADMIN_KEY = 'stluke14895';
 function isOwnerMode() {
-    return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY;
+    return Session.isAdmin();   // admin mode comes from a signed-in Data Administrator, not the address
 }
 function showMainContent() {
     document.getElementById('notLoggedIn').style.display = 'none';
@@ -368,7 +368,7 @@ function showNotLoggedIn() {
 }
 
 async function tryLiveLogin() {
-    const memberNumber = new URLSearchParams(window.location.search).get('member');
+    const memberNumber = Session.pageMember();
     const note = document.getElementById('memberNote');
     const owner = isOwnerMode();
 
@@ -416,12 +416,13 @@ async function loadMailAddress() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    Session.renew();   // quietly renews a remembered pass, at most once a day
     // If arriving from the verify wizard, show a "Return to wizard" button instead
     const fromWizard = new URLSearchParams(window.location.search).get('from') === 'wizard';
     if (fromWizard) {
         const actionsDiv = document.querySelector('.actions');
         if (actionsDiv) {
-            actionsDiv.innerHTML = '<a href="verify-wizard.html?member=' + (new URLSearchParams(window.location.search).get('member') || '') + '&paid=1" class="btn btn-primary">Return to Verify Wizard</a>';
+            actionsDiv.innerHTML = '<a href="verify-wizard.html?paid=1' + (Session.isAdmin() && Session.pageMember() ? '&member=' + encodeURIComponent(Session.pageMember()) : '') + '" class="btn btn-primary">Return to Verify Wizard</a>';
         }
     }
     if (isOwnerMode()) {

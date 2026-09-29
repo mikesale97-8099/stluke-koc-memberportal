@@ -91,13 +91,17 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
     nav ul::-webkit-scrollbar { display:none; }
     nav ul li { flex-shrink:0; }
 }
+.not-logged-in { max-width:500px; margin:4rem auto; padding:0 1.5rem; text-align:center; }
+.not-logged-in h1 { font-family:'Crimson Pro', serif; font-size:1.8rem; color:var(--primary); font-weight:700; }
+.not-logged-in p { font-family:'Lato',sans-serif; font-size:0.95rem; color:var(--text-medium); margin:0.75rem 0 1.5rem; }
 </style>
+<script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
 <body>
 
 <header class="site-header">
-<div class="review-panel">
+<div class="review-panel" id="reviewPanel" style="display:none;">
     <div class="inner">
         <span class="tag">Live</span>
         <span class="note" id="statusNote">Loading positions from the sheet&hellip;</span>
@@ -126,7 +130,13 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </nav>
 </header>
 
-<div class="page">
+<div class="not-logged-in" id="notLoggedIn" style="display:none;">
+    <h1>Please sign in</h1>
+    <p>Sign in to the Member Center to view this page.</p>
+    <a href="landing.html" class="btn btn-primary">Sign in</a>
+</div>
+
+<div class="page" id="mainContent">
 
     <h1>Groups</h1>
     <p class="sub">Board Members, Activity Leaders, and other council groups — who's currently serving.</p>
@@ -307,6 +317,14 @@ function initGroupSelect() {
 }
 
 async function init() {
+    // The directory is for signed-in members only
+    if (!Session.read()) {
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('notLoggedIn').style.display = 'block';
+        return;
+    }
+    Session.renew();
+    if (Session.isAdmin()) document.getElementById('reviewPanel').style.display = 'block';
     const status = document.getElementById('statusNote');
     try {
         const [positions, directory] = await Promise.all([fetchPositions(), fetchDirectoryMembers()]);

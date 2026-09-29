@@ -121,18 +121,24 @@ a { color:inherit; }
     .stage h1 { font-size:1.55rem; }
     .login-card { padding:1.5rem; margin-top:1.75rem; }
 }
+/* Sign-in with an emailed code */
+.step { display:none; }
+.step.active { display:block; }
+.step-title { font-family:'Crimson Pro', serif; font-size:1.5rem; color:var(--primary); font-weight:700; margin-bottom:0.4rem; }
+.step-text { font-family:'Lato',sans-serif; font-size:0.98rem; color:var(--text-dark); line-height:1.55; margin-bottom:1.1rem; }
+.code-input { width:100%; font-family:'Lato',sans-serif; font-size:2rem; font-weight:700; letter-spacing:0.55em; text-align:center;
+              padding:0.7rem 0.5rem 0.7rem 1rem; border:2px solid #D1D5DB; border-radius:10px; outline:none; }
+.code-input:focus { border-color:var(--primary-light); }
+.remember { display:flex; gap:0.7rem; align-items:flex-start; margin:1.1rem 0 0.2rem; font-family:'Lato',sans-serif; font-size:0.95rem; cursor:pointer; }
+.remember input { width:20px; height:20px; margin-top:0.1rem; accent-color:var(--primary); flex-shrink:0; }
+.remember-hint { font-size:0.85rem; color:var(--text-medium); }
+.small-links { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); margin-top:1.1rem; line-height:1.9; text-align:center; }
+.linkish { background:none; border:none; padding:0; font:inherit; color:var(--primary); text-decoration:underline; cursor:pointer; }
+.linkish:disabled { color:var(--text-medium); text-decoration:none; cursor:default; }
 </style>
+<script src="session.js"></script>
 </head>
 <body>
-
-<!-- Live status strip -->
-<div class="review-panel" id="reviewPanel" style="display:none;">
-    <div class="inner">
-        <span class="tag">Live</span>
-        <span class="note" id="wireStatus">Checking connection to the membership sheet&hellip;</span>
-    </div>
-</div>
-
 <div class="brandbar">
     <div class="inner">
         <div class="logo">
@@ -145,34 +151,60 @@ a { color:inherit; }
 <div class="stage">
     <div class="hero-emblem">14895</div>
     <h1>Member Center</h1>
-    <p class="sub">Enter the email address on file with the council to view your profile, membership card, and dues status.</p>
+    <p class="sub" id="stageSub">Enter the email address on file with the council. We'll email you a code to sign in.</p>
 
     <div class="login-card">
-        <label class="field-label" for="emailField">Email address</label>
-        <input class="email-input" id="emailField" type="email" placeholder="you@example.com" autocomplete="email">
-        <p class="login-hint">This should match the email a data administrator has on file for you.</p>
-        <button class="btn-submit" id="submitBtn" onclick="handleLogin()">Continue</button>
 
-        <div class="status-msg status-checking" id="msg-checking">Checking our records&hellip;</div>
-        <div class="status-msg status-found" id="msg-found">Found you<span id="foundName"></span> — taking you to your profile.</div>
-        <div class="status-msg status-notfound" id="msg-notfound">
-            We don't have that email on file yet. Try the email your dues notices usually arrive at — or tell us who you are below and a data administrator will help you get set up.
-            <div class="help-form" id="helpForm">
-                <label class="field-label" for="helpName">Your name</label>
-                <input class="email-input" id="helpName" type="text" placeholder="First and last name">
-                <label class="field-label" for="helpNote">Anything else that helps us find you (optional)</label>
-                <textarea class="help-textarea" id="helpNote" placeholder="e.g. your member number if you know it, or which council event you usually attend"></textarea>
-                <button class="btn-submit btn-submit-secondary" id="submitHelpBtn" onclick="submitHelpRequest()">Send to a data administrator</button>
-                <p class="help-status" id="helpStatus"></p>
+        <!-- Step 1: email -->
+        <div class="step" id="step-email">
+            <label class="field-label" for="emailField">Email address</label>
+            <input class="email-input" id="emailField" type="email" placeholder="you@example.com" autocomplete="email">
+            <p class="login-hint">This should match the email a data administrator has on file for you.</p>
+            <button class="btn-submit" id="sendBtn" onclick="sendCode()">Email Me a Code</button>
+            <div class="status-msg status-checking" id="msg-checking">Checking our records&hellip;</div>
+            <div class="status-msg status-notfound" id="msg-notfound">
+                We don't have that email on file yet. Try the email your dues notices usually arrive at — or tell us who you are below and a data administrator will help you get set up.
+                <div class="help-form" id="helpForm">
+                    <label class="field-label" for="helpName">Your name</label>
+                    <input class="email-input" id="helpName" type="text" placeholder="First and last name">
+                    <label class="field-label" for="helpNote">Anything else that helps us find you (optional)</label>
+                    <textarea class="help-textarea" id="helpNote" placeholder="e.g. your member number if you know it, or which council event you usually attend"></textarea>
+                    <button class="btn-submit btn-submit-secondary" id="submitHelpBtn" onclick="submitHelpRequest()">Send to a data administrator</button>
+                    <p class="help-status" id="helpStatus"></p>
+                </div>
+                <div class="help-confirm" id="helpConfirm">Thanks — a data administrator will follow up and help get your email added.</div>
             </div>
-            <div class="help-confirm" id="helpConfirm">Thanks — a data administrator will follow up and help get your email added.</div>
+            <div class="status-msg status-notyet" id="msg-notyet">
+                Thanks<span id="notyetName"></span>! We're opening the Member Center in stages so we can make sure everything works well. You'll get an email when it's your turn.
+                <div style="margin-top:0.6rem;">Questions? Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a>.</div>
+            </div>
+            <div class="status-msg status-notfound" id="msg-error"></div>
         </div>
-        <div class="status-msg status-notyet" id="msg-notyet">
-            Thanks<span id="notyetName"></span>! We're opening the Member Center in stages so we can make sure everything works well. You'll get an email when it's your turn.
-            <div style="margin-top:0.6rem;">Questions? Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a>.</div>
+
+        <!-- Step 2: code -->
+        <div class="step" id="step-code">
+            <h2 class="step-title">Check your email</h2>
+            <p class="step-text">We sent a 6-digit code to <strong id="maskedEmail"></strong>. It expires in 15 minutes.</p>
+            <label class="field-label" for="codeField">6-digit code</label>
+            <input class="code-input" id="codeField" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" oninput="this.value = this.value.replace(/\D/g, '')">
+            <label class="remember">
+                <input type="checkbox" id="rememberBox" checked>
+                <span><strong>Keep me signed in on this device</strong><br><span class="remember-hint">You'll stay signed in as long as you visit at least once every 90 days. Uncheck on a shared or public computer.</span></span>
+            </label>
+            <button class="btn-submit" id="verifyBtn" onclick="verifyCode()">Sign In</button>
+            <div class="status-msg" id="msg-code"></div>
+            <p class="small-links">
+                Didn't get it? Check your spam folder, or <button type="button" class="linkish" id="resendBtn" onclick="resendCode()">send a new code</button>.<br>
+                <button type="button" class="linkish" onclick="useDifferentEmail()">Use a different email</button>
+            </p>
         </div>
-        <div class="status-msg status-notfound" id="msg-error">
-            Couldn't reach the membership sheet right now. If this keeps happening, a data administrator may need to check the sheet's sharing settings.
+
+        <!-- Returning visitor on a remembered device -->
+        <div class="step" id="step-returning">
+            <h2 class="step-title">Welcome back<span id="returningName"></span></h2>
+            <p class="step-text">You're still signed in on this device, so you don't need a code.</p>
+            <button class="btn-submit" id="continueBtn" onclick="continueSignedIn()">Continue to My Profile</button>
+            <p class="small-links"><button type="button" class="linkish" id="notMeBtn" onclick="notMe()">Not you? Sign in as someone else</button></p>
         </div>
     </div>
 
@@ -181,15 +213,13 @@ a { color:inherit; }
         Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a> and a data administrator will help you get set up.</p>
     </div>
 </div>
-
 <p class="council-footer">St. Luke Knights of Columbus, Council 14895</p>
 
 <script>
-const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
-const SHEET_GID = '1292747386'; // St Luke KOC Membership DB tab
-const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-const VERIFY_ENDPOINT_URL = 'https://stluke-koc14895-relay.mike-sale97.workers.dev';
-const ASSUMPTIONS_GID = '753284304'; // Assumptions tab
+const VERIFY_ENDPOINT_URL = MC_ENDPOINT; // from session.js
+const SIGN_IN_SUB = "Enter the email address on file with the council. We'll email you a code to sign in.";
+let pendingEmail = '';
+let cooldownTimer = null;
 
 async function apiPost(params) {
     const res = await fetch(VERIFY_ENDPOINT_URL, {
@@ -201,121 +231,158 @@ async function apiPost(params) {
     return await res.json();
 }
 
-let SHEET_ROWS = null; // cached after first successful fetch
-
-async function fetchSheet() {
-    const res = await fetch(GVIZ_URL);
-    const text = await res.text();
-    const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
-    if (!match) throw new Error('Unexpected response from sheet');
-    const json = JSON.parse(match[1]);
-    const cols = json.table.cols.map(c => (c.label || '').trim());
-    const idx = (label) => cols.indexOf(label);
-    const rows = json.table.rows.map(r => {
-        const cell = (label) => {
-            const c = r.c[idx(label)];
-            if (!c) return null;
-            return (c.v !== null && c.v !== undefined) ? c.v : c.f;
-        };
-        return {
-            memberNumber: cell('Member Number'),
-            email: cell('email'),
-            firstName: cell('First Name'),
-            lastName: cell('Last Name'),
-            wave: cell('Rollout Wave'),
-        };
-    });
-    return rows;
+function show(id) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
 
-/* Staged rollout. "Open rollout waves through" on the Assumptions tab:
-   a number N lets in members whose Rollout Wave is 1..N (blank = not invited yet).
-   "All", blank, or no such row = everyone with an email on file gets in. */
-let OPEN_WAVES = undefined; // undefined = not loaded yet; null = rollout gating off; number = open through N
-
-async function fetchOpenWaves() {
-    try {
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${ASSUMPTIONS_GID}`;
-        const text = await (await fetch(url)).text();
-        const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
-        const row = json.table.rows.find(r => {
-            const c = r.c[0]; const label = c && (c.v || c.f);
-            return label && String(label).trim().toLowerCase().startsWith('open rollout waves through');
-        });
-        const cell = row && row.c[1];
-        const n = parseInt(cell ? String(cell.v != null ? cell.v : (cell.f || '')).trim() : '', 10);
-        return isNaN(n) ? null : n;
-    } catch (e) {
-        console.warn('Could not read the rollout setting; letting members in:', e.message);
-        return null; // fail open: the wave check is a courtesy, not security
-    }
+function hideMessages() {
+    ['checking', 'notfound', 'notyet', 'error'].forEach(s => document.getElementById('msg-' + s).classList.remove('show'));
+    const m = document.getElementById('msg-code'); m.className = 'status-msg'; m.textContent = '';
 }
 
-function isInvited(member) {
-    if (isOwnerMode() || OPEN_WAVES === null) return true;
-    const wave = parseInt(member.wave, 10);
-    return !isNaN(wave) && wave <= OPEN_WAVES;
+function codeMessage(text, kind) {
+    const m = document.getElementById('msg-code');
+    m.className = 'status-msg show ' + (kind === 'ok' ? 'status-found' : 'status-notfound');
+    m.textContent = text;
 }
 
-async function initConnection() {
-    const status = document.getElementById('wireStatus');
-    try {
-        [SHEET_ROWS, OPEN_WAVES] = await Promise.all([fetchSheet(), fetchOpenWaves()]);
-        status.textContent = `Connected — ${SHEET_ROWS.length} records loaded from the live sheet.`;
-    } catch (e) {
-        status.textContent = 'Could not connect to the membership sheet — check sharing settings (Anyone with the link — Viewer).';
-    }
+function maskTyped(email) {
+    const [name, domain] = email.split('@');
+    return domain ? name.charAt(0) + '\u2022'.repeat(Math.max(name.length - 1, 3)) + '@' + domain : email;
 }
 
-function titleCase(s) {
-    return (s || '').toString().replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
-}
+function goToProfile() { window.location.href = 'home.html'; }
 
-async function handleLogin() {
-    const emailInput = document.getElementById('emailField').value.trim().toLowerCase();
-    const btn = document.getElementById('submitBtn');
-    ['checking','found','notfound','notyet','error'].forEach(s => document.getElementById('msg-' + s)?.classList.remove('show'));
+async function sendCode() {
+    const email = document.getElementById('emailField').value.trim().toLowerCase();
+    hideMessages();
     document.getElementById('helpForm').classList.remove('hidden');
     document.getElementById('helpConfirm').classList.remove('open');
     document.getElementById('helpStatus').textContent = '';
-    document.getElementById('helpName').value = '';
-    document.getElementById('helpNote').value = '';
-    if (!emailInput) return;
-
+    if (!email) return;
+    const btn = document.getElementById('sendBtn');
     btn.disabled = true;
     document.getElementById('msg-checking').classList.add('show');
-
     try {
-        if (!SHEET_ROWS) SHEET_ROWS = await fetchSheet();
-        if (OPEN_WAVES === undefined) OPEN_WAVES = await fetchOpenWaves();
-        const match = SHEET_ROWS.find(r => (r.email || '').toString().trim().toLowerCase() === emailInput);
-
+        const r = await apiPost({ action: 'requestCode', email });
         document.getElementById('msg-checking').classList.remove('show');
-
-        if (match && !isInvited(match)) {
-            document.getElementById('notyetName').textContent = match.firstName ? ', ' + titleCase(match.firstName) : '';
-            document.getElementById('msg-notyet').classList.add('show');
-            btn.disabled = false;
-        } else if (match) {
-            document.getElementById('foundName').textContent = ', ' + titleCase(match.firstName);
-            document.getElementById('msg-found').classList.add('show');
-            setTimeout(() => {
-                window.location.href = 'home.html?member=' + encodeURIComponent(match.memberNumber);
-            }, 900);
-        } else {
+        if (r.success || r.error === 'wait') {
+            pendingEmail = email;
+            document.getElementById('maskedEmail').textContent = r.masked || maskTyped(email);
+            document.getElementById('codeField').value = '';
+            document.getElementById('stageSub').textContent = 'Almost there. Enter the code we just emailed you.';
+            show('step-code');
+            startCooldown(r.error === 'wait' ? (r.seconds || 30) : 30);
+            if (r.error === 'wait') codeMessage('We just sent you a code. Check your email.', 'ok');
+            document.getElementById('codeField').focus();
+        } else if (r.error === 'not_found') {
             document.getElementById('msg-notfound').classList.add('show');
-            btn.disabled = false;
+        } else if (r.error === 'not_yet') {
+            document.getElementById('notyetName').textContent = r.firstName ? ', ' + r.firstName : '';
+            document.getElementById('msg-notyet').classList.add('show');
+        } else if (r.error === 'too_many_codes') {
+            showError("We've sent several codes in the last hour. Please wait a little while, then try again.");
+        } else {
+            showError("Something went wrong. Please try again.");
         }
     } catch (e) {
         document.getElementById('msg-checking').classList.remove('show');
-        document.getElementById('msg-error').classList.add('show');
-        btn.disabled = false;
+        showError("We couldn't reach the Member Center just now. Please try again in a moment.");
     }
+    btn.disabled = false;
 }
 
-document.getElementById('emailField').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleLogin();
-});
+function showError(text) {
+    const m = document.getElementById('msg-error');
+    m.textContent = text;
+    m.classList.add('show');
+}
+
+async function verifyCode() {
+    const code = document.getElementById('codeField').value.trim();
+    if (code.length !== 6) return codeMessage('Please enter all 6 digits.');
+    const btn = document.getElementById('verifyBtn');
+    btn.disabled = true;
+    btn.textContent = 'Checking\u2026';
+    try {
+        const r = await apiPost({
+            action: 'verifyCode', email: pendingEmail, code,
+            remember: document.getElementById('rememberBox').checked
+        });
+        if (r.success) {
+            Session.save(r);
+            btn.textContent = 'Signed in \u2713';
+            goToProfile();
+            return;
+        }
+        if (r.error === 'wrong_code') codeMessage(`That code doesn't match. ${r.triesLeft} ${r.triesLeft === 1 ? 'try' : 'tries'} left.`);
+        else if (r.error === 'too_many_tries') codeMessage('Too many tries. Tap "send a new code" below.');
+        else if (r.error === 'expired') codeMessage('That code has expired. Tap "send a new code" below.');
+        else codeMessage('Something went wrong. Please try again.');
+    } catch (e) {
+        codeMessage("We couldn't reach the Member Center just now. Please try again in a moment.");
+    }
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+}
+
+function startCooldown(seconds) {
+    let s = seconds;
+    const btn = document.getElementById('resendBtn');
+    btn.disabled = true;
+    clearInterval(cooldownTimer);
+    const tick = () => {
+        if (s <= 0) { clearInterval(cooldownTimer); btn.disabled = false; btn.textContent = 'send a new code'; return; }
+        btn.textContent = `send a new code (in ${s}s)`;
+        s--;
+    };
+    tick();
+    cooldownTimer = setInterval(tick, 1000);
+}
+
+async function resendCode() {
+    const btn = document.getElementById('resendBtn');
+    btn.disabled = true;
+    document.getElementById('codeField').value = '';
+    try {
+        const r = await apiPost({ action: 'requestCode', email: pendingEmail });
+        if (r.success) { codeMessage('A new code is on its way. Only the newest code works.', 'ok'); startCooldown(30); return; }
+        if (r.error === 'wait') { startCooldown(r.seconds || 30); return; }
+        if (r.error === 'too_many_codes') codeMessage("We've sent several codes in the last hour. Please wait a little while, then try again.");
+        else codeMessage('Something went wrong. Please try again.');
+    } catch (e) {
+        codeMessage("We couldn't reach the Member Center just now. Please try again in a moment.");
+    }
+    btn.disabled = false;
+}
+
+function useDifferentEmail() {
+    clearInterval(cooldownTimer);
+    hideMessages();
+    document.getElementById('stageSub').textContent = SIGN_IN_SUB;
+    show('step-email');
+    document.getElementById('emailField').focus();
+}
+
+async function continueSignedIn() {
+    const btn = document.getElementById('continueBtn');
+    btn.disabled = true;
+    btn.textContent = 'One moment\u2026';
+    const s = await Session.renew(true);   // confirms the pass and restarts its 90 days
+    if (s) { goToProfile(); return; }
+    btn.disabled = false;
+    btn.textContent = 'Continue to My Profile';
+    document.getElementById('stageSub').textContent = 'Your sign-in has expired. ' + SIGN_IN_SUB;
+    show('step-email');
+}
+
+function notMe() {
+    Session.clear();
+    document.getElementById('emailField').value = '';
+    document.getElementById('rememberBox').checked = true;
+    useDifferentEmail();
+}
 
 async function submitHelpRequest() {
     const emailTried = document.getElementById('emailField').value.trim();
@@ -364,16 +431,19 @@ async function submitHelpRequest() {
     }
 }
 
-const ADMIN_KEY = 'stluke14895';
-function isOwnerMode() {
-    return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY;
-}
+document.getElementById('emailField').addEventListener('keydown', e => { if (e.key === 'Enter') sendCode(); });
+document.getElementById('codeField').addEventListener('keydown', e => { if (e.key === 'Enter') verifyCode(); });
 
 window.addEventListener('DOMContentLoaded', () => {
-    if (isOwnerMode()) document.getElementById('reviewPanel').style.display = 'block';
-    initConnection(); // pre-fetches the sheet for everyone so the first login attempt is instant
+    const s = Session.read();
+    if (s) {
+        document.getElementById('returningName').textContent = s.firstName ? ', ' + s.firstName : '';
+        document.getElementById('stageSub').textContent = '';
+        show('step-returning');
+    } else {
+        show('step-email');
+    }
 });
 </script>
-
 </body>
 </html>

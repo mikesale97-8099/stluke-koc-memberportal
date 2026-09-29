@@ -19,17 +19,9 @@ function doOptions(e) {
 }
 
 function doGet(e) {
-  const action = (e.parameter && e.parameter.action) || 'verify';
-  let result;
-  if (action === 'logChange') result = handleLogChange(e.parameter);
-  else if (action === 'saveContact') result = handleSaveContact(e.parameter);
-  else if (action === 'recordLogin') result = handleRecordLogin(e.parameter);
-  else if (action === 'completeWizard') result = handleCompleteWizard(e.parameter);
-  else if (action === 'reportCircumstance') result = handleReportCircumstance(e.parameter);
-  else if (action === 'verify') result = handleVerify(e.parameter);
-  else result = { success: false, error: 'Unknown action: ' + action };
-
-  const callback = e.parameter && e.parameter.callback;
+  const params = Object.assign({}, e.parameter || {});
+  const result = route(params.action || 'verify', params);
+  const callback = params.callback;
   if (callback) {
     return ContentService.createTextOutput(callback + '(' + JSON.stringify(result) + ');')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
@@ -44,16 +36,39 @@ function doPost(e) {
   } catch (err) {
     return jsonResponse({ success: false, error: 'Invalid request body' });
   }
-  const action = params.action || 'verify';
-  let result;
-  if (action === 'logChange') result = handleLogChange(params);
-  else if (action === 'saveContact') result = handleSaveContact(params);
-  else if (action === 'recordLogin') result = handleRecordLogin(params);
-  else if (action === 'completeWizard') result = handleCompleteWizard(params);
-  else if (action === 'reportCircumstance') result = handleReportCircumstance(params);
-  else if (action === 'verify') result = handleVerify(params);
-  else result = { success: false, error: 'Unknown action: ' + action };
-  return jsonResponse(result);
+  return jsonResponse(route(params.action || 'verify', params));
+}
+
+/**
+ * Every request comes through here.
+ * - Sign-in actions are open to anyone.
+ * - The "no email on file" help form is open (that member can't sign in yet).
+ * - Everything else needs a valid session pass, and uses the member number
+ *   from the pass, not whatever the page sent. The Data Administrator may
+ *   act on another member's record (admin view).
+ */
+function route(action, params) {
+  if (action === 'requestCode') return handleRequestCode(params);
+  if (action === 'verifyCode') return handleVerifyCode(params);
+  if (action === 'session') return handleSession(params);
+  if (action === 'logChange' && isAddEmailRequest(params)) return handleLogChange(params);
+
+  const auth = authenticate(params);
+  if (!auth.ok) return { success: false, error: auth.error };
+  const requested = String(params.memberNumber || '').trim();
+  if (!auth.admin || !requested) params.memberNumber = auth.memberNumber;
+
+  if (action === 'logChange') return handleLogChange(params);
+  if (action === 'saveContact') return handleSaveContact(params);
+  if (action === 'recordLogin') return handleRecordLogin(params);
+  if (action === 'completeWizard') return handleCompleteWizard(params);
+  if (action === 'reportCircumstance') return handleReportCircumstance(params);
+  if (action === 'verify') return handleVerify(params);
+  return { success: false, error: 'Unknown action: ' + action };
+}
+
+function isAddEmailRequest(params) {
+  return !String(params.memberNumber || '').trim() && params.type === 'Contact Request' && params.field === 'Add Email';
 }
 
 /**
@@ -530,4 +545,182 @@ function testMemberCenterEmail() {
     name: 'St. Luke Member Center'
   });
   Logger.log('Sent test email to ' + to + '\n' + lines.join('\n'));
+}
+
+
+/* ================================================================
+ * Sign-in with an emailed code
+ * ================================================================ */
+
+const CODE_TTL_SECONDS = 15 * 60;   // a code works for 15 minutes
+const CODE_MAX_TRIES = 5;           // wrong guesses before the code is locked
+const CODE_RESEND_SECONDS = 30;     // wait between code emails
+const CODE_MAX_PER_HOUR = 5;        // code emails per member per hour
+const REMEMBER_DAYS = 90;           // "Keep me signed in": 90 days from the last visit
+const SESSION_HOURS = 12;           // otherwise the pass lasts 12 hours (and ends when the browser closes)
+
+function normEmail(s) { return String(s || '').trim().toLowerCase(); }
+function titleCaseName(s) { return String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()); }
+function stripZeros(n) { return String(n || '').trim().replace(/^0+/, ''); }
+
+function maskEmail(email) {
+  const parts = String(email).split('@');
+  if (parts.length !== 2) return email;
+  return parts[0].charAt(0) + '\u2022'.repeat(Math.max(parts[0].length - 1, 3)) + '@' + parts[1];
+}
+
+/** The member row for an email address or member number, with the fields sign-in needs. */
+function findMember(by, value) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('St Luke KOC Membership DB');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0].map(h => String(h).trim());
+  const col = name => headers.indexOf(name);
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const get = name => col(name) === -1 ? '' : String(row[col(name)] == null ? '' : row[col(name)]).trim();
+    const match = by === 'email'
+      ? get('email').toLowerCase().split(/[,;\s]+/).filter(Boolean).indexOf(value) !== -1
+      : stripZeros(get('Member Number')) === stripZeros(value);
+    if (match) {
+      return {
+        number: get('Member Number'), email: get('email').split(/[,;\s]+/)[0],
+        first: get('First Name'), preferred: get('Preferred Name'), wave: get('Rollout Wave')
+      };
+    }
+  }
+  return null;
+}
+
+function isAdminEmail(email) {
+  const admins = readAssumption(['data administrator email']).toLowerCase().split(/[,;\s]+/).filter(Boolean);
+  return admins.indexOf(normEmail(email)) !== -1;
+}
+
+/** Staged rollout: a number N on "Open rollout waves through" lets in waves 1..N; anything else lets everyone in. */
+function isInvited(member) {
+  const open = parseInt(readAssumption(['open rollout waves through']), 10);
+  if (isNaN(open) || isAdminEmail(member.email)) return true;
+  const wave = parseInt(member.wave, 10);
+  return !isNaN(wave) && wave <= open;
+}
+
+function sessionSecret() {
+  const props = PropertiesService.getScriptProperties();
+  let s = props.getProperty('SESSION_SECRET');
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); props.setProperty('SESSION_SECRET', s); }
+  return s;
+}
+
+function hashCode(code) {
+  return Utilities.base64Encode(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, code + '|' + sessionSecret()));
+}
+
+/** A signed pass: base64(payload) + '.' + base64(HMAC). Pages can read the payload; only this script can sign it. */
+function makeToken(memberNumber, remember) {
+  const exp = Date.now() + (remember ? REMEMBER_DAYS * 864e5 : SESSION_HOURS * 36e5);
+  const payload = Utilities.base64EncodeWebSafe(JSON.stringify({ n: String(memberNumber), exp: exp, r: remember ? 1 : 0 }));
+  const sig = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(payload, sessionSecret()));
+  return payload + '.' + sig;
+}
+
+function readToken(token) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2) return null;
+  const expected = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(parts[0], sessionSecret()));
+  if (parts[1] !== expected) return null;
+  let data;
+  try { data = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString()); }
+  catch (err) { return null; }
+  if (!data || !data.n || Date.now() > data.exp) return null;
+  return data;
+}
+
+function authenticate(params) {
+  const pass = readToken(params.token);
+  if (!pass) return { ok: false, error: 'not_signed_in' };
+  const m = findMember('number', pass.n);
+  if (!m) return { ok: false, error: 'not_signed_in' };
+  return { ok: true, memberNumber: m.number, admin: isAdminEmail(m.email) };
+}
+
+function signedInReply(m, remember) {
+  return {
+    success: true,
+    token: makeToken(m.number, remember),
+    memberNumber: m.number,
+    firstName: titleCaseName(m.preferred || m.first),
+    admin: isAdminEmail(m.email),
+    remember: !!remember
+  };
+}
+
+function handleRequestCode(params) {
+  const email = normEmail(params.email);
+  if (!email) return { success: false, error: 'missing_email' };
+  const m = findMember('email', email);
+  if (!m) return { success: false, error: 'not_found' };
+  if (!isInvited(m)) return { success: false, error: 'not_yet', firstName: titleCaseName(m.preferred || m.first) };
+
+  const cache = CacheService.getScriptCache();
+  const key = stripZeros(m.number);
+  if (cache.get('cool:' + key)) return { success: false, error: 'wait', seconds: CODE_RESEND_SECONDS };
+  const sentThisHour = parseInt(cache.get('hour:' + key) || '0', 10);
+  if (sentThisHour >= CODE_MAX_PER_HOUR) return { success: false, error: 'too_many_codes' };
+
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  cache.put('code:' + key, JSON.stringify({ h: hashCode(code), t: 0, c: Date.now() }), CODE_TTL_SECONDS);
+  cache.put('cool:' + key, '1', CODE_RESEND_SECONDS);
+  cache.put('hour:' + key, String(sentThisHour + 1), 3600);
+
+  const name = titleCaseName(m.preferred || m.first);
+  MailApp.sendEmail({
+    to: m.email,
+    subject: 'Your St. Luke Member Center code: ' + code,
+    body: 'Hi ' + (name || 'Brother') + ',\n\nYour sign-in code is ' + code + '\n\nIt expires in 15 minutes.\n\n' +
+          "If you didn't ask for this code, you can ignore this email. No one can sign in without it.\n\n" +
+          'St. Luke Knights of Columbus, Council 14895',
+    name: 'St. Luke Member Center'
+  });
+  return { success: true, masked: maskEmail(m.email), firstName: name };
+}
+
+function handleVerifyCode(params) {
+  const m = findMember('email', normEmail(params.email));
+  if (!m) return { success: false, error: 'not_found' };
+  const cache = CacheService.getScriptCache();
+  const key = 'code:' + stripZeros(m.number);
+  const raw = cache.get(key);
+  if (!raw) return { success: false, error: 'expired' };
+  const rec = JSON.parse(raw);
+  if (rec.t >= CODE_MAX_TRIES) return { success: false, error: 'too_many_tries' };
+
+  const code = String(params.code || '').replace(/\D/g, '');
+  if (hashCode(code) !== rec.h) {
+    rec.t++;
+    const secondsLeft = Math.max(1, CODE_TTL_SECONDS - Math.floor((Date.now() - rec.c) / 1000));
+    cache.put(key, JSON.stringify(rec), secondsLeft);   // keep the original expiry
+    const left = CODE_MAX_TRIES - rec.t;
+    return { success: false, error: left > 0 ? 'wrong_code' : 'too_many_tries', triesLeft: left };
+  }
+  cache.remove(key);
+  const remember = params.remember === true || String(params.remember) === 'true';
+  return signedInReply(m, remember);
+}
+
+/** A returning visit: confirm the pass is still good and, if remembered, restart its 90 days. */
+function handleSession(params) {
+  const pass = readToken(params.token);
+  if (!pass) return { success: false, error: 'not_signed_in' };
+  const m = findMember('number', pass.n);
+  if (!m) return { success: false, error: 'not_signed_in' };
+  return signedInReply(m, pass.r === 1);
+}
+
+/**
+ * Emergency use: signs out every member on every device (they'll need a new code).
+ * Run from the Apps Script editor if you ever need it.
+ */
+function signEveryoneOut() {
+  PropertiesService.getScriptProperties().deleteProperty('SESSION_SECRET');
+  Logger.log('Everyone is signed out. Members will be asked for a new code.');
 }

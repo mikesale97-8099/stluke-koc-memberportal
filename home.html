@@ -188,6 +188,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 .dues-flag-link { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); text-decoration:underline; }
 .dues-flag-link:hover { color:var(--primary); }
 </style>
+<script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
 <body>
@@ -227,9 +228,9 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </header>
 
 <div class="not-logged-in" id="notLoggedIn" style="display:none;">
-    <h1>Please log in</h1>
-    <p>You need to log in through the member portal to view this page.</p>
-    <a href="landing.html" class="btn btn-primary">Go to login</a>
+    <h1>Please sign in</h1>
+    <p>Sign in to the Member Center to view this page.</p>
+    <a href="landing.html" class="btn btn-primary">Sign in</a>
 </div>
 
 <div class="page" id="mainContent" style="display:none;">
@@ -802,9 +803,8 @@ async function fetchLiveMember(memberNumber) {
     };
 }
 
-const ADMIN_KEY = 'stluke14895';
 function isOwnerMode() {
-    return new URLSearchParams(window.location.search).get('admin') === ADMIN_KEY;
+    return Session.isAdmin();   // admin mode comes from a signed-in Data Administrator, not the address
 }
 function showMainContent() {
     document.getElementById('notLoggedIn').style.display = 'none';
@@ -816,7 +816,7 @@ function showNotLoggedIn() {
 }
 
 async function tryLiveLogin() {
-    const memberNumber = new URLSearchParams(window.location.search).get('member');
+    const memberNumber = Session.pageMember();
     const note = document.getElementById('memberNote');
     const owner = isOwnerMode();
 
@@ -867,7 +867,7 @@ async function apiPost(params) {
     const res = await fetch(VERIFY_ENDPOINT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
+        body: JSON.stringify(Object.assign({ token: Session.token() }, params))
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
@@ -911,6 +911,7 @@ async function confirmInfo() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    Session.renew();   // quietly renews a remembered pass, at most once a day
     if (isOwnerMode()) {
         document.getElementById('reviewPanel').style.display = 'block';
         initMemberSelect(); // builds demo dropdown + applies a default member
