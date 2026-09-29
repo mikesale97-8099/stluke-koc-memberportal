@@ -73,6 +73,7 @@ const Session = {
     },
     signOut() {
         this.clear();
+        try { localStorage.removeItem('mcLastEmail'); } catch (e) {}
         window.location.href = 'landing.html';
     }
 };

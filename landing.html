@@ -135,6 +135,7 @@ a { color:inherit; }
 .small-links { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); margin-top:1.1rem; line-height:1.9; text-align:center; }
 .linkish { background:none; border:none; padding:0; font:inherit; color:var(--primary); text-decoration:underline; cursor:pointer; }
 .linkish:disabled { color:var(--text-medium); text-decoration:none; cursor:default; }
+.delivery-note { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); line-height:1.5; margin:-0.5rem 0 1.1rem; }
 </style>
 <script src="session.js"></script>
 </head>
@@ -157,10 +158,14 @@ a { color:inherit; }
 
         <!-- Step 1: email -->
         <div class="step" id="step-email">
-            <label class="field-label" for="emailField">Email address</label>
-            <input class="email-input" id="emailField" type="email" placeholder="you@example.com" autocomplete="email">
-            <p class="login-hint">This should match the email a data administrator has on file for you.</p>
-            <button class="btn-submit" id="sendBtn" onclick="sendCode()">Email Me a Code</button>
+            <form id="emailForm" action="#" method="post" novalidate onsubmit="event.preventDefault(); sendCode();">
+                <label class="field-label" for="emailField">Email address</label>
+                <input class="email-input" id="emailField" name="email" type="email" inputmode="email"
+                       autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false"
+                       enterkeyhint="go" placeholder="you@example.com">
+                <p class="login-hint">This should match the email a data administrator has on file for you.</p>
+                <button class="btn-submit" id="sendBtn" type="submit">Email Me a Code</button>
+            </form>
             <div class="status-msg status-checking" id="msg-checking">Checking our records&hellip;</div>
             <div class="status-msg status-notfound" id="msg-notfound">
                 We don't have that email on file yet. Try the email your dues notices usually arrive at — or tell us who you are below and a data administrator will help you get set up.
@@ -169,7 +174,7 @@ a { color:inherit; }
                     <input class="email-input" id="helpName" type="text" placeholder="First and last name">
                     <label class="field-label" for="helpNote">Anything else that helps us find you (optional)</label>
                     <textarea class="help-textarea" id="helpNote" placeholder="e.g. your member number if you know it, or which council event you usually attend"></textarea>
-                    <button class="btn-submit btn-submit-secondary" id="submitHelpBtn" onclick="submitHelpRequest()">Send to a data administrator</button>
+                    <button type="button" class="btn-submit btn-submit-secondary" id="submitHelpBtn" onclick="submitHelpRequest()">Send to a data administrator</button>
                     <p class="help-status" id="helpStatus"></p>
                 </div>
                 <div class="help-confirm" id="helpConfirm">Thanks — a data administrator will follow up and help get your email added.</div>
@@ -184,14 +189,19 @@ a { color:inherit; }
         <!-- Step 2: code -->
         <div class="step" id="step-code">
             <h2 class="step-title">Check your email</h2>
-            <p class="step-text">We sent a 6-digit code to <strong id="maskedEmail"></strong>. It expires in 15 minutes.</p>
+            <p class="step-text">We sent a 6-digit code to <strong id="maskedEmail"></strong>.</p>
+            <p class="delivery-note">It usually arrives within a minute, but some email providers, like AT&amp;T or Yahoo, can take up to 10 minutes. You can keep this page open.</p>
+            <form id="codeForm" action="#" method="post" novalidate onsubmit="event.preventDefault(); verifyCode();">
             <label class="field-label" for="codeField">6-digit code</label>
-            <input class="code-input" id="codeField" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" oninput="this.value = this.value.replace(/\D/g, '')">
+            <input class="code-input" id="codeField" name="one-time-code" type="text" inputmode="numeric" pattern="[0-9]*"
+                   autocomplete="one-time-code" autocorrect="off" enterkeyhint="done" maxlength="6" placeholder="••••••"
+                   oninput="this.value = this.value.replace(/\D/g, '')">
             <label class="remember">
                 <input type="checkbox" id="rememberBox" checked>
                 <span><strong>Keep me signed in on this device</strong><br><span class="remember-hint">You'll stay signed in as long as you visit at least once every 90 days. Uncheck on a shared or public computer.</span></span>
             </label>
-            <button class="btn-submit" id="verifyBtn" onclick="verifyCode()">Sign In</button>
+            <button class="btn-submit" id="verifyBtn" type="submit">Sign In</button>
+            </form>
             <div class="status-msg" id="msg-code"></div>
             <p class="small-links">
                 Didn't get it? Check your spam folder, or <button type="button" class="linkish" id="resendBtn" onclick="resendCode()">send a new code</button>.<br>
@@ -250,6 +260,16 @@ function codeMessage(text, kind) {
 function maskTyped(email) {
     const [name, domain] = email.split('@');
     return domain ? name.charAt(0) + '\u2022'.repeat(Math.max(name.length - 1, 3)) + '@' + domain : email;
+}
+
+/* The last email used to sign in, kept only when "Keep me signed in" was checked,
+   so the field is already filled in next time. "Not you?" and Sign out clear it. */
+const MC_EMAIL_KEY = 'mcLastEmail';
+function rememberEmail(email) {
+    try { email ? localStorage.setItem(MC_EMAIL_KEY, email) : localStorage.removeItem(MC_EMAIL_KEY); } catch (e) {}
+}
+function rememberedEmail() {
+    try { return localStorage.getItem(MC_EMAIL_KEY) || ''; } catch (e) { return ''; }
 }
 
 function goToProfile() { window.location.href = 'home.html'; }
@@ -312,6 +332,7 @@ async function verifyCode() {
         });
         if (r.success) {
             Session.save(r);
+            rememberEmail(document.getElementById('rememberBox').checked ? pendingEmail : '');
             btn.textContent = 'Signed in \u2713';
             goToProfile();
             return;
@@ -347,7 +368,7 @@ async function resendCode() {
     document.getElementById('codeField').value = '';
     try {
         const r = await apiPost({ action: 'requestCode', email: pendingEmail });
-        if (r.success) { codeMessage('A new code is on its way. Only the newest code works.', 'ok'); startCooldown(30); return; }
+        if (r.success) { codeMessage('A new code is on its way. Any code we\u2019ve sent you in the last hour will work.', 'ok'); startCooldown(30); return; }
         if (r.error === 'wait') { startCooldown(r.seconds || 30); return; }
         if (r.error === 'too_many_codes') codeMessage("We've sent several codes in the last hour. Please wait a little while, then try again.");
         else codeMessage('Something went wrong. Please try again.');
@@ -374,11 +395,14 @@ async function continueSignedIn() {
     btn.disabled = false;
     btn.textContent = 'Continue to My Profile';
     document.getElementById('stageSub').textContent = 'Your sign-in has expired. ' + SIGN_IN_SUB;
+    const saved = rememberedEmail();
+    if (saved) document.getElementById('emailField').value = saved;
     show('step-email');
 }
 
 function notMe() {
     Session.clear();
+    rememberEmail('');
     document.getElementById('emailField').value = '';
     document.getElementById('rememberBox').checked = true;
     useDifferentEmail();
@@ -431,8 +455,6 @@ async function submitHelpRequest() {
     }
 }
 
-document.getElementById('emailField').addEventListener('keydown', e => { if (e.key === 'Enter') sendCode(); });
-document.getElementById('codeField').addEventListener('keydown', e => { if (e.key === 'Enter') verifyCode(); });
 
 window.addEventListener('DOMContentLoaded', () => {
     const s = Session.read();
@@ -441,6 +463,8 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('stageSub').textContent = '';
         show('step-returning');
     } else {
+        const saved = rememberedEmail();
+        if (saved) document.getElementById('emailField').value = saved;
         show('step-email');
     }
 });
