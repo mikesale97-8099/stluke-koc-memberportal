@@ -197,10 +197,10 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
     <div class="inner">
         <span class="tag">Live</span>
         <span class="demo-controls" id="demoControls">
-            <label for="memberSelect">Browse as a member (demo):</label>
-            <select id="memberSelect" onchange="applyMember(parseInt(this.value)); document.getElementById('memberNote').textContent = 'Snapshot data \u00b7 arriving from login loads your live record instead';"></select>
+            <label for="memberSelect">Browse as a member (admin):</label>
+            <select id="memberSelect" onchange="browseAs(this.value)"></select>
         </span>
-        <span class="note" id="memberNote">Snapshot data · arriving from login loads your live record instead</span>
+        <span class="note" id="memberNote">Choose a member to see his live record.</span>
     </div>
 </div>
 
@@ -368,7 +368,8 @@ function casualFirstName(m) { return m.nickname || DEMO_NICKNAMES[m.firstName] |
 let CURRENT_MEMBER = null;
 
 function applyMember(indexOrMember) {
-    const m = (indexOrMember !== null && typeof indexOrMember === 'object') ? indexOrMember : MEMBERS[indexOrMember];
+    const m = (indexOrMember !== null && typeof indexOrMember === 'object') ? indexOrMember : null;
+    if (!m) return;
     CURRENT_MEMBER = m;
     const cfg = states[m.state] || states[DEFAULT_TIER];
     const name = fullName(m);
@@ -437,7 +438,7 @@ function applyMember(indexOrMember) {
     } else {
         const owedRaw = (m.outstandingDues === null || m.outstandingDues === undefined) ? '' : String(m.outstandingDues);
         let owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
-        if (/^\s*\(.*\)\s*$/.test(owedRaw)) owed = -Math.abs(owed); // ($28.55) is a credit, not money owed
+        if (/^\s*\(.*\)\s*$/.test(owedRaw)) owed = -Math.abs(owed); // e.g. ($25.00) is a credit, not money owed
         if (!isNaN(owed) && owed > 0) {
             duesEl.textContent = '$' + owed.toFixed(2) + ' owed';
             duesEl.classList.add('dues-owed');
@@ -613,26 +614,53 @@ function goToPayDues() {
 
 
 
-function initMemberSelect() {
+/* Admin "Browse as a member": the list is loaded live from the sheet only in admin
+   mode, so no member data is stored in this page. */
+async function initMemberSelect() {
     const select = document.getElementById('memberSelect');
-    let currentLetter = '';
-    let group = null;
-    MEMBERS.forEach((m, i) => {
-        const letter = (m.lastName || '?')[0].toUpperCase();
-        if (letter !== currentLetter) {
-            currentLetter = letter;
-            group = document.createElement('optgroup');
-            group.label = letter;
-            select.appendChild(group);
+    select.innerHTML = '<option value="">Loading members\u2026</option>';
+    try {
+        const text = await (await fetch(GVIZ_URL)).text();
+        const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
+        const cols = json.table.cols.map(c => (c.label || '').trim());
+        const val = (row, label) => { const i = cols.indexOf(label); const c = i === -1 ? null : row.c[i]; return c ? (c.v != null ? c.v : c.f) : null; };
+        const people = json.table.rows.map(r => ({
+            num: String(val(r, 'Member Number') || '').trim(),
+            first: titleCase(val(r, 'First Name')), last: titleCase(val(r, 'Last Name')), suffix: val(r, 'Suffix') || ''
+        })).filter(p => p.num).sort((a, b) => (a.last + ' ' + a.first).localeCompare(b.last + ' ' + b.first));
+        select.innerHTML = '<option value="">Choose a member\u2026</option>';
+        let letter = '', group = null;
+        people.forEach(p => {
+            const L = (p.last || '?').charAt(0).toUpperCase();
+            if (L !== letter) { letter = L; group = document.createElement('optgroup'); group.label = L; select.appendChild(group); }
+            const opt = document.createElement('option');
+            opt.value = p.num;
+            opt.textContent = `${p.last}, ${p.first}${p.suffix ? ' ' + p.suffix : ''} \u2014 #${p.num}`;
+            group.appendChild(opt);
+        });
+        const current = new URLSearchParams(window.location.search).get('member');
+        if (current) {
+            const match = people.find(p => p.num.replace(/^0+/, '') === current.replace(/^0+/, ''));
+            if (match) select.value = match.num;
         }
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${m.lastName}, ${m.firstName}${m.suffix ? ' ' + m.suffix : ''} — #${m.memberNumber}`;
-        group.appendChild(opt);
-    });
-    const defaultIdx = MEMBERS.findIndex(m => m.state === 'core');
-    select.value = defaultIdx >= 0 ? defaultIdx : 0;
-    applyMember(parseInt(select.value));
+    } catch (e) {
+        select.innerHTML = '<option value="">Could not load the member list</option>';
+    }
+}
+
+async function browseAs(num) {
+    if (!num) return;
+    const note = document.getElementById('memberNote');
+    if (note) note.textContent = 'Loading #' + num + '\u2026';
+    try {
+        const live = await fetchLiveMember(num);
+        if (!live) { if (note) note.textContent = 'Could not find #' + num + ' in the sheet.'; return; }
+        applyMember(live);
+        showMainContent();
+        if (note) note.textContent = 'Showing #' + num + ', live from the sheet.';
+    } catch (e) {
+        if (note) note.textContent = 'Could not reach the sheet \u2014 try again.';
+    }
 }
 
 /* ---- Live wiring: real sheet fetch, classification, login handoff, verified write-back ---- */
@@ -886,7 +914,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (isOwnerMode()) {
         document.getElementById('reviewPanel').style.display = 'block';
         initMemberSelect(); // builds demo dropdown + applies a default member
-        showMainContent();
     } else {
         document.getElementById('demoControls').style.display = 'none'; // no demo browsing for non-owners
     }
