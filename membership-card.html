@@ -149,7 +149,11 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 .d4-name { left:112px; top:43px; font-size:16px; max-width:228px; }
 .d4-rule { left:11px; right:11px; height:0; border-top:1px solid #53627a; }
 .d4-cap { color:#555; font-size:6px; letter-spacing:0.3px; }
-.d4-inline { color:#243c68; font-size:7px; }
+.d4-inline { color:#243c68; font-size:7px; letter-spacing:0.3px; font-family:Arial, Helvetica, sans-serif; }
+.d4-memberline { left:112px; top:57px; display:flex; align-items:baseline; gap:7px; }
+.d4-memberline > span { position:static; white-space:nowrap; }
+.d4-degnum { color:#e21f2f; font-weight:700; font-size:21px; font-family:Arial, Helvetica, sans-serif; }
+.card-note { font-family:'Lato',sans-serif; font-size:0.88rem; line-height:1.5; color:var(--text-medium); max-width:560px; margin:-0.35rem auto 0.9rem; }
 .d4-deg { left:198px; top:59px; color:#e21f2f; font-weight:700; font-size:21px; }
 .d4-year { right:12px; top:118px; color:#e21f2f; font-weight:700; font-size:21px; }
 .d4-logo { left:12px; top:128px; width:68px; height:86px; object-fit:contain; }
@@ -207,6 +211,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
     <p class="sub">This is a facsimile of your paper card and not officially recognized. Your official card for the current year can be picked up at a monthly council meeting from the Financial Secretary.</p>
 
     <h2 class="card-heading" id="councilHeading" style="display:none;">Council Card</h2>
+    <p class="card-note">This is a facsimile of your paper card and not officially recognized. Your official card for the current year can be picked up at a monthly council meeting from the Financial Secretary.</p>
     <div class="card-visual" id="cardVisual">
         <div class="ribbon" id="cardRibbon">Active</div>
 
@@ -251,6 +256,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 
     <div class="deg4-section" id="deg4Section" style="display:none;">
         <h2 class="card-heading">Fourth Degree Card</h2>
+        <p class="card-note">This is a facsimile of your paper card and not officially recognized. This image assumes you are current on dues for the current year as we have no access into the Assembly's dues records.</p>
         <div class="deg4-wrap" id="deg4Wrap">
             <div class="deg4-card" id="deg4Card" role="img" aria-label="Fourth Degree membership card">
                 <div class="d4-title">KNIGHTS OF COLUMBUS</div>
@@ -261,11 +267,13 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
                 <div class="d4-rule" style="top:60px;"></div>
 
                 <div class="d4-label" style="top:67px;">MEMBER NO.</div>
-                <div class="d4-value" id="d4Member" style="left:112px; top:64px;"></div>
-                <div class="d4-deg">4th</div>
+                <div class="d4-memberline" id="d4MemberLine">
+                    <span class="d4-value" id="d4Member"></span>
+                    <span class="d4-inline">IS A</span>
+                    <span class="d4-degnum">4th</span>
+                    <span class="d4-inline">DEGREE MEMBER OF</span>
+                </div>
                 <div class="d4-rule" style="top:80px;"></div>
-                <div class="d4-cap d4-inline" style="left:177px; top:71px;">IS A</div>
-                <div class="d4-cap d4-inline" style="left:235px; top:71px;">DEGREE MEMBER OF</div>
 
                 <div class="d4-label" style="top:95px;">ASSEMBLY NO.</div>
                 <div class="d4-value" id="d4Assembly" style="left:112px; top:92px;">2850</div>
@@ -530,6 +538,16 @@ function fitDeg4() {
     wrap.style.width = (350 * k) + 'px';
     wrap.style.height = (225 * k) + 'px';
     document.getElementById('deg4Card').style.transform = 'scale(' + k + ')';
+    const line = document.getElementById('d4MemberLine');
+    line.style.gap = ''; line.style.fontSize = '';
+    [...line.children].forEach(c => c.style.fontSize = '');
+    const room = 339 - 112;
+    if (line.scrollWidth > room) line.style.gap = '4px';
+    let scale = 1;
+    while (line.scrollWidth > room && scale > 0.75) {
+        scale -= 0.05;
+        [...line.children].forEach(c => { c.style.fontSize = ''; c.style.fontSize = (parseFloat(getComputedStyle(c).fontSize) * scale) + 'px'; });
+    }
     // Long names shrink to fit their line (measured at card scale, so k doesn't matter)
     const nameEl = document.getElementById('d4Name');
     nameEl.style.fontSize = '';
@@ -543,7 +561,7 @@ if (window.ResizeObserver) {
 function renderFourthDegree(m) {
     const isSirKnight = !!String(m.fourthDegree || '').trim();
     document.getElementById('deg4Section').style.display = isSirKnight ? 'block' : 'none';
-    document.getElementById('councilHeading').style.display = isSirKnight ? 'block' : 'none';
+    document.getElementById('councilHeading').style.display = isSirKnight ? 'block' : 'none';   // two-card titles for Sir Knights only
     if (!isSirKnight) return;
     document.getElementById('d4Name').textContent = sirKnightName(m);
     document.getElementById('d4Member').textContent = String(m.memberNumber || '').trim();
