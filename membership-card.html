@@ -581,7 +581,7 @@ function renderFourthDegree(m) {
 window.addEventListener('resize', fitDeg4);
 
 function isOwnerMode() {
-    return Session.isAdmin();   // admin mode comes from a signed-in Data Administrator, not the address
+    return Session.adminTools();   // a signed-in Data Administrator who has switched tools on (?admin=on)
 }
 function showMainContent() {
     document.getElementById('notLoggedIn').style.display = 'none';

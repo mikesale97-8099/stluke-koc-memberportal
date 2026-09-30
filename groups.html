@@ -328,7 +328,7 @@ async function init() {
         return;
     }
     Session.renew();
-    if (Session.isAdmin()) document.getElementById('reviewPanel').style.display = 'block';
+    if (Session.adminTools()) document.getElementById('reviewPanel').style.display = 'block';
     const status = document.getElementById('statusNote');
     try {
         const [positions, directory] = await Promise.all([fetchPositions(), fetchDirectoryMembers()]);

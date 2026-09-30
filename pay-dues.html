@@ -356,7 +356,7 @@ async function loadVenmo() {
 }
 
 function isOwnerMode() {
-    return Session.isAdmin();   // admin mode comes from a signed-in Data Administrator, not the address
+    return Session.adminTools();   // a signed-in Data Administrator who has switched tools on (?admin=on)
 }
 function showMainContent() {
     document.getElementById('notLoggedIn').style.display = 'none';
@@ -422,7 +422,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (fromWizard) {
         const actionsDiv = document.querySelector('.actions');
         if (actionsDiv) {
-            actionsDiv.innerHTML = '<a href="verify-wizard.html?paid=1' + (Session.isAdmin() && Session.pageMember() ? '&member=' + encodeURIComponent(Session.pageMember()) : '') + '" class="btn btn-primary">Return to Verify Wizard</a>';
+            actionsDiv.innerHTML = '<a href="verify-wizard.html?paid=1' + (Session.adminTools() && Session.pageMember() ? '&member=' + encodeURIComponent(Session.pageMember()) : '') + '" class="btn btn-primary">Return to Verify Wizard</a>';
         }
     }
     if (isOwnerMode()) {

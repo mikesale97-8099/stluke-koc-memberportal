@@ -8,6 +8,19 @@
  */
 const MC_ENDPOINT = 'https://stluke-koc14895-relay.mike-sale97.workers.dev';
 const MC_KEY = 'mcSession';
+const MC_TOOLS_KEY = 'mcAdminTools';
+
+/* ?admin=on / ?admin=off switches admin tools on this device, then tidies the address.
+   This only changes what's shown; admin rights come from the signed-in email. */
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const v = (params.get('admin') || '').toLowerCase();
+    if (v !== 'on' && v !== 'off') return;
+    try { v === 'on' ? localStorage.setItem(MC_TOOLS_KEY, 'on') : localStorage.removeItem(MC_TOOLS_KEY); } catch (e) {}
+    params.delete('admin');
+    const q = params.toString();
+    history.replaceState(null, '', window.location.pathname + (q ? '?' + q : '') + window.location.hash);
+})();
 
 const Session = {
     _store(kind) {
@@ -48,12 +61,17 @@ const Session = {
     },
     token() { const s = this.read(); return s ? s.token : ''; },
     isAdmin() { const s = this.read(); return !!(s && s.admin); },
+    /** Admin tools show only for an admin who has switched them on for this device (?admin=on). */
+    adminTools() {
+        if (!this.isAdmin()) return false;
+        try { return localStorage.getItem(MC_TOOLS_KEY) === 'on'; } catch (e) { return false; }
+    },
     /** The member this page should show: the signed-in member, or (admin only) the one in ?member= */
     pageMember() {
         const s = this.read();
         if (!s) return null;
         const asked = new URLSearchParams(window.location.search).get('member');
-        return (s.admin && asked) ? asked : s.memberNumber;
+        return (this.adminTools() && asked) ? asked : s.memberNumber;
     },
     /** Ask the Apps Script to confirm and renew a remembered pass (at most once a day). */
     async renew(force) {
@@ -73,6 +91,7 @@ const Session = {
     },
     signOut() {
         this.clear();
+        try { localStorage.removeItem(MC_TOOLS_KEY); } catch (e) {}
         try { localStorage.removeItem('mcLastEmail'); } catch (e) {}
         window.location.href = 'landing.html';
     }
