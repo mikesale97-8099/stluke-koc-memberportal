@@ -208,7 +208,6 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 
 <div class="stage" id="mainContent" style="display:none;">
     <h1>My Membership Card</h1>
-    <p class="sub">This is a facsimile of your paper card and not officially recognized. Your official card for the current year can be picked up at a monthly council meeting from the Financial Secretary.</p>
 
     <h2 class="card-heading" id="councilHeading" style="display:none;">Council Card</h2>
     <p class="card-note">This is a facsimile of your paper card and not officially recognized. Your official card for the current year can be picked up at a monthly council meeting from the Financial Secretary.</p>
@@ -341,6 +340,14 @@ function expText(m) {
 
 const DEGREE_ORDINAL = {'First Degree':'1st','Second Degree':'2nd','Third Degree':'3rd'};
 
+/* The council card shows 1st, 2nd, or 3rd. A council's highest degree is 3rd, so Sir Knights
+   (a "Forth Degree" date, or a Degree Level of 4th) show 3rd here; their 4th is on the Fourth Degree card. */
+function councilDegree(m) {
+    const raw = String(m.degree || '').trim();
+    if (String(m.fourthDegree || '').trim() || /4|fourth/i.test(raw)) return '3rd';
+    return DEGREE_ORDINAL[raw] || ({ '1st': '1st', '2nd': '2nd', '3rd': '3rd' })[raw.toLowerCase()] || '\u2014';
+}
+
 function duesPaidToText(m) {
     if (m.clergy) return 'N/A — Exempt';
     if (typeof m.lastYrPaid === 'number') return 'December 31, ' + m.lastYrPaid;
@@ -367,7 +374,7 @@ function applyMember(indexOrMember) {
     document.getElementById('cardName').textContent = name;
     document.getElementById('cardSince').textContent = m.memberSince || '—';
     document.getElementById('cardMemberId').textContent = '#' + m.memberNumber;
-    document.getElementById('cardDegree').textContent = DEGREE_ORDINAL[m.degree] || (m.degree || '—');
+    document.getElementById('cardDegree').textContent = councilDegree(m);
     document.getElementById('cardYos').textContent = (m.yrsSvc !== null && m.yrsSvc !== undefined) ? m.yrsSvc : '?';
     document.getElementById('cardDuesPaidTo').textContent = duesPaidToText(m);
 
