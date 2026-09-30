@@ -326,6 +326,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
         <h2>Verify your Contact Info</h2>
         <p class="step-sub">Review your information below. If you spot anything missing or out of date, correct it and we'll save your changes. Type in your preferred name if it's blank (e.g., Bob).</p>
         <div class="field-row"><label>Preferred Name</label><input type="text" id="wPreferred" placeholder="e.g., Bob" oninput="contactChanged()"></div>
+        <div class="field-row"><label>Wife's Name</label><input type="text" id="wWife" autocapitalize="words" placeholder="e.g., Mary (leave blank if it doesn't apply)" oninput="contactChanged()"></div>
         <div class="field-row"><label>Address</label><input type="text" id="wAddress" oninput="contactChanged()"></div>
         <div class="field-row"><label>City</label><input type="text" id="wCity" oninput="contactChanged()"></div>
         <div class="field-row"><label>State</label><input type="text" id="wState" maxlength="2" style="text-transform:uppercase;width:60px;" oninput="contactChanged()"></div>
@@ -409,7 +410,7 @@ async function fetchLiveMember(memberNumber) {
     const res = await fetch(url);
     const text = await res.text();
     const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
-    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const cols = json.table.cols.map(c => (c.label || '').trim().replace(/[\u2018\u2019]/g, "'"));
     const idx = label => cols.indexOf(label);
     const cell = (row, label) => { const c = row.c[idx(label)]; return c ? (c.v !== null && c.v !== undefined ? c.v : '') : ''; };
     const memberNum = String(memberNumber).replace(/^0+/, '');
@@ -428,6 +429,7 @@ async function fetchLiveMember(memberNumber) {
                 firstName:    String(cell(row, 'First Name') || '').trim(),
                 lastName:     String(cell(row, 'Last Name') || '').trim(),
                 nickname:     String(cell(row, 'Preferred Name') || '').trim(),
+                wifeName:     String(cell(row, "Wife's Name") || '').trim(),
                 address1:     String(cell(row, 'Street Address') || '').trim(),
                 city:         String(cell(row, 'City') || '').trim(),
                 stateAbbr:    String(cell(row, 'State') || '').trim(),
@@ -503,6 +505,7 @@ function loadMember(m) {
     const welcomeName = document.getElementById('welcomeName');
     if (welcomeName) welcomeName.textContent = (m.nickname || titleCase(m.firstName) || '') + ' ' + titleCase(m.lastName || '');
     const wPreferred = document.getElementById('wPreferred'); if (wPreferred) wPreferred.value = m.nickname || '';
+    const wWife = document.getElementById('wWife'); if (wWife) wWife.value = m.wifeName || '';
     const wAddress = document.getElementById('wAddress'); if (wAddress) wAddress.value = m.address1;
     const wCity = document.getElementById('wCity'); if (wCity) wCity.value = m.city;
     const wState = document.getElementById('wState'); if (wState) wState.value = m.stateAbbr;
@@ -512,6 +515,7 @@ function loadMember(m) {
 
     originalContact = {
         preferred: m.nickname || '',
+        wife: m.wifeName || '',
         address: m.address1,
         city: m.city,
         state: m.stateAbbr,
@@ -559,6 +563,7 @@ let originalContact = {};
 function contactChanged() {
     const current = {
         preferred: document.getElementById('wPreferred').value,
+        wife: document.getElementById('wWife').value,
         address: document.getElementById('wAddress').value,
         city: document.getElementById('wCity').value,
         state: document.getElementById('wState').value,
@@ -685,6 +690,7 @@ async function continueFromContact() {
         try {
             const fields = {
                 nickname:  document.getElementById('wPreferred').value,
+                wifeName:  document.getElementById('wWife').value,
                 address1:  document.getElementById('wAddress').value,
                 city:      document.getElementById('wCity').value,
                 stateAbbr: document.getElementById('wState').value,

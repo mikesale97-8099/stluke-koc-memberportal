@@ -298,6 +298,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
         <div class="empty-banner" id="emptyBanner" style="display:none;">Your contact info is empty — worth filling in so data administrators and brothers can reach you.</div>
         <div id="viewMode">
             <div class="field-row"><span class="field-label">Preferred Name</span><span class="field-value" id="profileNickname">Not on file</span></div>
+            <div class="field-row"><span class="field-label">Wife's Name</span><span class="field-value" id="profileWife">&mdash;</span></div>
             <div class="field-row"><span class="field-label">Address 1</span><span class="field-value" id="profileAddress1">4218 Birchwood Ln</span></div>
             <div class="field-row"><span class="field-label">City</span><span class="field-value" id="profileCity">Indianapolis</span></div>
             <div class="field-row"><span class="field-label">State</span><span class="field-value" id="profileState">IN</span></div>
@@ -308,6 +309,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
         </div>
         <div id="editMode" style="display:none;">
             <div class="field-row"><label class="field-label" for="editNickname">Preferred Name</label><input type="text" id="editNickname" placeholder="What you go by"></div>
+            <div class="field-row"><label class="field-label" for="editWife">Wife's Name</label><input type="text" id="editWife" autocapitalize="words" placeholder="e.g., Mary (leave blank if it doesn't apply)"></div>
             <div class="field-row"><label class="field-label" for="editAddress1">Address 1</label><input type="text" id="editAddress1"></div>
             <div class="field-row"><label class="field-label" for="editCity">City</label><input type="text" id="editCity"></div>
             <div class="field-row"><label class="field-label" for="editState">State</label>
@@ -400,6 +402,8 @@ function applyMember(indexOrMember) {
     nickEl.textContent = m.nickname || emptyText || 'Not on file — add yours';
     nickEl.classList.toggle('empty', !m.nickname);
     document.getElementById('editNickname').value = m.nickname || '';
+    document.getElementById('profileWife').textContent = m.wifeName || '\u2014';   // blank is often right: single, widowed, clergy
+    document.getElementById('editWife').value = m.wifeName || '';
 
     a1.textContent = m.address1 || emptyText || 'Not on file — add yours';
     a1.classList.toggle('empty', !m.address1);
@@ -568,6 +572,7 @@ async function saveContactChanges() {
 
     const newFields = {
         nickname: document.getElementById('editNickname').value.trim(),
+        wifeName: document.getElementById('editWife').value.trim(),
         address1: document.getElementById('editAddress1').value.trim(),
         city: document.getElementById('editCity').value.trim(),
         stateAbbr: document.getElementById('editState').value.trim(),
@@ -623,7 +628,7 @@ async function initMemberSelect() {
     try {
         const text = await (await fetch(GVIZ_URL)).text();
         const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
-        const cols = json.table.cols.map(c => (c.label || '').trim());
+        const cols = json.table.cols.map(c => (c.label || '').trim().replace(/[\u2018\u2019]/g, "'"));
         const val = (row, label) => { const i = cols.indexOf(label); const c = i === -1 ? null : row.c[i]; return c ? (c.v != null ? c.v : c.f) : null; };
         const people = json.table.rows.map(r => ({
             num: String(val(r, 'Member Number') || '').trim(),
@@ -714,7 +719,7 @@ async function loadTierMessages() {
         const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
         if (!match) return;
         const json = JSON.parse(match[1]);
-        const cols = json.table.cols.map(c => (c.label || '').trim());
+        const cols = json.table.cols.map(c => (c.label || '').trim().replace(/[\u2018\u2019]/g, "'"));
         const idx = (label) => cols.indexOf(label);
         const cell = (row, label) => {
             const i = idx(label);
@@ -762,7 +767,7 @@ async function fetchLiveMember(memberNumber) {
     const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
     if (!match) throw new Error('Unexpected sheet response');
     const json = JSON.parse(match[1]);
-    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const cols = json.table.cols.map(c => (c.label || '').trim().replace(/[\u2018\u2019]/g, "'"));
     const idx = (label) => cols.indexOf(label);
     const cell = (row, label) => {
         const c = row.c[idx(label)];
@@ -785,6 +790,7 @@ async function fetchLiveMember(memberNumber) {
         lastName: titleCase(cell(row, 'Last Name')),
         suffix: cell(row, 'Suffix'),
         nickname: cell(row, 'Preferred Name'),
+        wifeName: cell(row, "Wife's Name"),
         directoryOptIn: cell(row, 'Directory Opt-In'),
         degree: DEGREE_MAP[degreeRaw] || degreeRaw || null,
         yrsSvc: parseInt(cell(row, 'YRS SVC')) || null,
@@ -935,7 +941,7 @@ async function fetchAllPositions() {
     const match = text.match(/setResponse\(([\s\S]*)\);?\s*$/);
     if (!match) throw new Error('Unexpected sheet response');
     const json = JSON.parse(match[1]);
-    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const cols = json.table.cols.map(c => (c.label || '').trim().replace(/[\u2018\u2019]/g, "'"));
     const idx = (label) => cols.indexOf(label);
     const cell = (row, label) => {
         const i = idx(label);

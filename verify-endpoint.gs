@@ -105,6 +105,7 @@ function handleSaveContact(params) {
   // field key -> [sheet column name, friendly label for the log]
   const FIELD_MAP = {
     nickname:  ['Preferred Name', 'Preferred Name'],
+    wifeName:  ["Wife's Name", "Wife's Name"],
     address1:  ['Street Address', 'Address 1'],
     city:      ['City', 'City'],
     stateAbbr: ['State', 'State'],
@@ -128,7 +129,7 @@ function handleSaveContact(params) {
     const mapping = FIELD_MAP[key];
     if (!mapping) { skipped.push('Unknown field: ' + key); return; }
     const [colName, label] = mapping;
-    const colIdx = headers.indexOf(colName);
+    const colIdx = headers.map(h => String(h).trim().replace(/[\u2018\u2019]/g, "'")).indexOf(colName);   // tolerate a curly apostrophe
     if (colIdx === -1) { skipped.push(label); return; }
 
     const newValue = String(fields[key] || '').trim();
@@ -552,7 +553,7 @@ function testMemberCenterEmail() {
  * Sign-in with an emailed code
  * ================================================================ */
 
-const CODE_TTL_SECONDS = 15 * 60;   // a code works for 15 minutes
+const CODE_TTL_SECONDS = 60 * 60;   // a code works for an hour (some providers deliver slowly)
 const CODE_MAX_TRIES = 5;           // wrong guesses before the code is locked
 const CODE_RESEND_SECONDS = 30;     // wait between code emails
 const CODE_MAX_PER_HOUR = 5;        // code emails per member per hour
@@ -668,20 +669,33 @@ function handleRequestCode(params) {
   if (sentThisHour >= CODE_MAX_PER_HOUR) return { success: false, error: 'too_many_codes' };
 
   const code = String(Math.floor(100000 + Math.random() * 900000));
-  cache.put('code:' + key, JSON.stringify({ h: hashCode(code), t: 0, c: Date.now() }), CODE_TTL_SECONDS);
+  // Keep every code sent in the last hour: email can arrive slowly and out of order,
+  // so whichever code he types still works. A fresh code resets the wrong-guess count.
+  const prior = liveCodes(JSON.parse(cache.get('code:' + key) || '{"codes":[]}'));
+  prior.push({ h: hashCode(code), c: Date.now() });
+  cache.put('code:' + key, JSON.stringify({ codes: prior, t: 0 }), CODE_TTL_SECONDS);
   cache.put('cool:' + key, '1', CODE_RESEND_SECONDS);
   cache.put('hour:' + key, String(sentThisHour + 1), 3600);
 
   const name = titleCaseName(m.preferred || m.first);
   MailApp.sendEmail({
     to: m.email,
-    subject: 'Your St. Luke Member Center code: ' + code,
-    body: 'Hi ' + (name || 'Brother') + ',\n\nYour sign-in code is ' + code + '\n\nIt expires in 15 minutes.\n\n' +
-          "If you didn't ask for this code, you can ignore this email. No one can sign in without it.\n\n" +
-          'St. Luke Knights of Columbus, Council 14895',
+    subject: 'Your St. Luke Member Center sign-in code',
+    body: 'Hi ' + (name || 'Brother') + ',\n\n' +
+          'Here is your sign-in code for the St. Luke Knights of Columbus Member Center:\n\n' +
+          '    ' + code + '\n\n' +
+          'Enter it on the sign-in page to finish signing in. The code works for the next hour.\n\n' +
+          "If you didn't ask to sign in, you can safely ignore this email. No one can sign in without this code.\n\n" +
+          'Fraternally,\nSt. Luke Knights of Columbus\nCouncil 14895, Indianapolis',
     name: 'St. Luke Member Center'
   });
   return { success: true, masked: maskEmail(m.email), firstName: name };
+}
+
+/** Codes from the last hour, newest last. */
+function liveCodes(rec) {
+  const cutoff = Date.now() - CODE_TTL_SECONDS * 1000;
+  return (rec && rec.codes ? rec.codes : []).filter(x => x.c > cutoff);
 }
 
 function handleVerifyCode(params) {
@@ -689,16 +703,18 @@ function handleVerifyCode(params) {
   if (!m) return { success: false, error: 'not_found' };
   const cache = CacheService.getScriptCache();
   const key = 'code:' + stripZeros(m.number);
-  const raw = cache.get(key);
-  if (!raw) return { success: false, error: 'expired' };
-  const rec = JSON.parse(raw);
+  const rec = JSON.parse(cache.get(key) || '{"codes":[]}');
+  const codes = liveCodes(rec);
+  if (!codes.length) return { success: false, error: 'expired' };
   if (rec.t >= CODE_MAX_TRIES) return { success: false, error: 'too_many_tries' };
 
-  const code = String(params.code || '').replace(/\D/g, '');
-  if (hashCode(code) !== rec.h) {
-    rec.t++;
-    const secondsLeft = Math.max(1, CODE_TTL_SECONDS - Math.floor((Date.now() - rec.c) / 1000));
-    cache.put(key, JSON.stringify(rec), secondsLeft);   // keep the original expiry
+  const hashed = hashCode(String(params.code || '').replace(/\D/g, ''));
+  if (!codes.some(x => x.h === hashed)) {
+    rec.codes = codes;
+    rec.t = (rec.t || 0) + 1;
+    const newest = codes[codes.length - 1].c;
+    const secondsLeft = Math.max(1, CODE_TTL_SECONDS - Math.floor((Date.now() - newest) / 1000));
+    cache.put(key, JSON.stringify(rec), secondsLeft);   // keep the existing expiry
     const left = CODE_MAX_TRIES - rec.t;
     return { success: false, error: left > 0 ? 'wrong_code' : 'too_many_tries', triesLeft: left };
   }

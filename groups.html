@@ -57,7 +57,7 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
 .status-pill.active { background:var(--green-bg); color:var(--green); }
 .status-pill.ended { background:#F3F4F6; color:var(--text-medium); }
 
-.member-row.directory { grid-template-columns:1.3fr 1.3fr 1fr 1.3fr; }
+.member-row.directory { grid-template-columns:1.2fr 0.8fr 1.2fr 1fr 1.3fr; }
 .member-row.directory .contact-value { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-dark); }
 .member-row.directory .contact-value.empty { color:var(--text-medium); font-style:italic; }
 .position-pill { display:inline-block; background:var(--light-bg); color:var(--primary); border-radius:50px; padding:0.2rem 0.7rem; margin:0.15rem 0.3rem 0.15rem 0; font-family:'Lato',sans-serif; font-size:0.75rem; font-weight:600; }
@@ -78,6 +78,8 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
     .page { padding:0 1rem; }
     .member-row { grid-template-columns:1fr; gap:0.3rem; }
     .member-row.directory { grid-template-columns:1fr; }
+    .member-row.directory .wife::before { content:'Wife: '; font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
+    .member-row.directory .wife.empty { display:none; }
     .member-row.header { display:none; }
 }
 .site-header { position:sticky; top:0; z-index:1000; }
@@ -193,7 +195,7 @@ function titleCase(s) {
 }
 
 function gvizCellReader(json) {
-    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const cols = json.table.cols.map(c => (c.label || '').trim().replace(/[\u2018\u2019]/g, "'"));
     const idx = (label) => cols.indexOf(label);
     return (row, label) => {
         const i = idx(label);
@@ -234,6 +236,7 @@ async function fetchDirectoryMembers() {
         .map(row => ({
             memberNumber: String(cell(row, 'Member Number') || '').replace(/^0+/, ''),
             name: [titleCase(cell(row, 'First Name')), titleCase(cell(row, 'Last Name'))].filter(Boolean).join(' '),
+            wife: (cell(row, "Wife's Name") || '').toString().trim(),
             phone: (cell(row, 'phone') || '').toString().trim(),
             email: (cell(row, 'email') || '').toString().trim(),
             optIn: String(cell(row, 'Directory Opt-In') || '').trim().toLowerCase() === 'yes',
@@ -257,7 +260,7 @@ function renderGroup(groupName) {
 
     if (groupName === DIRECTORY_GROUP_NAME) {
         header.className = 'member-row header directory';
-        header.innerHTML = '<div>Name</div><div>Position(s)</div><div>Phone</div><div>Email</div>';
+        header.innerHTML = '<div>Name</div><div>Wife</div><div>Position(s)</div><div>Phone</div><div>Email</div>';
         if (!DIRECTORY_MEMBERS.length) {
             list.innerHTML = '<div class="empty-state">No members have opted into the directory yet.</div>';
             return;
@@ -271,6 +274,7 @@ function renderGroup(groupName) {
             const emailHtml = m.email ? `<span class="contact-value">${m.email}</span>` : '<span class="contact-value empty">Not on file</span>';
             return `<div class="member-row directory">
                 <div class="name">${m.name}</div>
+                <div class="wife${m.wife ? '' : ' empty'}">${m.wife ? `<span class="contact-value">${m.wife}</span>` : '<span class="contact-value empty">\u2014</span>'}</div>
                 <div>${positionsHtml}</div>
                 <div>${phoneHtml}</div>
                 <div>${emailHtml}</div>
