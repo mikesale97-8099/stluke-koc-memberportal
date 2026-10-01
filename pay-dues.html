@@ -178,7 +178,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
             <h2>Pay with Venmo</h2>
             <p>For members who already use Venmo. Send your payment to the council's Financial Secretary:</p>
             <p class="payable-to">Venmo: <strong id="venmoHandle">Loading&hellip;</strong></p>
-            <p class="mail-note">Please include your member number (<strong id="venmoMemberId">#0142</strong>) in the Venmo note so it's applied to the right account.</p>
+            <p class="mail-note">In the Venmo note, please include your name, <strong class="payer-name">your full name</strong>, and/or the invoice number from the dues invoice emailed to you, so it's applied to the right account.</p>
             <p class="mail-note venmo-alt"><strong>No Venmo?</strong> <a href="https://knights-of-columbus-14895.square.site/" target="_blank" rel="noopener">Use Square</a> to pay by card, no account needed.</p>
             <a class="btn btn-primary" id="venmoLink" href="#" target="_blank" rel="noopener">Open Venmo &rarr;</a>
         </div>
@@ -191,7 +191,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 Knights of Columbus
 Dave's Street
 City, State ZIP</div>
-            <p class="mail-note">Please write your member number (<strong id="mailMemberId">#0142</strong>) in the memo line so it's applied to the right account.</p>
+            <p class="mail-note">In the memo line, please write your name, <strong class="payer-name">your full name</strong>, and/or the invoice number from the dues invoice emailed to you, so it's applied to the right account.</p>
         </div>
     </div>
 
@@ -214,10 +214,8 @@ function applyMember(idxOrMember) {
     const m = (idxOrMember !== null && typeof idxOrMember === 'object') ? idxOrMember : null;
     if (!m) return;
     document.getElementById('memberName').textContent = fullName(m);
+    document.querySelectorAll('.payer-name').forEach(el => el.textContent = fullName(m));   // name for the Venmo note / check memo
     document.getElementById('memberId').textContent = m.memberNumber;
-    document.getElementById('mailMemberId').textContent = '#' + m.memberNumber;
-    const venmoMemberEl = document.getElementById('venmoMemberId');
-    if (venmoMemberEl) venmoMemberEl.textContent = '#' + m.memberNumber;
 
     const owedRaw = (m.outstandingDues === null || m.outstandingDues === undefined) ? '' : String(m.outstandingDues);
     const owed = parseFloat(owedRaw.replace(/[^0-9.\-]/g, ''));
