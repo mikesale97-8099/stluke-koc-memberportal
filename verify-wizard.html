@@ -165,7 +165,6 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
             <li class="nav-whydues"><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="#" class="navlink active">Verify Data</a></li>
         </ul>
-        <a href="landing.html" class="signout">Sign out</a>
     </div>
 </nav>
 </header>
@@ -179,7 +178,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
         <div class="welcome-icon"><img src="council-logo.png" alt="St. Luke Knights of Columbus, Council 14895" onerror="this.parentElement.style.display='none'"></div>
         <h1>Welcome, <span id="welcomeName"></span></h1>
         <p class="sub">Thank you for your service as a Knight. We're taking a minute to make sure our records are accurate for every member.</p>
-        <p class="sub" style="margin-top:0.75rem; font-size:0.82rem;">If this isn't you, sign out and log in with your own email before continuing.</p>
+        <p class="sub" style="margin-top:0.75rem; font-size:0.82rem;">Not you? <a href="landing.html" style="color:inherit;">Sign in with your own email</a> before continuing.</p>
         <div class="wizard-actions" style="margin-top:1.75rem;">
             <button class="btn btn-ghost" onclick="openChanged()">My circumstances<br>have changed</button>
             <button class="btn btn-primary" onclick="goTo('purpose')">Get Started</button>
@@ -897,7 +896,7 @@ function submitWithdraw() {
             sub: 'Your membership doesn\u2019t change until Supreme receives your signed request.',
             boxClass: 'leaving',
             box: parts.join('<hr style="border:none;border-top:1px solid rgba(0,0,0,0.1);margin:0.9rem 0;">'),
-            actions: '<a href="landing.html" class="btn btn-ghost">Sign Out</a>'
+            actions: PROFILE_BTN()
         });
     });
 }

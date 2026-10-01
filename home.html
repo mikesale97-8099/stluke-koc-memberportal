@@ -187,6 +187,14 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 }
 .dues-flag-link { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); text-decoration:underline; }
 .dues-flag-link:hover { color:var(--primary); }
+.quiet-signout { text-align:center; margin-top:2.5rem; }
+.quiet-signout-link { background:none; border:none; padding:0.3rem; font-family:'Lato',sans-serif; font-size:0.82rem; color:#9CA3AF; text-decoration:underline; cursor:pointer; }
+.quiet-signout-link:hover { color:var(--text-medium); }
+.signout-confirm { max-width:440px; margin:0 auto; background:white; border:1.5px solid #E5E7EB; border-radius:12px; padding:1rem 1.2rem; text-align:left; }
+.signout-confirm p { font-family:'Lato',sans-serif; font-size:0.92rem; color:var(--text-dark); line-height:1.55; }
+.signout-confirm-actions { display:flex; gap:1rem; align-items:center; justify-content:flex-end; margin-top:0.9rem; flex-wrap:wrap; }
+.signout-confirm-go { background:none; border:none; font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); text-decoration:underline; cursor:pointer; padding:0.4rem; }
+.signout-confirm-go:hover { color:var(--accent); }
 </style>
 <script src="session.js"></script>
 <script src="nav-toggle.js"></script>
@@ -222,7 +230,6 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
             <li class="nav-whydues"><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="verify-wizard.html" class="navlink preserve-member">Verify Data</a></li>
         </ul>
-        <a href="landing.html" class="signout" title="Signs you out and returns to the login page">Sign out</a>
     </div>
 </nav>
 </header>
@@ -337,6 +344,17 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 
     <div class="circumstances-link">
         <a href="verify-wizard.html?path=changed" class="preserve-member">My circumstances have changed</a>
+    </div>
+
+    <div class="quiet-signout">
+        <button type="button" class="quiet-signout-link" id="quietSignoutLink" onclick="toggleSignoutConfirm(true)">Sign out of this device</button>
+        <div class="signout-confirm" id="signoutConfirm" role="dialog" aria-labelledby="signoutConfirmTitle" hidden>
+            <p><strong id="signoutConfirmTitle">Sign out of this device?</strong> You'll need an emailed code to sign in again. If this is your own phone or computer, there's no need &mdash; just close the page.</p>
+            <div class="signout-confirm-actions">
+                <button type="button" class="btn btn-primary" onclick="toggleSignoutConfirm(false)">Stay signed in</button>
+                <button type="button" class="signout-confirm-go" onclick="Session.signOut()">Sign out</button>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -485,6 +503,12 @@ function memberStatusLabel(raw) {
     const s = String(raw == null ? '' : raw).trim();
     const friendly = MEMBER_STATUS_LABELS[s.toLowerCase()];
     return friendly !== undefined ? friendly : s;
+}
+
+/* Quiet sign-out (bottom of Profile only) with a confirmation */
+function toggleSignoutConfirm(open) {
+    document.getElementById('signoutConfirm').hidden = !open;
+    document.getElementById('quietSignoutLink').hidden = open;
 }
 
 function toggleEdit() {

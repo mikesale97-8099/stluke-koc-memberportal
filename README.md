@@ -53,7 +53,7 @@ Admin tools — the **Browse as a member** dropdown (Profile, Membership Card, P
 | "Keep me signed in" | 90 days **from the last visit** (renews automatically, at most once a day) |
 | Not kept signed in | Ends when the browser closes (12-hour limit) |
 
-**Sign out** forgets the device — the sign-in, the remembered email, and admin tools. Closing the browser or restarting the phone does **not** sign a member out.
+**Sign out** is deliberately out of the way: there's no Sign out in the top bar (members tapped it out of habit, forcing a new code each visit). A small gray **Sign out of this device** link sits at the very bottom of the Profile page and asks for confirmation (*Stay signed in* is the main button). Signing out forgets the device — the sign-in, the remembered email, and admin tools. Closing the browser or restarting the phone does **not** sign a member out. To switch people on a device, the sign-in page's **Not you? Sign in as someone else** link does the same.
 
 **Emails not on file** — the login page offers a help form that logs a "Contact Request / Add Email" row in the Change Log for a data administrator.
 
@@ -95,7 +95,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | File | Purpose | Sign-in required |
 |---|---|---|
 | `landing.html` | Emailed-code sign-in; welcome back; help form for emails not on file | — |
-| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link | Yes |
+| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom | Yes |
 | `membership-card.html` | Council card (degrees 1st–3rd) and, for Sir Knights, the Fourth Degree card | Yes |
 | `pay-dues.html` | Square (card), Venmo (for members who already use it), mail a check | Yes |
 | `groups.html` | Council positions and the member directory (opted-in members only) | Yes |
@@ -268,7 +268,6 @@ Timestamp · Member Number · Member Name · Type · Category · Field · Old Va
 - [ ] Optional: **Financial Secretary email** row; **Circumstance** column
 - [ ] Automatic wizard prompt on sign-in when Wizard Completed is blank or over a year old
 - [ ] Home-screen icon and one-time "Add to Home Screen" tip for iPhones
-- [ ] "Sign out and forget this device?" confirmation
 - [ ] Decide on member numbers with a leading zero on the cards (printed cards show none)
 - [ ] Clean up repository history (private repo or fresh repo)
 - [ ] Send code emails from the council's own domain once it's set up
