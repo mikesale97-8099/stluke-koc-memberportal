@@ -1,7 +1,7 @@
 # St. Luke Knights of Columbus — Member Center
 ### Council 14895 · Indianapolis, Indiana
 
-A member self-service site hosted on GitHub Pages. Members sign in with an emailed code, see and correct their profile, view their membership card(s), pay dues, browse the member directory, pray the Rosary, and complete an annual data-verification wizard. Member data lives in a Google Sheet; every change goes through an Apps Script (via a Cloudflare Worker relay) that checks the member's sign-in.
+A member self-service site hosted on GitHub Pages. Members sign in with an emailed code, see and correct their profile, add a profile photo, view their membership card(s), pay dues, browse the member directory, pray the Rosary, and complete an annual data-verification wizard. Member data lives in a Google Sheet; every change goes through an Apps Script (via a Cloudflare Worker relay) that checks the member's sign-in.
 
 ---
 
@@ -84,6 +84,7 @@ Member's browser
 ```
 
 - **Why the Worker?** Apps Script doesn't return browser-friendly (CORS) replies, which broke writes on iPhones. The Worker relays requests server-to-server and passes replies through unchanged. (Its code is kept in `cloudflare-worker.js`; the live copy is edited in the Cloudflare dashboard.)
+- **Large requests:** the Worker normally passes a request to the Apps Script in the web address. A request over about 1,500 characters (a member photo) can't fit there, so the Worker sends it as a POST body instead. Small requests are unchanged.
 - **Session pass:** after a correct code, the script issues a pass signed with a secret only it knows. Pages read the member number from the pass; the script re-checks the signature on every change and uses **the pass's** member number, never one supplied by the page.
 
 ---
@@ -95,10 +96,10 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | File | Purpose | Sign-in required |
 |---|---|---|
 | `landing.html` | Emailed-code sign-in; welcome back; help form for emails not on file | — |
-| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom | Yes |
+| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom. The identity card shows the member's **photo** (initials until one is added) with *Add my photo / Change photo / Remove photo* | Yes |
 | `membership-card.html` | Council card (degrees 1st–3rd) and, for Sir Knights, the Fourth Degree card | Yes |
 | `pay-dues.html` | Square (card), Venmo (for members who already use it), mail a check | Yes |
-| `groups.html` | Council positions and the member directory (opted-in members only) | Yes |
+| `groups.html` | Council positions and the member directory (opted-in members only), each with a photo or initials circle | Yes |
 | `verify-wizard.html` | Annual data-verification wizard and the circumstances flow | Yes |
 | `calendar.html` | Live activity calendar with theme and month filters | No |
 | `prayers.html` | Knights Prayers: Rosary (top), McGivney prayer, prayers for a Brother Knight / deceased Brother, resource links | No |
@@ -112,11 +113,12 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 
 ## Deploying Changes
 
+0. **Cloudflare Worker** (only when `cloudflare-worker.js` changes): open the Worker in the Cloudflare dashboard → **Edit code**, paste the whole file, **Save and deploy**. The Worker URL doesn't change.
 1. **Apps Script** (`verify-endpoint.gs`): paste the full file into the editor, save, then **Deploy → Manage deployments → pencil → Version: New version → Deploy.**
    - Keep **Execute as: Me** and **Who has access: Anyone.** ("User accessing the web app" would make every member sign in to Google.)
    - The web-app URL doesn't change between versions, so the Worker needs no update.
 2. **Pages:** upload the changed files to the repo root. Watch for browsers adding "(1)" to downloaded file names.
-3. When the script and pages both change (e.g. new sign-in features), deploy them **back to back** — each depends on the other.
+3. When the Worker, script and pages all change (e.g. member photos), deploy in this order, back to back: **Worker → Apps Script → pages**. The Worker and script changes are backward-compatible, so the old pages keep working until the new ones go up.
 4. Hard refresh (Ctrl+Shift+R) when testing; GitHub Pages can take a minute or two to update.
 
 > ⚠️ **Never upload `*-mockup.html` files to the repo.** Several contain an old built-in copy of all members' names, numbers, and dues balances.
@@ -134,6 +136,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | Positions | 620591520 | Council officers and committee positions |
 | Tier Messages | 1560227874 | Friendly tier labels and Profile/card messages |
 | Change Log | — | Audit trail of every change, flag, request, and notification |
+| Photos | — | Member photos, one row per member. **Created automatically** when the first photo is saved. Columns: Member Number (text, no leading zeros) · Photo (small JPEG as text) · Updated. Don't edit by hand |
 | Activity List (separate published sheet) | 2034915391 | Calendar events |
 
 ### Key Columns — Membership DB
@@ -188,6 +191,18 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 
 ---
 
+## Member Photos
+
+- **Who sees it:** signed-in members, on the member's **Profile** and the **Groups** page. In the **Member Directory** a photo shows only for members who are opted in (the directory's existing rule). **Council officer** rows show the officer's photo regardless. A member with no photo shows an initials circle, so lists stay even.
+- **How a member adds one:** Profile → **Add my photo** → **Take a photo** (camera) or **Choose from my photos** → preview → **Use this photo**. The phone shrinks the picture to a 160-pixel square (tall photos are cropped toward the top so faces aren't cut off) before sending, so each photo is only about 5–12 KB. **Remove photo** asks first; *Keep my photo* is the main button.
+- **Where it lives:** the **Photos** tab (see Tabs). Pages read it the same way as everything else, so the directory loads without extra requests. Groups shows initials immediately and fills in photos as they arrive.
+- **Admin:** a Data Administrator browsing another member (`?admin=on`) can't add or change that member's photo, but can **Remove photo** (logged as *Admin edit*).
+- **Change Log:** every add, change and removal writes a row (Category *Profile*, Field *Photo*; Type *Self-edit*, or *Admin edit* when an administrator acts on someone else).
+- **Rest of this visit:** after a member saves or removes a photo, that device shows the change right away even if the sheet is a moment behind.
+- **Limits:** JPEG only (phone photos convert automatically); a file the phone can't read shows a friendly "That photo didn't work" screen. Photos are not on the membership card yet.
+
+---
+
 ## Verify Data Wizard
 
 Reached from **Verify Data** in the menu.
@@ -234,6 +249,8 @@ Every report writes a Change Log row whose **Notes** column records who was emai
 | `completeWizard` | Pass | Wizard Completed / Wizard Outcome |
 | `reportCircumstance` | Pass | Moved / step back / withdraw / other: address, status, Change Log, emails |
 | `verify` | Pass | Member Last Verify Date |
+| `savePhoto` | Pass | Saves the member's photo to the Photos tab (JPEG only, under ~45,000 characters), logs it |
+| `removePhoto` | Pass | Removes the member's photo row, logs it. The Data Administrator may remove anyone's (admin view) |
 
 Unknown actions return an "Unknown action" error. A member can only change his own record; the data administrator may act on another member's record from the admin view.
 
@@ -249,6 +266,7 @@ Timestamp · Member Number · Member Name · Type · Category · Field · Old Va
 
 - **Sign-in and all changes are protected** (emailed code, signed pass, member number taken from the pass).
 - **The member sheet itself is still link-readable** (the pages read it directly for speed). Anyone who digs the link out of a page's source could download it. This was a deliberate trade-off: keeping the sheet private would require routing all reads through Apps Script, adding a second or two to every page. The directory wording promises only what's true under this setup ("only signed-in members can see the directory").
+- **Photos are on the sheet, not in the repo.** The Photos tab is link-readable like the rest of the sheet, so the same caveat applies: only the pages limit photos to signed-in members. The upload screen says photos are shown to signed-in members of the council. No photo is ever stored in the repo.
 - **Repository history:** older versions of `membership-card.html` and `pay-dues.html` (and all mockups) contained every member's name, number, and dues balance. They're removed from the current pages, but remain in the public repo's history until the repo is made private (requires GitHub Pro to keep Pages) or recreated fresh.
 - **Emails come from a personal Gmail account**, which some providers (notably AT&T/Yahoo) may delay. Sending from the council's own domain with proper email records would help.
 
@@ -272,6 +290,8 @@ Timestamp · Member Number · Member Name · Type · Category · Field · Old Va
 - [ ] Clean up repository history (private repo or fresh repo)
 - [ ] Send code emails from the council's own domain once it's set up
 - [ ] Collect emails for members with none on file
+- [ ] Member photo on the council card / Fourth Degree card (not built)
+- [ ] After deploying photos: add one real photo on your own profile and confirm the **Photos** tab gets a row, then see it on Groups from another device
 
 ---
 

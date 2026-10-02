@@ -57,6 +57,7 @@ function route(action, params) {
   if (!auth.ok) return { success: false, error: auth.error };
   const requested = String(params.memberNumber || '').trim();
   if (!auth.admin || !requested) params.memberNumber = auth.memberNumber;
+  params.actor = auth.memberNumber;   // who is really signed in (set here, so a page can't claim otherwise)
 
   if (action === 'logChange') return handleLogChange(params);
   if (action === 'saveContact') return handleSaveContact(params);
@@ -64,6 +65,8 @@ function route(action, params) {
   if (action === 'completeWizard') return handleCompleteWizard(params);
   if (action === 'reportCircumstance') return handleReportCircumstance(params);
   if (action === 'verify') return handleVerify(params);
+  if (action === 'savePhoto') return handleSavePhoto(params);
+  if (action === 'removePhoto') return handleRemovePhoto(params);
   return { success: false, error: 'Unknown action: ' + action };
 }
 
@@ -739,4 +742,89 @@ function handleSession(params) {
 function signEveryoneOut() {
   PropertiesService.getScriptProperties().deleteProperty('SESSION_SECRET');
   Logger.log('Everyone is signed out. Members will be asked for a new code.');
+}
+
+
+/* ============================================================
+ * Member photos
+ * Photos live on their own tab ("Photos"), one row per member:
+ *   Member Number (text, no leading zeros) | Photo (JPEG as base64 text) | Updated
+ * The page shrinks each photo to a small square before sending, so a row is
+ * only about 8-12 KB. The tab is created automatically on the first photo.
+ * ============================================================ */
+const PHOTO_SHEET = 'Photos';
+const PHOTO_MAX_CHARS = 45000;   // a sheet cell holds 50,000 characters
+
+function photoSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(PHOTO_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(PHOTO_SHEET);
+    sh.getRange('A:B').setNumberFormat('@');   // keep numbers and photo text exactly as sent
+    sh.getRange(1, 1, 1, 3).setValues([['Member Number', 'Photo', 'Updated']]);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
+/** Row number (1-based) of a member on the Photos tab, or -1. */
+function photoRow(sh, memberNumber) {
+  const last = sh.getLastRow();
+  if (last < 2) return -1;
+  const nums = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (let i = 0; i < nums.length; i++) {
+    if (stripZeros(nums[i][0]) === memberNumber) return i + 2;
+  }
+  return -1;
+}
+
+function handleSavePhoto(params) {
+  const memberNumber = stripZeros(params.memberNumber);
+  const memberName = String(params.memberName || '').trim();
+  const photo = String(params.photo || '');
+  if (!memberNumber) return { success: false, error: 'Missing memberNumber' };
+  if (!/^\/9j\/[A-Za-z0-9+\/]+={0,2}$/.test(photo)) return { success: false, error: 'That file is not a JPEG photo. Please try a different photo.' };
+  if (photo.length > PHOTO_MAX_CHARS) return { success: false, error: 'That photo is too large. Please try a different one.' };
+  if (!findMember('number', memberNumber)) return { success: false, error: 'Member not found' };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(8000); } catch (e) { return { success: false, error: 'Could not save right now \u2014 please try again.' }; }
+  try {
+    const sh = photoSheet();
+    const row = photoRow(sh, memberNumber);
+    const hadPhoto = row !== -1;
+    if (hadPhoto) {
+      sh.getRange(row, 2, 1, 2).setValues([[photo, new Date()]]);
+    } else {
+      sh.appendRow([memberNumber, photo, new Date()]);
+    }
+    const byAdmin = stripZeros(params.actor) !== memberNumber;
+    logSheet().appendRow([new Date(), memberNumber, memberName, byAdmin ? 'Admin edit' : 'Self-edit', 'Profile', 'Photo',
+      hadPhoto ? 'Had a photo' : 'No photo', hadPhoto ? 'Photo changed' : 'Photo added', '', '']);
+    return { success: true, replaced: hadPhoto };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** A member removes his own photo; the Data Administrator may remove anyone's (admin view). */
+function handleRemovePhoto(params) {
+  const memberNumber = stripZeros(params.memberNumber);
+  const memberName = String(params.memberName || '').trim();
+  if (!memberNumber) return { success: false, error: 'Missing memberNumber' };
+
+  const lock = LockService.getScriptLock();
+  try { lock.waitLock(8000); } catch (e) { return { success: false, error: 'Could not remove right now \u2014 please try again.' }; }
+  try {
+    const sh = photoSheet();
+    const row = photoRow(sh, memberNumber);
+    if (row === -1) return { success: true, removed: false };   // nothing there; that's fine
+    sh.deleteRow(row);
+    const byAdmin = stripZeros(params.actor) !== memberNumber;
+    logSheet().appendRow([new Date(), memberNumber, memberName, byAdmin ? 'Admin edit' : 'Self-edit', 'Profile', 'Photo',
+      'Had a photo', 'Photo removed', '', '']);
+    return { success: true, removed: true };
+  } finally {
+    lock.releaseLock();
+  }
 }
