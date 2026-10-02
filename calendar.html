@@ -120,6 +120,11 @@ nav a.signout:hover { color:var(--accent); }
 .event-responsibility { font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
 .event-responsibility strong { color:var(--text-dark); }
 .event-leader { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); font-style:italic; }
+.event-signup { display:flex; align-items:center; gap:0.6rem 0.9rem; flex-wrap:wrap; margin-top:0.35rem; }
+.signup-btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0.6rem 1.6rem; border-radius:50px; background:var(--primary); color:#fff; border:2px solid var(--primary); font-family:'Lato',sans-serif; font-size:1rem; font-weight:700; text-decoration:none; }
+.signup-btn:focus-visible { background:#fff; color:var(--primary); }
+@media (hover:hover) { .signup-btn:hover { background:#fff; color:var(--primary); } }   /* phones keep the solid button after a tap */
+.signup-note { font-family:'Lato',sans-serif; font-size:0.78rem; color:var(--text-medium); }
 
 .no-results, .load-status { text-align:center; padding:2.5rem 1rem; font-family:'Lato',sans-serif; color:var(--text-medium); }
 .no-results { display:none; }
@@ -131,6 +136,7 @@ nav a.signout:hover { color:var(--accent); }
 .btn-outline:hover { background:var(--primary); color:white; }
 
 @media (max-width:640px){
+    .signup-btn { width:100%; }
     .hero { padding:2rem 1.25rem 0; }
     .hero h1 { font-size:1.6rem; }
     .page { padding:0 1.25rem; }
@@ -244,6 +250,16 @@ let EVENTS = [];
 let MONTH_ORDER = [];
 let currentTheme = 'All';
 
+/* The Sign-up Link column: accept only a real web address, so a stray word or a bad paste never becomes a broken or unsafe button. */
+function cleanSignupUrl(raw) {
+    let u = String(raw || '').trim();
+    if (!u || /\s/.test(u)) return '';
+    if (/^http:\/\//i.test(u)) u = 'https://' + u.slice(7);                       // always use the secure address
+    else if (!/^[a-z][a-z0-9+.-]*:/i.test(u) && /^[\w-]+(\.[\w-]+)+(\/|$)/.test(u)) u = 'https://' + u;   // "surveymonkey.com/r/ABC" typed without https://
+    try { const url = new URL(u); return url.protocol === 'https:' ? url.href : ''; } catch (e) { return ''; }
+}
+const attrEsc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
 const THEME_ICON = { Faith: '&#9767;', Family: '&#128110;', Community: '&#129309;', Life: '&#10084;' };
 
 /* Minimal CSV parser that handles quoted fields with embedded commas/quotes */
@@ -277,6 +293,7 @@ async function loadEvents() {
         const rows = parseCSV(text);
         const headers = rows[0].map(h => h.trim());
         const idx = (label) => headers.indexOf(label);
+        const signupCol = headers.findIndex(h => h.toLowerCase().replace(/[^a-z]/g, '') === 'signuplink');   // "Sign-up Link", "Signup link", etc.
 
         EVENTS = rows.slice(1).map(r => ({
             month: (r[idx('Month')] || '').trim(),
@@ -285,12 +302,15 @@ async function loadEvents() {
             waysToHelp: (r[idx('Ways to Help')] || '').trim(),
             leader: (r[idx('Leader')] || '').trim(),
             type: (r[idx('Type')] || '').trim(),
+            signup: signupCol === -1 ? '' : cleanSignupUrl(r[signupCol]),
         })).filter(e => e.activity);
 
         MONTH_ORDER = [...new Set(EVENTS.map(e => e.month))];
         const monthYears = computeMonthYears(EVENTS, MONTH_ORDER);
 
-        loadNote.textContent = `Connected \u2014 ${EVENTS.length} events loaded from the council calendar.`;
+        const withSignup = EVENTS.filter(e => e.signup).length;
+        loadNote.textContent = `Connected \u2014 ${EVENTS.length} events loaded from the council calendar` +
+            (signupCol === -1 ? ' (no "Sign-up Link" column found).' : ` (${withSignup} with a sign-up link).`);
         loadStatus.remove();
         buildMonthCheckboxes(monthYears);
         applyFilters();
@@ -402,6 +422,7 @@ function renderEvents() {
                 <div class="event-title">${e.activity}</div>
                 ${e.waysToHelp ? `<div class="event-responsibility"><strong>Volunteers needed:</strong> ${e.waysToHelp}</div>` : ''}
                 ${e.leader ? `<div class="event-leader">Contact: ${e.leader}</div>` : ''}
+                ${e.signup ? `<div class="event-signup"><a class="signup-btn" href="${attrEsc(e.signup)}" target="_blank" rel="noopener noreferrer" aria-label="Sign up for ${attrEsc(e.activity)} (opens in a new tab)">Sign up</a><span class="signup-note">Opens in a new tab</span></div>` : ''}
             </div>`;
         });
         html += `</div>`;

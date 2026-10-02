@@ -101,7 +101,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | `pay-dues.html` | Square (card), Venmo (for members who already use it), mail a check | Yes |
 | `groups.html` | Council positions and the member directory (opted-in members only), each with a photo or initials circle, and a **search box** above the list | Yes |
 | `verify-wizard.html` | Annual data-verification wizard and the circumstances flow | Yes |
-| `calendar.html` | Live activity calendar with theme and month filters | No |
+| `calendar.html` | Live activity calendar with theme and month filters; events with a **Sign-up Link** show a *Sign up* button | No |
 | `prayers.html` | Knights Prayers: Rosary (top), McGivney prayer, prayers for a Brother Knight / deceased Brother, resource links | No |
 | `rosary.html` | Sub-page of Prayers: how to pray, prayers, the four sets of mysteries with USCCB Scripture links, today's mysteries tagged | No |
 | `why-dues.html` | Where dues go | No |
@@ -210,6 +210,18 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 - It also matches the member's **Preferred Name** (nickname) — "bob" finds Robert — but the nickname itself isn't shown in the list.
 - Switching groups clears the search. Photos loading later don't disturb it.
 - It only shows or hides rows already on the page, so it is instant and makes no extra requests.
+
+---
+
+## Calendar Sign-up Links
+
+- **Where the link comes from:** a column named **Sign-up Link** on the Activity List tab (the published sheet the calendar reads). Paste the sign-up address (SurveyMonkey or any `https://` link) into that row. Leave it blank for events with no sign-up — those cards show no button.
+- **What members see:** a large **Sign up** button at the bottom of that event's card, with "Opens in a new tab" beside it. It opens the link in a new tab, so the Member Center stays open behind it.
+- **Forgiving about what's pasted:** stray spaces are trimmed; a link typed without `https://` gets it added; an `http://` link is upgraded to `https://`. Anything that isn't a real web address (words like "coming soon", a link with a space in it, `javascript:` etc.) is ignored and shows no button.
+- **Timing:** the calendar reads the *published* copy of the sheet, so a new or changed link appears after Google republishes it (usually a few minutes). The column header is matched loosely ("Sign-up Link", "Signup link", "Sign-Up Link" all work).
+- **Check it worked:** the calendar's status line (admin view) says how many events have a link, or that no Sign-up Link column was found.
+- **Remember:** the calendar page doesn't require sign-in, and the published sheet is readable by anyone with its address, so sign-up links aren't hidden from non-members.
+- **Cleanup:** the calendar hides past months by default; clear a link from the sheet once its sign-up has closed.
 
 ---
 
