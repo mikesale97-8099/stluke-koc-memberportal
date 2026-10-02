@@ -99,7 +99,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom. The identity card shows the member's **photo** (initials until one is added) with *Add my photo / Change photo / Remove photo* | Yes |
 | `membership-card.html` | Council card (degrees 1st–3rd) and, for Sir Knights, the Fourth Degree card | Yes |
 | `pay-dues.html` | Square (card), Venmo (for members who already use it), mail a check | Yes |
-| `groups.html` | Council positions and the member directory (opted-in members only), each with a photo or initials circle | Yes |
+| `groups.html` | Council positions and the member directory (opted-in members only), each with a photo or initials circle, and a **search box** above the list | Yes |
 | `verify-wizard.html` | Annual data-verification wizard and the circumstances flow | Yes |
 | `calendar.html` | Live activity calendar with theme and month filters | No |
 | `prayers.html` | Knights Prayers: Rosary (top), McGivney prayer, prayers for a Brother Knight / deceased Brother, resource links | No |
@@ -200,6 +200,16 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 - **Change Log:** every add, change and removal writes a row (Category *Profile*, Field *Photo*; Type *Self-edit*, or *Admin edit* when an administrator acts on someone else).
 - **Rest of this visit:** after a member saves or removes a photo, that device shows the change right away even if the sheet is a moment behind.
 - **Limits:** JPEG only (phone photos convert automatically); a file the phone can't read shows a friendly "That photo didn't work" screen. Photos are not on the membership card yet.
+
+---
+
+## Groups Search
+
+- A search box sits above the list and narrows it as the member types (no Search button needed; Enter just closes the phone keyboard). A line under it shows "Showing 4 of 150"; the **×** clears it.
+- It searches the list on screen: **name, wife's name, position, phone and email**. Several words must all match ("tom kow"). Capitals and accents are ignored ("renee" finds Renée). A phone number works with or without spaces, dashes and parentheses.
+- It also matches the member's **Preferred Name** (nickname) — "bob" finds Robert — but the nickname itself isn't shown in the list.
+- Switching groups clears the search. Photos loading later don't disturb it.
+- It only shows or hides rows already on the page, so it is instant and makes no extra requests.
 
 ---
 

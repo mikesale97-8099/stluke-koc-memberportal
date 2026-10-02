@@ -61,6 +61,16 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
 #mainContent { max-width:1000px; }   /* wider on computers so the photo column leaves room for emails */
 .member-row.directory .contact-value { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-dark); }
 .member-row.directory .contact-value.empty { color:var(--text-medium); font-style:italic; }
+
+/* Search */
+.search-row { position:relative; margin-top:1rem; max-width:560px; }
+.search-row input { width:100%; min-height:52px; font-family:'Lato',sans-serif; font-size:1.05rem; color:var(--text-dark); padding:0.8rem 3.4rem 0.8rem 2.9rem; border-radius:12px; border:1.5px solid #D1D5DB; background:white url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>") no-repeat 0.95rem center; -webkit-appearance:none; appearance:none; }
+.search-row input::-webkit-search-cancel-button { -webkit-appearance:none; display:none; }
+.search-row input:focus { outline:3px solid rgba(37,99,235,0.3); border-color:var(--primary); }
+.search-clear { position:absolute; right:0.3rem; top:0; width:48px; height:52px; border:none; background:none; font-size:1.7rem; line-height:1; color:var(--text-medium); cursor:pointer; border-radius:50%; }
+.search-count { font-family:'Lato',sans-serif; font-size:0.88rem; color:var(--text-medium); margin-top:0.6rem; min-height:1.3em; }
+.is-hidden { display:none !important; }
+.no-match .btn { margin-top:0.9rem; }
 .contact-value { overflow-wrap:break-word; }
 .mc-avatar { width:var(--s,56px); height:var(--s,56px); border-radius:50%; flex:none; object-fit:cover; display:block; background:#E8EDFB; box-shadow:0 0 0 2px #fff, 0 0 0 3px #D1D5DB; }
 .mc-avatar.initials { display:flex; align-items:center; justify-content:center; font-family:'Crimson Pro',serif; font-weight:700; color:var(--primary); font-size:calc(var(--s,56px) * 0.4); line-height:1; }
@@ -153,8 +163,14 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 
     <div class="selector-row">
         <label for="groupSelect">Group:</label>
-        <select id="groupSelect" onchange="renderGroup(this.value)"></select>
+        <select id="groupSelect" onchange="clearSearch(false); renderGroup(this.value)"></select>
     </div>
+
+    <div class="search-row">
+        <input type="search" id="groupSearch" placeholder="Search this list" aria-label="Search this list by name, position, phone or email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+        <button type="button" class="search-clear" id="searchClear" aria-label="Clear search" hidden>&times;</button>
+    </div>
+    <div class="search-count" id="searchCount" aria-live="polite"></div>
 
     <div class="group-card">
         <div class="member-row header" id="groupHeader">
@@ -164,6 +180,11 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
         </div>
         <div id="groupList">
             <div class="empty-state">Loading&hellip;</div>
+        </div>
+        <div class="empty-state no-match is-hidden" id="noMatch">
+            <div>No one matches that search.</div>
+            <div style="margin-top:0.3rem;font-size:0.9rem;">Try fewer letters, or just part of a name.</div>
+            <button type="button" class="btn btn-outline" onclick="clearSearch(true)">Clear search</button>
         </div>
     </div>
 
@@ -278,6 +299,7 @@ async function fetchDirectoryMembers() {
             memberNumber: String(cell(row, 'Member Number') || '').replace(/^0+/, ''),
             name: [titleCase(cell(row, 'First Name')), titleCase(cell(row, 'Last Name'))].filter(Boolean).join(' '),
             wife: (cell(row, "Wife's Name") || '').toString().trim(),
+            nick: (cell(row, 'Preferred Name') || '').toString().trim(),   // searchable only, not shown
             phone: (cell(row, 'phone') || '').toString().trim(),
             email: (cell(row, 'email') || '').toString().trim(),
             optIn: String(cell(row, 'Directory Opt-In') || '').trim().toLowerCase() === 'yes',
@@ -295,7 +317,7 @@ function buildActivePositionsIndex() {
     return map;
 }
 
-function renderGroup(groupName) {
+function renderGroupRows(groupName) {
     const header = document.getElementById('groupHeader');
     const list = document.getElementById('groupList');
 
@@ -313,7 +335,8 @@ function renderGroup(groupName) {
                 : '<span class="contact-value empty">—</span>';
             const phoneHtml = m.phone ? `<span class="contact-value">${m.phone}</span>` : '<span class="contact-value empty">Not on file</span>';
             const emailHtml = m.email ? `<span class="contact-value">${m.email}</span>` : '<span class="contact-value empty">Not on file</span>';
-            return `<div class="member-row directory">
+            const find = [m.name, m.nick, m.wife, positions.join(' '), m.phone, m.email].join(' ');
+            return `<div class="member-row directory" data-s="${searchAttr(find)}" data-d="${digitsOf(m.phone)}">
                 <div class="name-cell">${avatarHtml(m.name, m.memberNumber, 56)}<div class="name">${m.name}</div></div>
                 <div class="wife${m.wife ? '' : ' empty'}">${m.wife ? `<span class="contact-value">${m.wife}</span>` : '<span class="contact-value empty">\u2014</span>'}</div>
                 <div>${positionsHtml}</div>
@@ -338,7 +361,8 @@ function renderGroup(groupName) {
         const statusHtml = active
             ? `<span class="status-pill active">Active${startText ? ' since ' + startText : ''}</span>`
             : `<span class="status-pill ended">Ended ${endText || ''}</span>`;
-        return `<div class="member-row">
+        const find = [p.position, p.name, active ? 'active' : 'ended'].join(' ');
+        return `<div class="member-row" data-s="${searchAttr(find)}" data-d="">
             <div class="position">${p.position}</div>
             <div class="name-cell">${avatarHtml(p.name, p.memberNumber, 48)}<div class="name">${p.name}</div></div>
             <div>${statusHtml}</div>
@@ -360,6 +384,48 @@ function initGroupSelect() {
     select.value = DIRECTORY_GROUP_NAME;
     renderGroup(DIRECTORY_GROUP_NAME);
 }
+
+/* ---------- Search ----------
+   Every row carries its own searchable text (data-s), so typing only shows or hides rows. */
+const normText = s => String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const digitsOf = s => String(s == null ? '' : s).replace(/\D/g, '');
+const searchAttr = s => normText(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function applySearch() {
+    const input = document.getElementById('groupSearch');
+    const tokens = normText(input.value).split(/\s+/).filter(Boolean);
+    document.getElementById('searchClear').hidden = !input.value;
+    const rows = document.querySelectorAll('#groupList [data-s]');
+    let shown = 0;
+    rows.forEach(r => {
+        const hay = r.dataset.s, hayDigits = r.dataset.d || '';
+        const ok = tokens.every(t => {
+            if (hay.includes(t)) return true;
+            const d = digitsOf(t);   // a phone number typed with or without punctuation
+            return d.length >= 3 && d.length === t.replace(/[\s().+\-]/g, '').length && hayDigits.includes(d);
+        });
+        r.classList.toggle('is-hidden', !ok);
+        if (ok) shown++;
+    });
+    const total = rows.length, count = document.getElementById('searchCount');
+    document.getElementById('noMatch').classList.toggle('is-hidden', !(total && tokens.length && !shown));
+    if (!total) count.textContent = '';
+    else if (!tokens.length) count.textContent = total + ' in this list. Type a name, position, phone number or email to narrow it down.';
+    else count.textContent = shown ? 'Showing ' + shown + ' of ' + total : '';   // the box below says "No one matches"
+}
+function clearSearch(refocus) {
+    const input = document.getElementById('groupSearch');
+    input.value = '';
+    applySearch();
+    if (refocus) input.focus();
+}
+function renderGroup(groupName) { renderGroupRows(groupName); applySearch(); }
+(function () {
+    const input = document.getElementById('groupSearch');
+    input.addEventListener('input', applySearch);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });   // closes the phone keyboard so the results are visible
+    document.getElementById('searchClear').addEventListener('click', () => clearSearch(true));
+})();
 
 async function init() {
     // The directory is for signed-in members only
