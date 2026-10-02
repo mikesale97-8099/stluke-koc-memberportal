@@ -187,6 +187,14 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 }
 .dues-flag-link { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); text-decoration:underline; }
 .dues-flag-link:hover { color:var(--primary); }
+.help-block { text-align:center; margin-top:2.5rem; padding-top:1.75rem; border-top:1px dashed #D1D5DB; }
+.help-title { font-family:'Crimson Pro',serif; font-size:1.2rem; font-weight:700; color:var(--primary); }
+.help-text { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); margin-top:0.3rem; }
+.help-actions { display:flex; gap:0.7rem; justify-content:center; flex-wrap:wrap; margin-top:1rem; }
+.help-btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0.55rem 1.3rem; border-radius:50px; border:2px solid var(--primary); background:#fff; color:var(--primary); font-family:'Lato',sans-serif; font-size:0.95rem; font-weight:700; text-decoration:none; }
+@media (hover:hover) { .help-btn:hover { background:var(--primary); color:#fff; } }
+.help-btn:focus-visible { background:var(--primary); color:#fff; }
+@media (max-width:640px) { .help-btn { width:100%; max-width:320px; } }
 .quiet-signout { text-align:center; margin-top:2.5rem; }
 .quiet-signout-link { background:none; border:none; padding:0.3rem; font-family:'Lato',sans-serif; font-size:0.82rem; color:#9CA3AF; text-decoration:underline; cursor:pointer; }
 .quiet-signout-link:hover { color:var(--text-medium); }
@@ -374,6 +382,16 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 
     <div class="circumstances-link">
         <a href="verify-wizard.html?path=changed" class="preserve-member">My circumstances have changed</a>
+    </div>
+
+    <div class="help-block" id="helpBlock">
+        <div class="help-title">Questions, problems or ideas?</div>
+        <p class="help-text">Send us a note. We read every one.</p>
+        <div class="help-actions">
+            <a class="help-btn" data-kind="help" href="#">Ask for help</a>
+            <a class="help-btn" data-kind="bug" href="#">Report a problem</a>
+            <a class="help-btn" data-kind="idea" href="#">Suggest an idea</a>
+        </div>
     </div>
 
     <div class="quiet-signout">
@@ -655,6 +673,53 @@ function mailtoFallback(action) {
     );
     return 'mailto:council14895@gmail.com?subject=' + subject + '&body=' + body;
 }
+
+/* ---------- Help / problem / idea email ----------
+   Opens the member's own email app with a note already started.
+   Who it goes to comes from the Assumptions tab, so it can change without touching this page:
+     1. the "Help email" row (one address, or several separated by commas)
+     2. otherwise the first address in the "Data Administrator email" row
+     3. otherwise the council address that is already in the page footer */
+let FEEDBACK_TO = 'council14895@gmail.com';
+const FEEDBACK_KINDS = {
+    help: { subject: 'Member Center \u2014 Help request',  intro: 'I need help with:\n\n\n' },
+    bug:  { subject: 'Member Center \u2014 Problem report', intro: 'What I was trying to do:\n\n\nWhat happened instead:\n\n\n' },
+    idea: { subject: 'Member Center \u2014 Suggestion',     intro: 'My idea:\n\n\nHow it would help:\n\n\n' }
+};
+function emailsIn(text) {
+    return String(text || '').split(/[,;\s]+/).filter(a => /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/.test(a));
+}
+async function loadHelpEmail() {
+    try {
+        let list = emailsIn(await fetchAssumptionsRow('help email'));
+        if (!list.length) list = emailsIn(await fetchAssumptionsRow('data administrator email')).slice(0, 1);
+        if (list.length) FEEDBACK_TO = list.join(',');
+    } catch (e) { /* keep the council address */ }
+    document.querySelectorAll('.help-btn').forEach(a => { a.href = feedbackHref(a.dataset.kind, true); });
+}
+function feedbackWho() {
+    const sess = Session.read() || {};
+    const own = CURRENT_MEMBER && isOwnProfile();
+    const name = own ? fullName(CURRENT_MEMBER) : (sess.firstName || '');
+    const num = sess.memberNumber || (CURRENT_MEMBER && CURRENT_MEMBER.memberNumber) || '';
+    return (name ? name + ' ' : '') + (num ? '(#' + String(num).replace(/^0+/, '') + ')' : '');
+}
+function feedbackHref(kind, plain) {
+    const k = FEEDBACK_KINDS[kind] || FEEDBACK_KINDS.help;
+    if (plain) return 'mailto:' + FEEDBACK_TO + '?subject=' + encodeURIComponent(k.subject);
+    const body = 'Hello,\n\n' + k.intro +
+        '\u2014 Please leave the lines below so we can help \u2014\n' +
+        'Member: ' + feedbackWho() + '\n' +
+        'Page: Profile\n' +
+        'Time: ' + new Date().toString() + '\n' +
+        'Device: ' + navigator.userAgent;
+    return 'mailto:' + FEEDBACK_TO + '?subject=' + encodeURIComponent(k.subject) + '&body=' + encodeURIComponent(body.replace(/\n/g, '\r\n'));
+}
+document.querySelectorAll('.help-btn').forEach(a => {
+    a.href = feedbackHref(a.dataset.kind, true);                            // a working link from the start
+    a.addEventListener('click', () => { a.href = feedbackHref(a.dataset.kind); });   // filled in with details the moment it's tapped
+});
+window.addEventListener('DOMContentLoaded', loadHelpEmail);                 // after the page has loaded, look up who it goes to
 
 function showUnreachableError(statusEl, action) {
     statusEl.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it, not a problem with your info. ' +

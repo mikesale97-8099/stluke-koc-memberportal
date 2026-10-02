@@ -96,7 +96,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | File | Purpose | Sign-in required |
 |---|---|---|
 | `landing.html` | Emailed-code sign-in; welcome back; help form for emails not on file | — |
-| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom. The identity card shows the member's **photo** (initials until one is added) with *Add my photo / Change photo / Remove photo* | Yes |
+| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom. The identity card shows the member's **photo** (initials until one is added) with *Add my photo / Change photo / Remove photo*. Near the bottom: a **Questions, problems or ideas?** block with three email buttons | Yes |
 | `membership-card.html` | Council card (degrees 1st–3rd) and, for Sir Knights, the Fourth Degree card | Yes |
 | `pay-dues.html` | Square (card), Venmo (for members who already use it), mail a check | Yes |
 | `groups.html` | Council positions and the member directory (opted-in members only), each with a photo or initials circle, and a **search box** above the list | Yes |
@@ -172,6 +172,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | Grand Knight email | Withdrawal-request emails |
 | Retention Committee email | Move / step-back / withdrawal / other emails |
 | Data Administrator email | Admin rights; "something else" emails; stands in for the Financial Secretary if that row is missing |
+| Help email *(optional)* | Where the Profile page's **Help / Problem / Idea** buttons send email. One address, or several separated by commas. If the row is missing or blank: the first **Data Administrator email**, then council14895@gmail.com |
 | Financial Secretary email *(optional)* | Move-out-of-area emails (address update in Member Management) |
 | Open rollout waves through | A number *N* lets in waves 1..N; **All** (or no row) lets in everyone with an email on file |
 | 4th Degree Assembly No. *(optional)* | Overrides **2850** on the Fourth Degree card |
@@ -222,6 +223,16 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 - **Check it worked:** the calendar's status line (admin view) says how many events have a link, or that no Sign-up Link column was found.
 - **Remember:** the calendar page doesn't require sign-in, and the published sheet is readable by anyone with its address, so sign-up links aren't hidden from non-members.
 - **Cleanup:** the calendar hides past months by default; clear a link from the sheet once its sign-up has closed.
+
+---
+
+## Help / Problem / Idea Email
+
+- **Where:** the bottom of the Profile page, just above *Sign out of this device*. Three large buttons: **Ask for help**, **Report a problem**, **Suggest an idea**.
+- **What happens:** each opens the member's own email app with a note already started — the subject says which kind it is, and the body has short prompts to fill in ("What I was trying to do… What happened instead…").
+- **What arrives automatically:** below the prompts, the member's **name and member number**, the page, the time, and the phone or browser, so a problem can be looked into without a back-and-forth. (If an administrator is browsing as another member, it identifies the administrator who is actually sending.)
+- **Who receives it — set on the Assumptions tab, no code change:** the **Help email** row; if that's empty, the first **Data Administrator email**; if that's empty too, council14895@gmail.com. When the council's own domain is ready, put the new address in **Help email** and you're done.
+- **Limit:** like every email link on the site, it needs an email app set up on the device. Members who only use webmail in a browser may see nothing happen; the council address in the page footer still works for them.
 
 ---
 
