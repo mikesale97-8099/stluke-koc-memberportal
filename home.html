@@ -187,6 +187,23 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 }
 .dues-flag-link { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); text-decoration:underline; }
 .dues-flag-link:hover { color:var(--primary); }
+/* Announcement banner */
+.ann-banner { margin-top:0.9rem; background:#FFFDF7; border-radius:16px; box-shadow:0 4px 15px var(--shadow); border-left:6px solid var(--secondary); overflow:hidden; animation:annIn .35s ease; }
+.ann-banner[hidden] { display:none; }
+@keyframes annIn { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .ann-banner { animation:none; } }
+.ann-item { display:flex; gap:0.9rem; align-items:flex-start; padding:1.05rem 1.2rem; }
+.ann-item + .ann-item { border-top:1px solid #EFE7D6; }
+.ann-icon { flex:none; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.3rem; background:#fff; box-shadow:0 0 0 1.5px #E8DCC0; }
+.ann-body { flex:1; min-width:0; }
+.ann-label { font-family:'Lato',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--text-medium); }
+.ann-text { font-family:'Lora',serif; font-size:1.08rem; line-height:1.45; color:var(--text-dark); margin-top:0.15rem; font-weight:500; overflow-wrap:break-word; }
+.ann-text b { font-weight:600; color:var(--primary); }
+.ann-actions { margin-top:0.7rem; }
+.ann-btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0.55rem 1.5rem; border-radius:50px; background:var(--primary); color:#fff; border:2px solid var(--primary); font-family:'Lato',sans-serif; font-size:1rem; font-weight:700; text-decoration:none; }
+@media (hover:hover) { .ann-btn:hover { background:#fff; color:var(--primary); } }
+.ann-btn:focus-visible { background:#fff; color:var(--primary); }
+@media (max-width:640px) { .ann-btn { width:100%; } .ann-item { padding:1rem; gap:0.75rem; } }
 .help-block { text-align:center; margin-top:2.5rem; padding-top:1.75rem; border-top:1px dashed #D1D5DB; }
 .help-title { font-family:'Crimson Pro',serif; font-size:1.2rem; font-weight:700; color:var(--primary); }
 .help-text { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); margin-top:0.3rem; }
@@ -275,6 +292,8 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 <div class="page" id="mainContent" style="display:none;">
 
     <p class="greeting-line" id="greetingLine">Welcome back, Daniel</p>
+
+    <section class="ann-banner" id="annBanner" role="region" aria-label="Announcements" hidden></section>
 
     <div class="identity-card">
         <div class="identity-top">
@@ -719,7 +738,159 @@ document.querySelectorAll('.help-btn').forEach(a => {
     a.href = feedbackHref(a.dataset.kind, true);                            // a working link from the start
     a.addEventListener('click', () => { a.href = feedbackHref(a.dataset.kind); });   // filled in with details the moment it's tapped
 });
-window.addEventListener('DOMContentLoaded', loadHelpEmail);                 // after the page has loaded, look up who it goes to
+window.addEventListener('DOMContentLoaded', loadHelpEmail);
+
+/* ---------- Announcement banner ----------
+   Up to MAX_TYPED announcements typed on the sheet's "Announcements" tab, plus an automatic
+   "Next event" line taken from the Calendar. Anything that can't be read is simply left out. */
+const ANN_MAX_TYPED = 2;              // typed announcements shown at once (keeps the profile card on screen)
+const ANN_NEXT_EVENT_DAYS = 60;       // the automatic Next event line only appears when the event is this close
+const ANN_CALENDAR_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQDS_b-fdZjWOcOZ4OUD7TkNLLaCaXt-AN2cOHyltxZRwOOlcGICvdTd2JXGLpzoAx3fPFKq5SgNjd/pub?gid=2034915391&single=true&output=csv';
+const ANN_TYPES = {
+    event:  { icon: '\uD83D\uDCC5', label: 'Event' },
+    need:   { icon: '\uD83D\uDE4B', label: 'We need you' },
+    prayer: { icon: '\uD83D\uDE4F', label: 'Prayer' },
+    notice: { icon: '\u2139\uFE0F', label: 'Notice' }
+};
+const ANN_MONTHS = { jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, sept:8, oct:9, nov:10, dec:11 };
+
+/* A real https web address, or nothing (same rule as the calendar's sign-up links). */
+function annCleanLink(raw) {
+    let u = String(raw || '').trim();
+    if (!u || /\s/.test(u)) return '';
+    if (/^http:\/\//i.test(u)) u = 'https://' + u.slice(7);
+    else if (!/^[a-z][a-z0-9+.-]*:/i.test(u) && /^[\w-]+(\.[\w-]+)+(\/|$)/.test(u)) u = 'https://' + u;
+    try { const url = new URL(u); return url.protocol === 'https:' ? url.href : ''; } catch (e) { return ''; }
+}
+/* "Saturday, October 17, 2026", "Oct 17 2026", "October 17-18, 2026", "10/17/2026", "2026-10-17" -> that day at midnight (first day of a range). */
+function annParseDay(text) {
+    const t = String(text || '').trim();
+    let m = t.match(/([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s*(?:-|\u2013|\u2014|to)\s*\d{1,2})?,?\s+(\d{4})/);
+    if (m) { const mo = ANN_MONTHS[m[1].toLowerCase().slice(0, 4)] ?? ANN_MONTHS[m[1].toLowerCase().slice(0, 3)]; if (mo !== undefined) return annMakeDay(+m[3], mo, +m[2]); }
+    m = t.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) return annMakeDay(+m[3], +m[1] - 1, +m[2]);
+    m = t.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return annMakeDay(+m[1], +m[2] - 1, +m[3]);
+    return null;
+}
+function annMakeDay(y, mo, d) { const x = new Date(y, mo, d); return (x.getFullYear() === y && x.getMonth() === mo && x.getDate() === d && y >= 2020) ? x : null; }
+/* A Google Sheets date cell ("Date(2026,9,1)") or typed text. Returns {blank:true}, {date}, or {bad:true}. */
+function annSheetDate(cell) {
+    const v = cell && cell.v;
+    if (v === null || v === undefined || String(v).trim() === '') return { blank: true };
+    const g = String(v).match(/^Date\((\d+),(\d+),(\d+)/);
+    if (g) return { date: new Date(+g[1], +g[2], +g[3]) };
+    const d = annParseDay(v);
+    return d ? { date: d } : { bad: true };
+}
+function annToday() { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+
+async function annFetchTyped() {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=Announcements&tq=` + encodeURIComponent('select *');
+    const m = (await (await fetch(url)).text()).match(/setResponse\(([\s\S]*)\);?\s*$/);
+    const t = m && JSON.parse(m[1]) && JSON.parse(m[1]).table;
+    if (!t || !t.cols || !t.rows) return [];                                   // no Announcements tab yet
+    const labels = t.cols.map(c => String(c.label || '').toLowerCase().replace(/[^a-z]/g, ''));
+    const at = n => labels.indexOf(n);
+    const iMsg = at('message'), iType = at('type'), iLink = at('link'), iFrom = at('showfrom'), iThru = at('showthrough');
+    if (iMsg === -1 || iType === -1) return [];                                // not the Announcements tab: never show it
+    const today = annToday(), out = [];
+    t.rows.forEach(r => {
+        const c = r.c || [];
+        const message = String((c[iMsg] && c[iMsg].v) || '').trim();
+        if (!message) return;
+        const from = iFrom === -1 ? { blank: true } : annSheetDate(c[iFrom]);
+        const thru = iThru === -1 ? { blank: true } : annSheetDate(c[iThru]);
+        if (from.bad || thru.bad) return;                                       // an unreadable date never shows (so nothing gets stuck on)
+        if (from.date && from.date > today) return;                             // not yet
+        if (thru.date && thru.date < today) return;                             // expired
+        const type = String((c[iType] && c[iType].v) || '').trim().toLowerCase();
+        out.push({ type: ANN_TYPES[type] ? type : 'notice', message, link: iLink === -1 ? '' : annCleanLink(c[iLink] && c[iLink].v) });
+    });
+    return out.slice(0, ANN_MAX_TYPED);
+}
+
+function annCsv(text) {
+    const rows = []; let row = [], f = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i], nx = text[i + 1];
+        if (q) { if (ch === '"' && nx === '"') { f += '"'; i++; } else if (ch === '"') q = false; else f += ch; }
+        else if (ch === '"') q = true;
+        else if (ch === ',') { row.push(f); f = ''; }
+        else if (ch === '\r') { /* skip */ }
+        else if (ch === '\n') { row.push(f); rows.push(row); row = []; f = ''; }
+        else f += ch;
+    }
+    if (f.length || row.length) { row.push(f); rows.push(row); }
+    return rows;
+}
+async function annFetchNextEvent() {
+    const rows = annCsv(await (await fetch(ANN_CALENDAR_CSV)).text());
+    if (rows.length < 2) return null;
+    const heads = rows[0].map(h => h.trim());
+    const iAct = heads.indexOf('Activity'), iDate = heads.indexOf('Date');
+    const iLink = heads.findIndex(h => h.toLowerCase().replace(/[^a-z]/g, '') === 'signuplink');
+    if (iAct === -1 || iDate === -1) return null;
+    const today = annToday(), limit = new Date(today); limit.setDate(limit.getDate() + ANN_NEXT_EVENT_DAYS);
+    let best = null;
+    rows.slice(1).forEach(r => {
+        const name = (r[iAct] || '').trim(), day = annParseDay(r[iDate]);
+        if (!name || !day || day < today || day > limit) return;
+        if (!best || day < best.day) best = { name, day, link: iLink === -1 ? '' : annCleanLink(r[iLink]) };
+    });
+    return best;
+}
+function annDayWords(day) {
+    const diff = Math.round((day - annToday()) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Tomorrow';
+    return day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+}
+
+function annCanHelpHref(message) {
+    const short = message.length > 70 ? message.slice(0, 67).trim() + '\u2026' : message;
+    const body = 'Hello,\n\nI can help with this:\n\u201C' + message + '\u201D\n\nThe best way or time to reach me:\n\n\n' +
+        '\u2014 Please leave the lines below \u2014\nMember: ' + feedbackWho() + '\nPage: Profile announcement\nTime: ' + new Date().toString();
+    return 'mailto:' + FEEDBACK_TO + '?subject=' + encodeURIComponent('I can help \u2014 ' + short) + '&body=' + encodeURIComponent(body.replace(/\n/g, '\r\n'));
+}
+function annItem(meta, textNodes, action) {
+    const el = document.createElement('div'); el.className = 'ann-item';
+    const icon = document.createElement('div'); icon.className = 'ann-icon'; icon.setAttribute('aria-hidden', 'true'); icon.textContent = meta.icon;
+    const body = document.createElement('div'); body.className = 'ann-body';
+    const label = document.createElement('div'); label.className = 'ann-label'; label.textContent = meta.label;
+    const text = document.createElement('div'); text.className = 'ann-text'; textNodes.forEach(n => text.appendChild(n));
+    body.append(label, text);
+    if (action) {
+        const wrap = document.createElement('div'); wrap.className = 'ann-actions';
+        const a = document.createElement('a'); a.className = 'ann-btn'; a.textContent = action.text; a.href = action.href;
+        if (action.newTab) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+        if (action.refresh) a.addEventListener('click', () => { a.href = action.refresh(); });
+        wrap.appendChild(a); body.appendChild(wrap);
+    }
+    el.append(icon, body);
+    return el;
+}
+const annText = s => document.createTextNode(s);
+
+async function loadBanner() {
+    const [typed, next] = await Promise.all([annFetchTyped().catch(() => []), annFetchNextEvent().catch(() => null)]);
+    const box = document.getElementById('annBanner');
+    box.textContent = '';
+    if (next) {
+        const strong = document.createElement('b'); strong.textContent = next.name;
+        box.appendChild(annItem({ icon: ANN_TYPES.event.icon, label: 'Next event' }, [strong, annText(' \u2014 ' + annDayWords(next.day))],
+            next.link ? { text: 'Sign up', href: next.link, newTab: true } : null));
+    }
+    typed.forEach(a => {
+        const meta = ANN_TYPES[a.type]; let action = null;
+        if (a.type === 'need') action = { text: 'I Can Help', href: annCanHelpHref(a.message), refresh: () => annCanHelpHref(a.message) };   // emails the administrator
+        else if (a.link) action = { text: a.type === 'event' ? 'Sign up' : 'Learn more', href: a.link, newTab: true };
+        box.appendChild(annItem(meta, [annText(a.message)], action));
+    });
+    box.hidden = !box.children.length;
+}
+window.addEventListener('DOMContentLoaded', loadBanner);
+                 // after the page has loaded, look up who it goes to
 
 function showUnreachableError(statusEl, action) {
     statusEl.innerHTML = 'Could not reach the server \u2014 this usually means something on your device (like a content blocker in Safari) is blocking it, not a problem with your info. ' +
@@ -1078,19 +1249,35 @@ function ensurePhotoFor(memberNumber) {
     MY_PHOTO = null;
     loadPhoto(key);
 }
+/* Reading the Photos tab. Asking Google for "just this member's row" (a where-filter) turned out to be unreliable on the live
+   sheet, so this uses only plain requests: first a light list of member numbers, then just that one row's photo (by position).
+   If anything about that doesn't work, it falls back to reading the whole tab, exactly the way the Groups page does. */
+async function gvizPhotoRows(query) {
+    const res = await fetch(GVIZ_PHOTOS_URL + '&tq=' + encodeURIComponent(query));
+    const m = (await res.text()).match(/setResponse\(([\s\S]*)\);?\s*$/);
+    const json = m ? JSON.parse(m[1]) : null;
+    return (json && json.table && json.table.rows) || null;      // null = Google rejected the request
+}
+const photoCell = (row, i) => (row && row.c && row.c[i] && row.c[i].v) || null;
+async function findPhoto(key) {
+    try {
+        const keys = await gvizPhotoRows('select A');
+        if (keys) {
+            const idx = keys.findIndex(r => noZeros(photoCell(r, 0)) === key);
+            if (idx === -1) return null;                          // no photo for this member
+            const one = await gvizPhotoRows('select A, B limit 1 offset ' + idx);
+            if (one && one[0] && noZeros(photoCell(one[0], 0)) === key) { const v = photoCell(one[0], 1); return isB64(v) ? v : null; }
+        }
+    } catch (e) { /* fall through to the whole-tab read */ }
+    const all = await gvizPhotoRows('select A, B');
+    const row = all && all.find(r => noZeros(photoCell(r, 0)) === key);
+    const v = photoCell(row, 1);
+    return isB64(v) ? v : null;
+}
 async function loadPhoto(key) {
     try {
         const ov = photoOverride(key);          // a change made earlier in this visit wins (the sheet can lag a moment)
-        if (ov !== null) { MY_PHOTO = ov === '-' ? null : ov; }
-        else {
-            const q = encodeURIComponent("select A, B where A = '" + key + "'");
-            const res = await fetch(GVIZ_PHOTOS_URL + '&tq=' + q);
-            const m = (await res.text()).match(/setResponse\(([\s\S]*)\);?\s*$/);
-            const json = m ? JSON.parse(m[1]) : null;
-            const row = json && json.table && json.table.rows && json.table.rows[0];
-            const v = row && row.c && row.c[1] && row.c[1].v;
-            MY_PHOTO = isB64(v) ? v : null;      // no Photos tab yet, or no row: initials
-        }
+        MY_PHOTO = ov !== null ? (ov === '-' ? null : ov) : await findPhoto(key);   // no Photos tab yet, or no row: initials
     } catch (e) { MY_PHOTO = null; }
     if (PHOTO_FOR === key) renderPhotoUI();
 }

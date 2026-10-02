@@ -96,7 +96,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | File | Purpose | Sign-in required |
 |---|---|---|
 | `landing.html` | Emailed-code sign-in; welcome back; help form for emails not on file | — |
-| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom. The identity card shows the member's **photo** (initials until one is added) with *Add my photo / Change photo / Remove photo*. Near the bottom: a **Questions, problems or ideas?** block with three email buttons | Yes |
+| `home.html` (Profile) | Tier badge and message; Membership Profile (Member Status, degree, years, role); Dues Profile with **Thanks for Clicking to Pay →**; Contact Profile edit (incl. Wife's Name, Directory opt-in); *My circumstances have changed* link; quiet *Sign out of this device* link (with confirmation) at the very bottom. The identity card shows the member's **photo** (initials until one is added) with *Add my photo / Change photo / Remove photo*. Under the greeting: an **announcement banner** (when there is something to say). Near the bottom: a **Questions, problems or ideas?** block with three email buttons | Yes |
 | `membership-card.html` | Council card (degrees 1st–3rd) and, for Sir Knights, the Fourth Degree card | Yes |
 | `pay-dues.html` | Square (card), Venmo (for members who already use it), mail a check | Yes |
 | `groups.html` | Council positions and the member directory (opted-in members only), each with a photo or initials circle, and a **search box** above the list | Yes |
@@ -136,6 +136,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 | Positions | 620591520 | Council officers and committee positions |
 | Tier Messages | 1560227874 | Friendly tier labels and Profile/card messages |
 | Change Log | — | Audit trail of every change, flag, request, and notification |
+| Announcements | — | The Profile banner. **You create this tab** (see *Announcements Banner*). Headings: Message · Type · Link · Show From · Show Through |
 | Photos | — | Member photos, one row per member. **Created automatically** when the first photo is saved. Columns: Member Number (text, no leading zeros) · Photo (small JPEG as text) · Updated. Don't edit by hand |
 | Activity List (separate published sheet) | 2034915391 | Calendar events |
 
@@ -199,6 +200,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 - **Where it lives:** the **Photos** tab (see Tabs). Pages read it the same way as everything else, so the directory loads without extra requests. Groups shows initials immediately and fills in photos as they arrive.
 - **Admin:** a Data Administrator browsing another member (`?admin=on`) can't add or change that member's photo, but can **Remove photo** (logged as *Admin edit*).
 - **Change Log:** every add, change and removal writes a row (Category *Profile*, Field *Photo*; Type *Self-edit*, or *Admin edit* when an administrator acts on someone else).
+- **How Profile reads it:** with plain requests only — a short list of member numbers, then just that one row's photo; if Google refuses either, it reads the whole tab the way Groups does. (A "where member = N" filter was tried first and was unreliable on the live sheet: the photo showed only on the device that had just saved it.)
 - **Rest of this visit:** after a member saves or removes a photo, that device shows the change right away even if the sheet is a moment behind.
 - **Limits:** JPEG only (phone photos convert automatically); a file the phone can't read shows a friendly "That photo didn't work" screen. Photos are not on the membership card yet.
 
@@ -233,6 +235,27 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 - **What arrives automatically:** below the prompts, the member's **name and member number**, the page, the time, and the phone or browser, so a problem can be looked into without a back-and-forth. (If an administrator is browsing as another member, it identifies the administrator who is actually sending.)
 - **Who receives it — set on the Assumptions tab, no code change:** the **Help email** row; if that's empty, the first **Data Administrator email**; if that's empty too, council14895@gmail.com. When the council's own domain is ready, put the new address in **Help email** and you're done.
 - **Limit:** like every email link on the site, it needs an email app set up on the device. Members who only use webmail in a browser may see nothing happen; the council address in the page footer still works for them.
+
+---
+
+## Announcements Banner
+
+- **Where:** the top of the Profile, under *Welcome back*. When there is nothing to show, the banner takes no space.
+- **Two sources:**
+  1. **Next event** (automatic): the soonest upcoming event on the Calendar sheet, e.g. *Fall Pancake Breakfast — Saturday, October 17*. Says *Today* / *Tomorrow* when it's that close. It shows a **Sign up** button when that event has a Sign-up Link. Only events within **60 days** are announced (`ANN_NEXT_EVENT_DAYS` in `home.html`); events whose date can't be read are skipped.
+  2. **Typed announcements** from the **Announcements** tab in the main workbook (the same workbook as Assumptions and Photos). At most **2** show at once, top of the sheet first (`ANN_MAX_TYPED`).
+- **The Announcements tab** (you create it; headings in row 1, any order, spelling and capitals don't matter):
+
+  | Message | Type | Link | Show From | Show Through |
+  |---|---|---|---|---|
+  | Need two drivers for Thursday's food pantry run. | Need | | 10/1/2026 | 10/8/2026 |
+
+  - **Type** — *Event* 📅, *Need* 🙋, *Prayer* 🙏 or *Notice* ℹ️ (anything else shows as a Notice). It picks the icon and label.
+  - **Buttons:** **Need** always gets **I Can Help**, which opens the member's email app with a note to the administrator already started (subject *I can help — <the need>*; the body quotes the need, asks how to reach them, and adds the member's name and number). It goes to the same address as the Help buttons: the **Help email** row, else the first **Data Administrator email**, else the council address. For other types, a **Link** gives a button: **Sign up** for *Event*, **Learn more** for *Prayer* and *Notice*. No Link, no button. (A Link typed on a Need is ignored — use *Event* for something with a sign-up form.)
+  - **Show From / Show Through** — real dates (Format → Number → Date), or leave blank. A row shows from the start of its From date through the **end** of its Through date, then disappears by itself. Blank From = shows right away; blank Through = stays until you delete the row. A date the page can't read (e.g. "soon") **hides** the row, so nothing gets stuck on.
+- **Safe by design:** text is always shown as plain text (no formatting or HTML is run); links must be real `https://` addresses; and the page only uses the tab if it has *Message* and *Type* headings, so it can never show some other tab by mistake.
+- **Keep it short** (about 140 characters). The sheet is link-readable like the rest, so put nothing private in it, and name people in a Prayer only with their agreement.
+- **Not built (ideas):** a dismiss button; a per-row "send replies to" address (e.g. to the Food Pantry chair) instead of the administrator.
 
 ---
 
