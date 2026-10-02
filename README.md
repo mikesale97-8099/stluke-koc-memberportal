@@ -251,11 +251,12 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
   | Need two drivers for Thursday's food pantry run. | Need | | 10/1/2026 | 10/8/2026 |
 
   - **Type** — *Event* 📅, *Need* 🙋, *Prayer* 🙏 or *Notice* ℹ️ (anything else shows as a Notice). It picks the icon and label.
-  - **Buttons:** **Need** always gets **I Can Help**, which opens the member's email app with a note to the administrator already started (subject *I can help — <the need>*; the body quotes the need, asks how to reach them, and adds the member's name and number). It goes to the same address as the Help buttons: the **Help email** row, else the first **Data Administrator email**, else the council address. For other types, a **Link** gives a button: **Sign up** for *Event*, **Learn more** for *Prayer* and *Notice*. No Link, no button. (A Link typed on a Need is ignored — use *Event* for something with a sign-up form.)
+  - **Buttons:** **Need** always gets **I Can Help**, which opens the member's email app with a note to the administrator already started (subject *I can help — <the need>*; the body quotes the need, asks how to reach them, and adds the member's name and number). **Who gets it:** if the Need's **Link** cell holds an **email address** (or several, separated by commas or semicolons; `mailto:` in front is fine), it goes there — e.g. the Food Pantry chair. If **Link is blank** (or isn't an email address), it goes to the same address as the Help buttons: the **Help email** row, else the first **Data Administrator email**, else the council address. Only plain email addresses are accepted, so nothing extra (a hidden Cc or Bcc) can be added by what's typed in the cell. For other types, a **Link** gives a button: **Sign up** for *Event*, **Learn more** for *Prayer* and *Notice*. No Link, no button. (A web address typed on a Need is ignored — use *Event* for something with a sign-up form.)
   - **Show From / Show Through** — real dates (Format → Number → Date), or leave blank. A row shows from the start of its From date through the **end** of its Through date, then disappears by itself. Blank From = shows right away; blank Through = stays until you delete the row. A date the page can't read (e.g. "soon") **hides** the row, so nothing gets stuck on.
 - **Safe by design:** text is always shown as plain text (no formatting or HTML is run); links must be real `https://` addresses; and the page only uses the tab if it has *Message* and *Type* headings, so it can never show some other tab by mistake.
 - **Keep it short** (about 140 characters). The sheet is link-readable like the rest, so put nothing private in it, and name people in a Prayer only with their agreement.
-- **Not built (ideas):** a dismiss button; a per-row "send replies to" address (e.g. to the Food Pantry chair) instead of the administrator.
+- **v1 limit:** only the first **2** active typed announcements show (sheet order); any others are hidden, and nobody is told. **v2 idea (decided to hold):** the first two plus a large *See N more* button that expands the rest in place (cap about 8 total).
+- **Not built (ideas):** a dismiss button.
 
 ---
 
@@ -323,7 +324,17 @@ Timestamp · Member Number · Member Name · Type · Category · Field · Old Va
 - **Sign-in and all changes are protected** (emailed code, signed pass, member number taken from the pass).
 - **The member sheet itself is still link-readable** (the pages read it directly for speed). Anyone who digs the link out of a page's source could download it. This was a deliberate trade-off: keeping the sheet private would require routing all reads through Apps Script, adding a second or two to every page. The directory wording promises only what's true under this setup ("only signed-in members can see the directory").
 - **Photos are on the sheet, not in the repo.** The Photos tab is link-readable like the rest of the sheet, so the same caveat applies: only the pages limit photos to signed-in members. The upload screen says photos are shown to signed-in members of the council. No photo is ever stored in the repo.
-- **Repository history:** older versions of `membership-card.html` and `pay-dues.html` (and all mockups) contained every member's name, number, and dues balance. They're removed from the current pages, but remain in the public repo's history until the repo is made private (requires GitHub Pro to keep Pages) or recreated fresh.
+- **Repository history:** older versions of `membership-card.html` (Aug 27 – Sep 28, 2026) and `home.html` (Aug 27 – Sep 23) — plus some mockups — contained members' names, numbers, dues balances, and up to about 133 emails and 143 phone numbers per file (a scan of all 133 commits, Oct 2, 2026). The current files are clean, but the old versions remain in the **public** repo's history. **No passwords or keys are in the history** (the session secret lives in Apps Script's private settings), so nothing needs replacing. **Plan: do the cleanup below before the Board pilot starts.** It removes the old copies; it does not recall copies anyone already made, and it does not make the live sheet private (see the first bullet above).
+
+### Repo cleanup — fresh repo (about 20–30 minutes; the site is offline briefly)
+1. On the old repo, check **Insights → Forks** (forks keep their own copy of the history).
+2. Rename the old repo (e.g. `stluke-koc-memberportal-OLD`), then **Settings → Danger Zone → Change visibility → Private**. The live site goes offline.
+3. Create a new **public** repo named `stluke-koc-memberportal` (the original name).
+4. **Add file → Upload files**: the 17 current files, individually (no zip). Ask Claude to stage the complete current set at that time so it's up to date.
+5. **Settings → Pages**: deploy from branch `main`, folder `/ (root)`. The site returns at the same address in a minute or two; members stay signed in; the Worker, Apps Script and sheet are unchanged.
+6. Check the site works, then keep the private `-OLD` repo as a backup or delete it later.
+- Alternatives: a private repo (needs a paid GitHub plan to keep Pages online), or rewriting history with `git filter-repo` (command line; not recommended for the upload-through-the-web workflow).
+- Worth mentioning to the council officers that the old pages were publicly readable Aug 27 – Sep 28.
 - **Emails come from a personal Gmail account**, which some providers (notably AT&T/Yahoo) may delay. Sending from the council's own domain with proper email records would help.
 
 ---
@@ -343,7 +354,7 @@ Timestamp · Member Number · Member Name · Type · Category · Field · Old Va
 - [ ] Automatic wizard prompt on sign-in when Wizard Completed is blank or over a year old
 - [ ] Home-screen icon and one-time "Add to Home Screen" tip for iPhones
 - [ ] Decide on member numbers with a leading zero on the cards (printed cards show none)
-- [ ] Clean up repository history (private repo or fresh repo)
+- [ ] **Before the Board pilot:** clean up repository history — fresh repo, steps under *Security notes → Repository history*
 - [ ] Send code emails from the council's own domain once it's set up
 - [ ] Collect emails for members with none on file
 - [ ] Member photo on the council card / Fourth Degree card (not built)
