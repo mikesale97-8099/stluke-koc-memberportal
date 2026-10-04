@@ -91,7 +91,7 @@ Member's browser
 
 ## Pages
 
-Menu order on every page: **Profile · Calendar · Prayers · Membership Card · Groups · Why Dues? · Verify Data**
+Menu order on every page: **Profile · Calendar · Prayers · Groups · KofC Card · Why Dues? · Verify Data** (*KofC Card* opens the Membership Cards page)
 
 | File | Purpose | Sign-in required |
 |---|---|---|
@@ -262,7 +262,11 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 
 ## Verify Data Wizard
 
-Reached from **Verify Data** in the menu.
+Reached from **Verify Data** in the menu, and **automatically on a member's first visit**:
+
+- **First-visit start:** when a signed-in member's **Wizard Completed** is blank, the Profile sends him to the wizard (welcome screen with a line saying it's his first visit and takes about two minutes) before showing the Profile. It's a *start*, not a wall: it fires **once per browser visit**, so going back to the Profile (or using the menu) never loops, and the next visit asks again until he's done.
+- **Never redirects:** an administrator with admin tools **on** (so the Profile can be tested — switch tools off to see what members see); anyone viewing someone else's profile; a Profile link that carries `?member=` (the wizard's own *Continue to My Profile*); members whose **Council Member Status** is anything other than blank/Active (Move Alert, Withdrawal Pending, etc.); and **everyone** if the sheet has no *Wizard Completed* column (a misspelled heading can't trap members).
+- **Device memory:** finishing the wizard, or reporting *moved / step back / something else* (which don't stamp the sheet), is remembered on that device for **7 days** (`WIZARD_GATE_SUPPRESS_DAYS` in `home.html`) so he isn't sent straight back while the sheet catches up.
 
 1. **Welcome** — greets by preferred name; **Get Started** or **My circumstances have changed**.
 2. **A quick refresher before we begin** — what dues support.
@@ -351,7 +355,8 @@ Timestamp · Member Number · Member Name · Type · Category · Field · Old Va
 - [ ] Fill in **Forth Degree** dates for Sir Knights (and reconcile anyone with Degree Level "4th" but no date)
 - [ ] Fill in **Rollout Wave** values; set **Open rollout waves through**
 - [ ] Optional: **Financial Secretary email** row; **Circumstance** column
-- [ ] Automatic wizard prompt on sign-in when Wizard Completed is blank or over a year old
+- [x] Automatic wizard prompt on **first** sign-in (Wizard Completed blank) — built
+- [ ] Re-prompt once a year (Wizard Completed over a year old) — not built; the gate would just treat an old date like a blank one
 - [ ] Home-screen icon and one-time "Add to Home Screen" tip for iPhones
 - [ ] Decide on member numbers with a leading zero on the cards (printed cards show none)
 - [ ] **Before the Board pilot:** clean up repository history — fresh repo, steps under *Security notes → Repository history*

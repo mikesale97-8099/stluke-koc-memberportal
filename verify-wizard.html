@@ -160,8 +160,8 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
             <li><a href="home.html" class="navlink preserve-member">Profile</a></li>
             <li><a href="calendar.html" class="navlink preserve-member">Calendar</a></li>
             <li><a href="prayers.html" class="navlink preserve-member">Prayers</a></li>
-            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
             <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">KofC Card</a></li>
             <li class="nav-whydues"><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="#" class="navlink active">Verify Data</a></li>
         </ul>
@@ -178,6 +178,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
         <div class="welcome-icon"><img src="council-logo.png" alt="St. Luke Knights of Columbus, Council 14895" onerror="this.parentElement.style.display='none'"></div>
         <h1>Welcome, <span id="welcomeName"></span></h1>
         <p class="sub">Thank you for your service as a Knight. We're taking a minute to make sure our records are accurate for every member.</p>
+        <p class="sub" id="firstVisitNote" style="margin-top:0.75rem; font-weight:700; display:none;">Since this is your first visit to the new Member Center, let's start by checking your information. It takes about two minutes.</p>
         <p class="sub" style="margin-top:0.75rem; font-size:0.82rem;">Not you? <a href="landing.html" style="color:inherit;">Sign in with your own email</a> before continuing.</p>
         <div class="wizard-actions" style="margin-top:1.75rem;">
             <button class="btn btn-ghost" onclick="openChanged()">My circumstances<br>have changed</button>
@@ -803,7 +804,13 @@ async function reportCircumstance(type, details, fields) {
         fields: fields ? JSON.stringify(fields) : ''
     });
     if (!data || !data.success) throw new Error((data && data.error) || 'Could not send');
+    rememberWizardHandled();
     return data;
+}
+/* Remember on this device that the member has dealt with the wizard, so the Profile doesn't send him straight back
+   (a "moved / step back / something else" report doesn't stamp Wizard Completed on the sheet). */
+function rememberWizardHandled() {
+    try { localStorage.setItem('mcWizardDone_' + String(currentMember.memberNumber).replace(/^0+/, ''), String(Date.now())); } catch (e) {}
 }
 
 async function runSubmit(type, work) {
@@ -954,6 +961,7 @@ async function completeWizard(outcome, notes) {
             outcome: outcome,
             notes: notes || ''
         });
+        rememberWizardHandled();
     } catch (e) {
         console.warn('Wizard completion log failed:', e.message);
     }
@@ -998,6 +1006,8 @@ async function init() {
         window.location.href = 'landing.html';
         return;
     }
+
+    if (new URLSearchParams(window.location.search).get('first') === '1') document.getElementById('firstVisitNote').style.display = 'block';
 
     // Show loading state
     const welcomeSpan = document.getElementById('welcomeName');

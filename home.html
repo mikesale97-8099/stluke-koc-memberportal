@@ -274,8 +274,8 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
             <li><a href="home.html" class="navlink active">Profile</a></li>
             <li><a href="calendar.html" class="navlink preserve-member">Calendar</a></li>
             <li><a href="prayers.html" class="navlink preserve-member">Prayers</a></li>
-            <li><a href="membership-card.html" class="navlink preserve-member">Membership Card</a></li>
             <li><a href="groups.html" class="navlink preserve-member">Groups</a></li>
+            <li><a href="membership-card.html" class="navlink preserve-member">KofC Card</a></li>
             <li class="nav-whydues"><a href="why-dues.html" class="navlink preserve-member">Why Dues?</a></li>
             <li><a href="verify-wizard.html" class="navlink preserve-member">Verify Data</a></li>
         </ul>
@@ -1142,6 +1142,7 @@ async function fetchLiveMember(memberNumber) {
         outstandingDues: cell(row, 'Outstanding Dues'),
         lastYrPaid: lastYrPaid,
         councilStatus: cell(row, 'Council Member Status'),
+        wizardCompleted: idx('Wizard Completed') === -1 ? undefined : cell(row, 'Wizard Completed'),   // undefined = the column isn't there (the gate then does nothing)
     };
 }
 
@@ -1155,6 +1156,30 @@ function showMainContent() {
 function showNotLoggedIn() {
     document.getElementById('mainContent').style.display = 'none';
     document.getElementById('notLoggedIn').style.display = 'block';
+}
+
+/* ---------- First visit starts with the Verify Data wizard ----------
+   A signed-in member whose "Wizard Completed" is blank is sent to the wizard once per visit, before the Profile is shown.
+   It never traps anyone: it only fires on the plain Profile address (not when returning from the wizard or when an
+   administrator is viewing a member), only once per browser visit, and not at all for an administrator with tools on. */
+const WIZARD_GATE_SUPPRESS_DAYS = 7;   // after finishing the wizard or reporting a change on this device, don't ask again for this long
+function startsWithWizard(m) {
+    try {
+        if (isOwnerMode()) return false;                                            // administrator with tools on (so you can test the Profile)
+        if (m.wizardCompleted === undefined) return false;                          // the sheet has no such column: never redirect
+        const sess = Session.read(); if (!sess) return false;
+        const digits = x => String(x == null ? '' : x).replace(/^0+/, '');
+        if (digits(sess.memberNumber) !== digits(m.memberNumber)) return false;     // looking at someone else's profile
+        if (new URLSearchParams(window.location.search).has('member')) return false;   // coming back from the wizard, or an administrator's link
+        if (String(m.wizardCompleted == null ? '' : m.wizardCompleted).trim() !== '') return false;   // already done
+        const status = String(m.councilStatus == null ? '' : m.councilStatus).trim().toLowerCase();
+        if (status && status !== 'active') return false;                            // Move Alert, Withdrawal Pending and the like: leave alone
+        if (sessionStorage.getItem('mcWizardGate')) return false;                   // already offered this visit
+        const handled = +localStorage.getItem('mcWizardDone_' + digits(m.memberNumber)) || 0;
+        if (Date.now() - handled < WIZARD_GATE_SUPPRESS_DAYS * 86400000) return false;
+        sessionStorage.setItem('mcWizardGate', '1');
+        return true;
+    } catch (e) { return false; }
 }
 
 async function tryLiveLogin() {
@@ -1171,6 +1196,7 @@ async function tryLiveLogin() {
     if (note) note.textContent = 'Loading your live record\u2026';
     try {
         const live = await fetchLiveMember(memberNumber);
+        if (live && startsWithWizard(live)) { window.location.replace('verify-wizard.html?first=1'); return; }
         if (live) {
             try { applyMember(live); } catch(applyErr) { console.error('applyMember error:', applyErr); }
             showMainContent();
