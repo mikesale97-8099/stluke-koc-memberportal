@@ -95,7 +95,7 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
     .member-row { grid-template-columns:1fr; gap:0.3rem; }
     .member-row.directory { grid-template-columns:1fr; }
     .member-row.directory .wife::before { content:'Wife: '; font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
-    .member-row.directory .wife.empty { display:none; }
+    .member-row.directory .wife.empty, .member-row.directory .pos.empty { display:none; }
     .member-row.header { display:none; }
     /* line the contact details up under the name, not under the photo */
     .member-row.directory > div:not(:first-child) { padding-left:calc(56px + 0.85rem); }
@@ -291,15 +291,35 @@ async function fetchPositions() {
         .filter(p => p.group && p.position && p.name);
 }
 
+/* Tidying names for the directory. A name typed with its own capitals ("McKay", "O'Brien", "DeLuca") is left exactly as typed.
+   Only names that are ALL CAPITALS or all lower-case are tidied: "MCKAY" -> "McKay", "O'BRIEN" -> "O'Brien", "SMITH-JONES" -> "Smith-Jones".
+   A short all-capital nickname ("DJ", "AJ") is kept when the member chose it (keepShort). */
+function tidyName(s, keepShort) {
+    const t = String(s == null ? '' : s).trim();
+    if (!t) return '';
+    const hasLower = /[a-z]/.test(t), hasUpper = /[A-Z]/.test(t);
+    if (hasLower && hasUpper) return t;
+    if (keepShort && hasUpper && t.replace(/[^A-Za-z]/g, '').length <= 2) return t;
+    return t.toLowerCase()
+        .replace(/(^|[\s'\u2019\-])([a-z])/g, (m, pre, ch) => pre + ch.toUpperCase())
+        .replace(/\bMc([a-z])/g, (m, ch) => 'Mc' + ch.toUpperCase());
+}
+/* The name shown in the directory: the preferred name if there is one ("Bill Berg"), otherwise the first name. */
+function directoryName(first, preferred, last) {
+    const given = tidyName(preferred, true) || tidyName(first);
+    const fam = tidyName(last);
+    if (given && fam && given.toLowerCase().endsWith(' ' + fam.toLowerCase())) return given;   // they already typed the whole name
+    return [given, fam].filter(Boolean).join(' ');
+}
 async function fetchDirectoryMembers() {
     const json = await fetchGvizJson(GVIZ_MEMBERSHIP_URL);
     const cell = gvizCellReader(json);
     return json.table.rows
         .map(row => ({
             memberNumber: String(cell(row, 'Member Number') || '').replace(/^0+/, ''),
-            name: [titleCase(cell(row, 'First Name')), titleCase(cell(row, 'Last Name'))].filter(Boolean).join(' '),
+            name: directoryName(cell(row, 'First Name'), cell(row, 'Preferred Name'), cell(row, 'Last Name')),
+            legalName: [tidyName(cell(row, 'First Name')), tidyName(cell(row, 'Last Name'))].filter(Boolean).join(' '),
             wife: (cell(row, "Wife's Name") || '').toString().trim(),
-            nick: (cell(row, 'Preferred Name') || '').toString().trim(),   // searchable only, not shown
             phone: (cell(row, 'phone') || '').toString().trim(),
             email: (cell(row, 'email') || '').toString().trim(),
             optIn: String(cell(row, 'Directory Opt-In') || '').trim().toLowerCase() === 'yes',
@@ -332,14 +352,14 @@ function renderGroupRows(groupName) {
             const positions = ACTIVE_POSITIONS_BY_MEMBER[m.memberNumber] || [];
             const positionsHtml = positions.length
                 ? positions.map(p => `<span class="position-pill">${p}</span>`).join('')
-                : '<span class="contact-value empty">—</span>';
+                : '';
             const phoneHtml = m.phone ? `<span class="contact-value">${m.phone}</span>` : '<span class="contact-value empty">Not on file</span>';
             const emailHtml = m.email ? `<span class="contact-value">${m.email}</span>` : '<span class="contact-value empty">Not on file</span>';
-            const find = [m.name, m.nick, m.wife, positions.join(' '), m.phone, m.email].join(' ');
+            const find = [m.name, m.legalName, m.wife, positions.join(' '), m.phone, m.email].join(' ');
             return `<div class="member-row directory" data-s="${searchAttr(find)}" data-d="${digitsOf(m.phone)}">
                 <div class="name-cell">${avatarHtml(m.name, m.memberNumber, 56)}<div class="name">${m.name}</div></div>
-                <div class="wife${m.wife ? '' : ' empty'}">${m.wife ? `<span class="contact-value">${m.wife}</span>` : '<span class="contact-value empty">\u2014</span>'}</div>
-                <div>${positionsHtml}</div>
+                <div class="wife${m.wife ? '' : ' empty'}">${m.wife ? `<span class="contact-value">${m.wife}</span>` : ''}</div>
+                <div class="pos${positions.length ? '' : ' empty'}">${positionsHtml}</div>
                 <div>${phoneHtml}</div>
                 <div>${emailHtml}</div>
             </div>`;

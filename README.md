@@ -210,7 +210,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Membership Card ·
 
 - A search box sits above the list and narrows it as the member types (no Search button needed; Enter just closes the phone keyboard). A line under it shows "Showing 4 of 150"; the **×** clears it.
 - It searches the list on screen: **name, wife's name, position, phone and email**. Several words must all match ("tom kow"). Capitals and accents are ignored ("renee" finds Renée). A phone number works with or without spaces, dashes and parentheses.
-- It also matches the member's **Preferred Name** (nickname) — "bob" finds Robert — but the nickname itself isn't shown in the list.
+- **Names in the directory:** a member's **Preferred Name** is shown in place of the first name when one is on file (*Bill Berg*, not *William Berg*), and search finds either the preferred or the legal first name. A preferred name that already includes the last name isn't doubled. **Capitalization:** a name typed with its own capitals (*McKay*, *O'Brien*, *DeLuca*) is shown exactly as typed; only names that are ALL CAPS or all lower-case are tidied (*MCKAY* → *McKay*, *O'BRIEN* → *O'Brien*, *SMITH-JONES* → *Smith-Jones*). Limits: a plain all-caps *DELUCA* becomes *Deluca*, and only the *Mc* prefix is recognized (*MACDONALD* → *Macdonald*) — retype it with its capitals in the sheet and it will be kept. The council-officer lists show names as typed on the Positions tab. Members with no position or no wife simply show nothing for it (no dash); on phones the empty line is dropped, and on computers the columns stay lined up.
 - Switching groups clears the search. Photos loading later don't disturb it.
 - It only shows or hides rows already on the page, so it is instant and makes no extra requests.
 
