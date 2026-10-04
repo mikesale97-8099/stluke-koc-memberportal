@@ -93,13 +93,22 @@ h1 { font-family:'Crimson Pro', serif; font-size:1.9rem; color:var(--primary); f
     .logo-section { padding:0.6rem 1rem; flex:1; min-width:200px; }
     .page { padding:0 1rem; }
     .member-row { grid-template-columns:1fr; gap:0.3rem; }
-    .member-row.directory { grid-template-columns:1fr; }
     .member-row.directory .wife::before { content:'Wife: '; font-family:'Lato',sans-serif; font-size:0.85rem; color:var(--text-medium); }
     .member-row.directory .wife.empty, .member-row.directory .pos.empty { display:none; }
     .member-row.header { display:none; }
-    /* line the contact details up under the name, not under the photo */
-    .member-row.directory > div:not(:first-child) { padding-left:calc(56px + 0.85rem); }
-    .member-row:not(.directory) > div:nth-child(3) { padding-left:calc(48px + 0.85rem); }
+    /* Photo on the left; the name and every detail stacked to its right, so each line sits right under the one above it
+       (no empty space under the name where the photo ends). The photo spans a few rows; rows with nothing in them take no room. */
+    .member-row.directory { grid-template-columns:56px 1fr; column-gap:0.85rem; row-gap:0; align-items:start; }
+    .member-row.directory .name-cell { display:contents; }
+    .member-row.directory .mc-avatar { grid-column:1; grid-row:1 / span 4; }
+    .member-row.directory .name { grid-column:2; grid-row:1; margin-top:2px; }
+    .member-row.directory > div:not(.name-cell) { grid-column:2; margin-top:0.3rem; }
+    .member-row:not(.directory):not(.header) { grid-template-columns:48px 1fr; column-gap:0.85rem; row-gap:0; align-items:start; }
+    .member-row:not(.directory):not(.header) .name-cell { display:contents; }
+    .member-row:not(.directory):not(.header) .mc-avatar { grid-column:1; grid-row:1 / span 3; }
+    .member-row:not(.directory):not(.header) > .position { grid-column:2; grid-row:1; }
+    .member-row:not(.directory):not(.header) .name { grid-column:2; grid-row:2; margin-top:0.15rem; }
+    .member-row:not(.directory):not(.header) > div:last-child { grid-column:2; grid-row:3; margin-top:0.35rem; }
 }
 .site-header { position:sticky; top:0; z-index:1000; }
 
