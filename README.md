@@ -173,6 +173,7 @@ Menu order on every page: **Profile · Calendar · Prayers · Groups · KofC Car
 | Grand Knight email | Withdrawal-request emails |
 | Retention Committee email | Move / step-back / withdrawal / other emails |
 | Data Administrator email | Admin rights; "something else" emails; stands in for the Financial Secretary if that row is missing |
+| Show step back option *(optional)* | Whether the wizard's **"I need to step back for a while"** choice is offered. **No** (also *Off*, *False*, *Hide*) removes it; a missing row, or anything else, keeps it. Takes effect on the next page load. Members who want to step back can still use *Something else* |
 | Help email *(optional)* | Where the Profile page's **Help / Problem / Idea** buttons send email. One address, or several separated by commas. If the row is missing or blank: the first **Data Administrator email**, then council14895@gmail.com |
 | Financial Secretary email *(optional)* | Move-out-of-area emails (address update in Member Management) |
 | Open rollout waves through | A number *N* lets in waves 1..N; **All** (or no row) lets in everyone with an email on file |
@@ -281,7 +282,7 @@ Reached from the wizard's Welcome screen or the link at the bottom of the Profil
 | Choice | Sheet | Emails |
 |---|---|---|
 | **I've moved out of the area** (moves within the area are handled by a Profile address update — the screen offers a button for that) | Saves any new address; **Council Member Status → Move Alert** (only if blank/Active) | Retention Chair + Financial Secretary |
-| **I need to step back for a while** — reasons: Family or work, Health, Dues or cost, Other | Change Log (flags **DUES BARRIER**) | Retention Chair, who calls within a few weeks |
+| **I need to step back for a while** *(can be switched off — Assumptions row **Show step back option** = No)* — reasons: Family or work, Health, Dues or cost, Other | Change Log (flags **DUES BARRIER**) | Retention Chair, who calls within a few weeks |
 | **I want to withdraw from the Knights** — print a signed letter (to the Grand Knight, cc Retention Chair) and/or ask to be contacted | **Council Member Status → Withdrawal Pending**; wizard stamped so he isn't asked to verify again | Grand Knight + Retention Chair |
 | **Something else** — free text | Change Log | Retention Chair + Data Administrator |
 

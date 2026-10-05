@@ -209,7 +209,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
                     <div class="opt-desc">Moving away from St. Luke. (Moved nearby? Just update your address on your Profile.)</div>
                 </div>
             </label>
-            <label class="status-option" onclick="selectCircumstance('stepback', this)">
+            <label class="status-option" id="optStepBack" onclick="selectCircumstance('stepback', this)">
                 <input type="radio" name="circumstance">
                 <div>
                     <div class="opt-title">I need to step back for a while</div>
@@ -777,19 +777,22 @@ function escHtml(s) {
     return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
-// Council mailing address for the withdrawal letter, from the Assumptions tab
+// Settings from the Assumptions tab: the council mailing address for the withdrawal letter, and whether the
+// "I need to step back for a while" choice is offered (row "Show step back option": No / Off / False / Hide turns it off;
+// a missing row or anything else leaves it on).
 let RETURN_ADDRESS = '';
 async function loadReturnAddress() {
     try {
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=753284304`;
         const text = await (await fetch(url)).text();
         const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
-        const row = json.table.rows.find(r => {
-            const c = r.c[0]; const label = c && (c.v || c.f);
-            return label && String(label).trim().toLowerCase().startsWith('dues check mail to');
-        });
-        const cell = row && row.c[1];
-        RETURN_ADDRESS = cell ? String(cell.v != null ? cell.v : (cell.f || '')).trim() : '';
+        const find = test => json.table.rows.find(r => { const c = r.c[0]; const label = c && (c.v || c.f); return label && test(String(label).trim().toLowerCase()); });
+        const val = row => { const cell = row && row.c[1]; return cell ? String(cell.v != null ? cell.v : (cell.f || '')).trim() : ''; };
+        RETURN_ADDRESS = val(find(l => l.startsWith('dues check mail to')));
+        const stepRow = find(l => l.replace(/[^a-z]/g, '').startsWith('showstepback'));
+        if (stepRow && /^(no|n|off|false|hide|hidden|0)$/i.test(val(stepRow))) {
+            const opt = document.getElementById('optStepBack'); if (opt) opt.style.display = 'none';
+        }
     } catch (e) { RETURN_ADDRESS = ''; }
 }
 
@@ -1014,11 +1017,12 @@ async function init() {
     if (welcomeSpan) welcomeSpan.textContent = '\u2026';
 
     try {
-        loadReturnAddress();
+        const settingsReady = loadReturnAddress();
         CURRENT_MEMBER = await fetchLiveMember(MEMBER_NUMBER);
         loadMember(CURRENT_MEMBER);
         const cameFromProfile = new URLSearchParams(window.location.search).get('path') === 'changed';
         if (cameFromProfile && !new URLSearchParams(window.location.search).get('paid')) {
+            await settingsReady;
             enteredFromProfile = true;
             openChanged();
         } else if (consumePayReturn()) {
