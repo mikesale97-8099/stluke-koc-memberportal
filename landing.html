@@ -137,6 +137,7 @@ a { color:inherit; }
 .linkish:disabled { color:var(--text-medium); text-decoration:none; cursor:default; }
 .delivery-note { font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text-medium); line-height:1.5; margin:-0.5rem 0 1.1rem; }
 </style>
+<script src="config.js"></script>
 <script src="session.js"></script>
 </head>
 <body>
@@ -181,7 +182,7 @@ a { color:inherit; }
             </div>
             <div class="status-msg status-notyet" id="msg-notyet">
                 Thanks<span id="notyetName"></span>! We're opening the Member Center in stages so we can make sure everything works well. You'll get an email when it's your turn.
-                <div style="margin-top:0.6rem;">Questions? Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a>.</div>
+                <div style="margin-top:0.6rem;">Questions? Email <a data-koc-email></a>.</div>
             </div>
             <div class="status-msg status-notfound" id="msg-error"></div>
         </div>
@@ -220,7 +221,7 @@ a { color:inherit; }
 
     <div class="fallback">
         <p>Not sure what email the council has for you, or don't have one on file at all?<br>
-        Email <a href="mailto:council14895@gmail.com">council14895@gmail.com</a> and a data administrator will help you get set up.</p>
+        Email <a data-koc-email></a> and a data administrator will help you get set up.</p>
     </div>
 </div>
 <p class="council-footer">St. Luke Knights of Columbus, Council 14895</p>
@@ -445,12 +446,12 @@ async function submitHelpRequest() {
             status.textContent = '';
         } else {
             btn.disabled = false;
-            status.textContent = data.error || 'Could not send \u2014 try again, or email council14895@gmail.com directly.';
+            status.textContent = data.error || 'Could not send \u2014 try again, or email ' + KOC_CONFIG.emails.council + ' directly.';
             status.style.color = 'var(--accent)';
         }
     } catch (e) {
         btn.disabled = false;
-        status.textContent = 'Could not reach the log endpoint \u2014 try again, or email council14895@gmail.com directly.';
+        status.textContent = 'Could not reach the log endpoint \u2014 try again, or email ' + KOC_CONFIG.emails.council + ' directly.';
         status.style.color = 'var(--accent)';
     }
 }

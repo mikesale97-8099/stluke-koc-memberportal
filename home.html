@@ -245,6 +245,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 .ph-vh { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
 .ph-step { display:none; } .ph-step.on { display:block; }
 </style>
+<script src="config.js"></script>
 <script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
@@ -427,7 +428,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </div>
 
 <div class="page-footer">
-    <p>St. Luke Knights of Columbus, Council 14895 · Indianapolis, IN · council14895@gmail.com</p>
+    <p>St. Luke Knights of Columbus, Council 14895 · Indianapolis, IN · <span data-koc-email></span></p>
     <p class="data-refresh" id="dataRefreshLine"></p>
 </div>
 
@@ -682,7 +683,7 @@ async function submitFlag() {
 
 
 function mailtoFallback(action) {
-    if (!CURRENT_MEMBER) return 'mailto:council14895@gmail.com';
+    if (!CURRENT_MEMBER) return 'mailto:' + KOC_CONFIG.emails.council;
     const subject = encodeURIComponent('Portal issue \u2014 ' + fullName(CURRENT_MEMBER) + ' #' + CURRENT_MEMBER.memberNumber);
     const body = encodeURIComponent(
         'Action that failed: ' + action + '\n' +
@@ -690,7 +691,7 @@ function mailtoFallback(action) {
         'Time: ' + new Date().toString() + '\n' +
         'Device: ' + navigator.userAgent
     );
-    return 'mailto:council14895@gmail.com?subject=' + subject + '&body=' + body;
+    return 'mailto:' + KOC_CONFIG.emails.council + '?subject=' + subject + '&body=' + body;
 }
 
 /* ---------- Help / problem / idea email ----------
@@ -699,7 +700,7 @@ function mailtoFallback(action) {
      1. the "Help email" row (one address, or several separated by commas)
      2. otherwise the first address in the "Data Administrator email" row
      3. otherwise the council address that is already in the page footer */
-let FEEDBACK_TO = 'council14895@gmail.com';
+let FEEDBACK_TO = KOC_CONFIG.emails.council;
 const FEEDBACK_KINDS = {
     help: { subject: 'Member Center \u2014 Help request',  intro: 'I need help with:\n\n\n' },
     bug:  { subject: 'Member Center \u2014 Problem report', intro: 'What I was trying to do:\n\n\nWhat happened instead:\n\n\n' },
@@ -745,7 +746,7 @@ window.addEventListener('DOMContentLoaded', loadHelpEmail);
    "Next event" line taken from the Calendar. Anything that can't be read is simply left out. */
 const ANN_MAX_TYPED = 2;              // typed announcements shown at once (keeps the profile card on screen)
 const ANN_NEXT_EVENT_DAYS = 60;       // the automatic Next event line only appears when the event is this close
-const ANN_CALENDAR_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQDS_b-fdZjWOcOZ4OUD7TkNLLaCaXt-AN2cOHyltxZRwOOlcGICvdTd2JXGLpzoAx3fPFKq5SgNjd/pub?gid=2034915391&single=true&output=csv';
+const ANN_CALENDAR_CSV = KOC_CONFIG.calendarCsvUrl;
 const ANN_TYPES = {
     event:  { icon: '\uD83D\uDCC5', label: 'Event' },
     need:   { icon: '\uD83D\uDE4B', label: 'We need you' },
@@ -786,7 +787,7 @@ function annSheetDate(cell) {
 function annToday() { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
 
 async function annFetchTyped() {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=Announcements&tq=` + encodeURIComponent('select *');
+    const url = `https://docs.google.com/spreadsheets/d/${KOC_CONFIG.announcementsSheetId}/gviz/tq?tqx=out:json&headers=1&gid=${KOC_CONFIG.gids.announcements}&tq=` + encodeURIComponent('select *');
     const m = (await (await fetch(url)).text()).match(/setResponse\(([\s\S]*)\);?\s*$/);
     const t = m && JSON.parse(m[1]) && JSON.parse(m[1]).table;
     if (!t || !t.cols || !t.rows) return [];                                   // no Announcements tab yet
@@ -1006,14 +1007,14 @@ async function browseAs(num) {
 }
 
 /* ---- Live wiring: real sheet fetch, classification, login handoff, verified write-back ---- */
-const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
-const SHEET_GID = '1292747386'; // St Luke KOC Membership DB tab
-const ASSUMPTIONS_GID = '753284304'; // Assumptions tab
-const TIER_MESSAGES_GID = '1560227874'; // Tier Messages tab
+const SHEET_ID = KOC_CONFIG.sheetId;
+const SHEET_GID = KOC_CONFIG.gids.membership; // St Luke KOC Membership DB tab
+const ASSUMPTIONS_GID = KOC_CONFIG.gids.assumptions; // Assumptions tab
+const TIER_MESSAGES_GID = KOC_CONFIG.gids.tierMessages; // Tier Messages tab
 const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-const GVIZ_ASSUMPTIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${ASSUMPTIONS_GID}`;
+const GVIZ_ASSUMPTIONS_URL = `https://docs.google.com/spreadsheets/d/${KOC_CONFIG.assumptionsSheetId}/gviz/tq?tqx=out:json&gid=${ASSUMPTIONS_GID}`;
 const GVIZ_TIER_MESSAGES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${TIER_MESSAGES_GID}`;
-const VERIFY_ENDPOINT_URL = 'https://stluke-koc14895-relay.mike-sale97.workers.dev';
+const VERIFY_ENDPOINT_URL = KOC_CONFIG.endpoint;
 const DEGREE_MAP = {'1st':'First Degree','2nd':'Second Degree','3rd':'Third Degree'};
 
 async function fetchAssumptionsRow(labelPrefix) {
@@ -1481,7 +1482,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ---- Positions (Groups feature): active positions shown on the rolodex ---- */
-const POSITIONS_GID = '620591520'; // Positions tab
+const POSITIONS_GID = KOC_CONFIG.gids.positions; // Positions tab
 const GVIZ_POSITIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${POSITIONS_GID}`;
 let POSITIONS_CACHE = null;
 

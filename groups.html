@@ -125,6 +125,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 .not-logged-in h1 { font-family:'Crimson Pro', serif; font-size:1.8rem; color:var(--primary); font-weight:700; }
 .not-logged-in p { font-family:'Lato',sans-serif; font-size:0.95rem; color:var(--text-medium); margin:0.75rem 0 1.5rem; }
 </style>
+<script src="config.js"></script>
 <script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
@@ -203,9 +204,9 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </div>
 
 <script>
-const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
-const POSITIONS_GID = '620591520'; // Positions tab
-const MEMBERSHIP_GID = '1292747386'; // St Luke KOC Membership DB tab
+const SHEET_ID = KOC_CONFIG.sheetId;
+const POSITIONS_GID = KOC_CONFIG.gids.positions; // Positions tab
+const MEMBERSHIP_GID = KOC_CONFIG.gids.membership; // St Luke KOC Membership DB tab
 const GVIZ_POSITIONS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${POSITIONS_GID}`;
 const GVIZ_MEMBERSHIP_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${MEMBERSHIP_GID}`;
 const DIRECTORY_GROUP_NAME = 'Member Directory';

@@ -6,7 +6,7 @@
  *   every change is checked by the Apps Script, which only trusts its own signature.
  * - Remembered passes are renewed at most once a day, which restarts the 90 days.
  */
-const MC_ENDPOINT = 'https://stluke-koc14895-relay.mike-sale97.workers.dev';
+const MC_ENDPOINT = KOC_CONFIG.endpoint;   // set in config.js
 const MC_KEY = 'mcSession';
 const MC_TOOLS_KEY = 'mcAdminTools';
 

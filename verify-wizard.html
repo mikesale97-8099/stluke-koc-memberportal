@@ -142,6 +142,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 }
 .dispute-link:hover { color:var(--primary); }
 </style>
+<script src="config.js"></script>
 <script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
@@ -400,9 +401,9 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </div>
 
 <script>
-const VERIFY_ENDPOINT_URL = 'https://stluke-koc14895-relay.mike-sale97.workers.dev';
-const SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
-const DB_GID = '1292747386';
+const VERIFY_ENDPOINT_URL = KOC_CONFIG.endpoint;
+const SHEET_ID = KOC_CONFIG.sheetId;
+const DB_GID = KOC_CONFIG.gids.membership;
 
 /* ── Live data fetch ── */
 async function fetchLiveMember(memberNumber) {
@@ -783,7 +784,7 @@ function escHtml(s) {
 let RETURN_ADDRESS = '';
 async function loadReturnAddress() {
     try {
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=753284304`;
+        const url = `https://docs.google.com/spreadsheets/d/${KOC_CONFIG.assumptionsSheetId}/gviz/tq?tqx=out:json&gid=${KOC_CONFIG.gids.assumptions}`;
         const text = await (await fetch(url)).text();
         const json = JSON.parse(text.match(/setResponse\(([\s\S]*)\);?\s*$/)[1]);
         const find = test => json.table.rows.find(r => { const c = r.c[0]; const label = c && (c.v || c.f); return label && test(String(label).trim().toLowerCase()); });
@@ -829,7 +830,7 @@ async function runSubmit(type, work) {
         console.warn('Circumstance report failed:', e.message);
         btn.disabled = false;
         btn.textContent = label;
-        err.innerHTML = 'That didn\u2019t go through. Please try again, or email <a href="mailto:council14895@gmail.com" style="color:inherit;">council14895@gmail.com</a>.';
+        err.innerHTML = 'That didn\u2019t go through. Please try again, or email <a href="mailto:' + KOC_CONFIG.emails.council + '" style="color:inherit;">' + KOC_CONFIG.emails.council + '</a>.';
     }
 }
 

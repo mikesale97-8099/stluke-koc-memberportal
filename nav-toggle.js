@@ -14,8 +14,8 @@
         'html.show-whydues .nav-whydues { display:flex !important; }';
     document.head.appendChild(style);
 
-    var SHEET_ID = '1BXIzmI531yWJA7BYkATFrqED4nxict_pkScKadFNdUI';
-    var ASSUMPTIONS_GID = '753284304';
+    var SHEET_ID = KOC_CONFIG.assumptionsSheetId;
+    var ASSUMPTIONS_GID = KOC_CONFIG.gids.assumptions;
     var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
               '/gviz/tq?tqx=out:json&gid=' + ASSUMPTIONS_GID;
 

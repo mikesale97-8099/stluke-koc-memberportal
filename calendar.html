@@ -158,6 +158,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
     nav ul li { flex-shrink:0; }
 }
 </style>
+<script src="config.js"></script>
 <script src="session.js"></script>
 <script src="nav-toggle.js"></script>
 </head>
@@ -244,7 +245,7 @@ nav a.navlink, nav a.signout { white-space:nowrap; }
 </div>
 
 <script>
-const ACTIVITY_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRQDS_b-fdZjWOcOZ4OUD7TkNLLaCaXt-AN2cOHyltxZRwOOlcGICvdTd2JXGLpzoAx3fPFKq5SgNjd/pub?gid=2034915391&single=true&output=csv';
+const ACTIVITY_SHEET_URL = KOC_CONFIG.calendarCsvUrl;
 
 let EVENTS = [];
 let MONTH_ORDER = [];
